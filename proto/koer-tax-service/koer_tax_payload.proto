@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+
+package koer_tax.service.v3;
+option go_package = "./pb";
+
+message GeneralBodyResponse {
+  bool error = 2;
+  uint32 code = 3;
+  string message = 4;
+};
+
+message GeneralBodyRequest {
+  string process_id = 1;
+  string token = 2;
+};
+
+message V3SaveTaxNumberRequest {
+  string tax_id_number = 1 [(validate.rules).string = {min_len: 1}];
+  string tax_owner_name = 2 [(validate.rules).string = {min_len: 1}];
+}

@@ -1,0 +1,638 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/httpbody.proto";
+
+import "company-service/company_payload.proto";
+
+package company.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+            key: "bearer"
+            value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+
+    rpc DownloadListCompanyTasks(FileListCompanyTaskRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/company/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list companies task"
+            description: "This API for download list companies task"
+        };
+    };
+
+    rpc CreateCompanyTask(CreateCompanyTaskReq) returns (CreateCompanyTaskRes){
+        option (google.api.http) = {
+            post: "/api/company/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    post: "/api/company/task/edit/{taskID}"
+                    body: "*"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Create company task"
+            description: "This API for create role task"
+        };
+    }
+
+    rpc GetCompanyTaskByHolding(GetCompanyTaskByHoldingIDReq) returns (GetCompanyTaskByIDRes){
+        option (google.api.http) = {
+            get: "/api/company/task/holding/{holdingID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get company task by holding id"
+            description: "Get company task by holding id"
+        };
+    }
+
+    rpc GetCompanyTaskByHoldingGroupLimitOnly(GetCompanyTaskByHoldingIDCompanyIDReq) returns (ListGroupLimitRes){
+        option (google.api.http) = {
+            get: "/api/company/task/holding/{holdingID}/group-limit"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get company task by holding id"
+            description: "Get company task by holding id"
+        };
+    }
+
+    rpc DeleteCompany(CreateCompanyTaskReq) returns (DeleteCompanyRes) ;
+
+    rpc DeleteCompanyTask(GetCompanyTaskByIDReq) returns (GetCompanyTaskByIDRes){
+        option (google.api.http) = {
+            post: "/api/company/task/delete/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Create company task"
+            description: "This API for create role task"
+        };
+    }
+
+    rpc DeleteCompanyTaskV2(DeleteCompanyTaskReq) returns (GeneralResponse){
+        option (google.api.http) = {
+            post: "/api/company/v2/task/delete/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete Company Task"
+            description: "This API for Delete Company Task"
+        };
+    }
+
+    rpc CreateCompany(CreateCompanyReq) returns (CreateCompanyRes){
+        // option (google.api.http) = {
+        //     post: "/api/company"
+        //     body: "*"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     security: { } // Disable security key
+        //     summary: "Create company"
+        //     description: "This API for create role"
+        // };
+    }
+
+    rpc ListCompanyTask(ListCompanyTaskReq) returns (ListCompanyTaskRes) {
+        // option (google.api.http) = {
+        //     get: "/api/company/task"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     security: { } // Disable security key
+        //     summary: "Get list role task"
+        //     description: "This API for get list role task"
+        // };
+    };
+
+    rpc GetCompanyTaskByID(GetCompanyTaskByIDReq) returns (GetCompanyTaskByIDRes) {
+        option (google.api.http) = {
+            get: "/api/company/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get list role task"
+            description: "This API for get list role task"
+        };
+    };
+
+    rpc ListCompanyDataV2(ListCompanyDataReq) returns (ListCompanyDataRes);
+
+    rpc ListCompanyData(ListCompanyDataReq) returns (ListCompanyDataRes){
+        option (google.api.http) = {
+            get: "/api/company/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: ""
+            description: ""
+        };
+    }
+
+    rpc ListGroupLimitGRPC(ListGroupLimitReq) returns (ListGroupLimitRes);
+    rpc ListGroupLimit(ListGroupLimitReq) returns (ListGroupLimitRes){
+        option (google.api.http) = {
+            get: "/api/company/group-limit"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: ""
+            description: ""
+        };
+    }
+
+    rpc ListLimitGRPC(ListLimitReq) returns (ListLimitRes);
+    rpc ListLimit(ListLimitReq) returns (ListLimitRes){
+        option (google.api.http) = {
+            get: "/api/company/limit"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: ""
+            description: ""
+        };
+    }
+
+    rpc ListCurrencyGRPC(ListCurrencyReq) returns (ListCurrencyRes);
+
+    rpc ListCurrency(ListCurrencyReq) returns (ListCurrencyRes){
+        option (google.api.http) = {
+            get: "/api/company/currency"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: ""
+            description: ""
+        };
+    }
+
+    //    rpc ValidateCompanyByCIF(ValidateCompanyByCIFRequest) returns (ValidateCompanyByCIFResponse) {}
+
+    rpc ValidateCompanyByCIFHttp(ValidateCompanyByCIFRequest) returns (ValidateCompanyByCIFResponse) {
+        option (google.api.http) = {
+            post: "/api/company/validate-cif"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Validate company by CIF"
+            description: "This API for Validate company by CIF"
+        };
+    }
+
+    rpc ValidateCompanyByAccountNumber(ValidateCompanyByAccountNumberRequest) returns (ValidateCompanyByAccountNumberResponse) {
+        option (google.api.http) = {
+            post: "/api/company/validate-account-number"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Validate company by account number"
+            description: "This API for Validate company by account number"
+        };
+    }
+
+    rpc BRICaMSgetCustomer(BricamsGetCustomerReq) returns (BricamsResponseDatas) {
+        option (google.api.http) = {
+            get: "/api/company/bricams/customer"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get List Customer(company) from BRICaMS API"
+            description: "This API for get list Customer(Company) from BRICaMS API"
+        };
+    }
+
+    rpc BRICaMSgetCustomerByID(BricamsGetCustomerByIdReq) returns (BricamsResponseData) {
+        option (google.api.http) = {
+            get: "/api/company/bricams/customer/detail/{id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get data Customer(company) from BRICaMS API By ID"
+            description: "This API for get data Customer(Company) from BRICaMS API By ID"
+        };
+    }
+
+    rpc BRICaMSgetCustomerByUser(BricamsGetCustomerByUserReq) returns (BricamsResponseData) {
+        option (google.api.http) = {
+            get: "/api/company/bricams/customer/user/{username}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get data Customer(company) from BRICaMS API By Usename owned by user"
+            description: "This API for get data Customer(Company) from BRICaMS API Usename owned by user"
+        };
+    }
+
+    rpc BRICaMSgetCustomerV2Http(BricamsGetCustomerReq) returns (BRICaMSSvcMultipleResV2) {
+        option (google.api.http) = {
+            get: "/api/company/bricams-svc/customer"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get List Customer(company) from BRICaMS API"
+            description: "This API for get list Customer(Company) from BRICaMS API"
+        };
+    }
+
+    rpc BRICaMSgetCustomerV2(BricamsGetCustomerReq) returns (BRICaMSSvcMultipleResV2);
+
+
+    rpc BRICaMSgetCustomerByIDV2Http(BricamsGetCustomerByIdReq) returns (BRICaMSSvcSingleResV2) {
+        option (google.api.http) = {
+            post: "/api/company/bricams-svc/customer/detail"
+            body: "*"
+            additional_bindings: [
+                {
+                    get: "/api/company/bricams-svc/customer/detail/{id}"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Get data Customer(company) from BRICaMS API By ID"
+            description: "This API for get data Customer(Company) from BRICaMS API By ID"
+        };
+    }
+
+    rpc BRICaMSgetCustomerByIDV2(BricamsGetCustomerByIdReq) returns (BRICaMSSvcSingleResV2) {
+    }
+
+
+    rpc BRICaMSgetCustomerByUserV2(BricamsGetCustomerByUserReq) returns (BRICaMSSvcSingleResV2) {
+        option (google.api.http) = {
+            get: "/api/company/bricams-svc/customer/user/{username}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get data Customer(company) from BRICaMS API By Usename owned by user"
+            description: "This API for get data Customer(Company) from BRICaMS API Usename owned by user"
+        };
+    }
+
+    rpc CekCompanyIDAvaibility(CekCompanyIDAvaibilityReq) returns (CekCompanyIDAvaibilityRes) {
+        option (google.api.http) = {
+            get: "/api/company/task/avaibility/{companyID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Check Username avaibility"
+            description: "Check if username avaibel to create/update task"
+        };
+    }
+
+    rpc BRICaMSCustomerMapping(BricamsGetCustomerGroupReq) returns (BRICaMSSvcMultipleResV2CG) {
+        option (google.api.http) = {
+            get: "/api/company/data-bricams"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get List Customer(company) from BRICaMS API with Company Group"
+            description: "This API for get list Customer(Company) from BRICaMS API with Company Group"
+        };
+    }
+
+    rpc CompanySubsidiaryValidation(CompanySubsidiaryValidationReq) returns (CompanySubsidiaryValidationRes) {
+        option (google.api.http) = {
+            get: "/api/company/subsidiary-validation"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Check Company ID Task and Data"
+            description: "Check Company ID Task and Data"
+        };
+    }
+
+    rpc GetMyTasks(ListCompanyTaskReq) returns (ListCompanyTaskRes) {
+        option (google.api.http) = {
+            get: "/api/company/task/me"
+            additional_bindings: [
+                {
+                    get: "/api/company/task"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my company tasks"
+            description: "This API for get list companys task"
+        };
+    };
+
+    rpc GetGroupIDStore(GetGroupIDStoreReq) returns (GetGroupIDStoreRes){
+        // option (google.api.http) = {
+        //     get: "/api/testget"
+        // };
+    }
+
+    rpc DetailCompany(CompanyParams) returns (DetailCompanyRes);
+
+    //API company V2
+    //
+    //
+    //
+
+    rpc CreateCompanyV2(CreateCompanyV2Request) returns (CreateCompanyV2Response);
+
+    rpc DeleteCompanyV2(CreateCompanyTaskReqV2) returns (DeleteCompanyV2Response);
+
+    rpc GetMyTasksV2(ListCompanyTaskV2Request) returns (ListCompanyTaskV2Response) {
+        option (google.api.http) = {
+            get: "/api/company/v2/task"
+
+            // get: "/api/company/v2/task/me"
+            // additional_bindings: [
+            //     {
+            //         get: "/api/company/v2/task"
+            //     }
+            // ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my company tasks V2"
+            description: "This API for get list companys task V2",
+        };
+    };
+    rpc GetCreatedUpdatedByTaskV2(Empty) returns (AdminsCompanyV2Res) {
+        option (google.api.http) = {
+            get: "/api/company/v2/admins/task"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list company task created and apporved by V2"
+            description: "This API for get list company admins task V2",
+        };
+    };
+    rpc GetCompanyDataV2(ListCompanyDataV2Request) returns (ListCompanyTaskV2Response) {
+        option (google.api.http) = {
+            get: "/api/company/v2/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list company data V2"
+            description: "This API for get list companys data V2",
+        };
+    };
+    rpc GetCreatedUpdatedByDataV2(Empty) returns (AdminsCompanyV2Res) {
+        option (google.api.http) = {
+            get: "/api/company/v2/admins/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list company data created and apporved by V2"
+            description: "This API for get list company admins data V2",
+        };
+    };
+
+    rpc CreateCompanyTaskV2(CreateCompanyTaskReqV2) returns (CreateCompanyTaskResV2){
+        option (google.api.http) = {
+            post: "/api/company/v2/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    post: "/api/company/v2/task/edit/{taskID}"
+                    body: "*"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Create company task"
+            description: "This API for create role task"
+        };
+    }
+
+    rpc GetCompanyTaskByIDV2(GetCompanyTaskByIDV2Request) returns (GetCompanyTaskByIDV2Response) {
+        option (google.api.http) = {
+            get: "/api/company/v2/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get company task by ID v2"
+            description: "This API for get company task by ID v2"
+        };
+    };
+
+    rpc GetCompanyDataByIDV2HTTP(GetCompanyDataByIDV2Request) returns (GetCompanyTaskByIDV2Response) {
+        option (google.api.http) = {
+            get: "/api/company/v2/data/{companyID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get company task by ID v2"
+            description: "This API for get company data by ID v2"
+        };
+    };
+    rpc GetCompanyDataByIDV2(GetCompanyDataByIDV2Request) returns (GetCompanyTaskByIDV2Response);
+
+    rpc TaskActionV2(TaskActionV2Request) returns (TaskActionV2Response) {
+        option (google.api.http) = {
+            post: "/api/company/v2/task/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject \n - delete \n - cancel"
+        };
+    };
+
+
+    rpc GetField(Empty) returns (CreateCompanyFieldResV2) {
+        option (google.api.http) = {
+            get: "/api/company/v2/get-field"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Health Check"
+            description: "This API for check health server"
+        };
+    };
+
+    rpc CekCompanyStatus(CekCompanyIDAvaibilityReq) returns (CekCompanyStatusRes) {
+        option (google.api.http) = {
+            get: "/api/company/status/{companyID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Check Username avaibility"
+            description: "Check if username avaibel to create/update task"
+        };
+    }
+
+    rpc CreateCompanyTrbV2(CreateCompanyTrbV2Req) returns (CreateCompanyTrbResV2){
+        option (google.api.http) = {
+            post: "/api/company/v2/create"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Create company task"
+            description: "This API for create role task"
+        };
+    }
+
+    rpc CekCompanyTRBAvaibility(CekCompanyTrbAvaibilityReq) returns (CreateCompanyTrbResV2) {
+        option (google.api.http) = {
+            get: "/api/company/v2/avaibility/{companyLoginCode}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Check Username avaibility"
+            description: "Check if username avaibel to create/update task"
+        };
+    }
+
+    rpc CekCompanyStatusV2(CekCompanyTrbAvaibilityReq) returns (CekCompanyStatusV2Res);
+
+
+    rpc DownloadListCompanyTasksV2(FileListCompanyTaskRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/company/v2/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list companies task"
+            description: "This API for download list companies task"
+        };
+    };
+
+    rpc DownloadListCompanyV2(FileListCompany) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/company/v2/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list companies tab approved and inactive"
+            description: "This API for download list companies tab approve and inactive"
+        };
+    };
+
+    rpc SetStatusCompany(SetStatusCompanyReq) returns (SetStatusCompanyRes) {
+        option (google.api.http) = {
+            post: "/api/company/v2/status/{companyID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "set status company"
+            description: "This API for change company status"
+        };
+    };
+
+    rpc CheckCompanyLoginCodeAvailabilityV2(CheckCompanyLoginCodeAvaibilityReqV2) returns (ErrorBodyResponse) {
+        option (google.api.http) = {
+            get: "/api/company/v2/availability/{companyLoginCode}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "check company login code availability"
+            description: "This API for check company login code availability"
+        };
+    };
+    rpc QlolaGetListCompany(QlolaGetListCompanyRequest) returns (QlolaGetListCompanyBrigateResponse) {
+        option (google.api.http) = {
+            post: "/api/company/qlola/company-list"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get List of Companies",
+              tags: ["QLOLA"]
+            description: "This API retrieves a list of companies based on specified criteria."
+        };
+    }
+
+    rpc QlolaGetDetailCompany(QlolaGetDetailCompanyRequest) returns (QlolaGetDetailCompanyBrigateResponse) {
+        option (google.api.http) = {
+            post: "/api/company/qlola/company-detail"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Detail of Company",
+            tags: ["QLOLA"]
+            description: "This API retrieves a detail of company based on specified criteria."
+        };
+    }
+
+    rpc QlolaCheckStatusCompanyByID(QlolaCheckStatusCompanyByIdRequest) returns (QlolaCheckStatusCompanyByIdResponse){
+        //    option (google.api.http) = {
+        //        get: "/api/role/product/company/check-status/{company_id}"
+        //     };
+        //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //          security: { } // Disable security key
+        //      };
+    };
+
+    rpc ValidateAccountAtCompanyByCIFHttp(ValidateAccountByCIFRequest) returns (ValidateAccountByCIFResponse) {
+        option (google.api.http) = {
+            post: "/api/company/account/validate-cif"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Validate account by CIF"
+            description: "This API for Validate account by CIF"
+        };
+    }
+
+    rpc ValidateAccountDataAtCompanyHttp(ValidateAccountRequest) returns (ValidateAccountDataResponse) {
+        option (google.api.http) = {
+            post: "/api/company/account/validate/data"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Validate account"
+            description: "This API for Validate account"
+        };
+    }
+
+    rpc GetCompanyDataByCompanyIDs(GetCompanyDataByCompanyIDsRequest) returns (GetCompanyDataByCompanyIDsResponse) {
+        option (google.api.http) = {
+            get: "/api/role/v2/company-ids"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get company data by company IDs"
+            description: "This API for get company data by company IDs"
+        };
+    }
+
+    rpc CekCompanyTRBAvaibilityV3(CekCompanyTrbAvaibilityReq) returns (CreateCompanyTrbResV2);
+
+    rpc V3GetCompanyDataWithoutLimit(GetCompanyDataNativeByIDReq) returns (GetCompanyDataNativeByIDRes); 
+
+    rpc V3GetListLimit(ListLimitReq) returns (ListLimitRes) {
+        option (google.api.http) = {
+            post: "/api/company/v3/list-limits"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get company limit with query db native"
+            description: "This API for get company limit with query db native"
+        };
+    }
+
+    rpc GetCompanyWithIntervalChangePassword(Empty) returns (GetCompanyWithIntervalChangePasswordResponse); 
+    
+    rpc FindCompanyDataByCompanyIDs(GetCompanyDataByCompanyIDsRequest) returns (GetCompanyDataByCompanyIDsResponse) {}
+    
+}

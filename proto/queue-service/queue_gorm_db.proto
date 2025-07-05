@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+// import "protoc-gen-openapiv2/options/annotations.proto";
+// import "mwitkow/go-proto-validators/validator.proto";
+
+package queue.service.v1;
+option go_package = "./pb";
+
+message QueueJob {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "jobs",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string queue = 2;
+    string payload = 3 [(gorm.field).tag = { type: "jsonb" }];
+    string metadata = 4 [(gorm.field).tag = { type: "jsonb" }];
+    int64 attempts = 5;
+    google.protobuf.Timestamp createdAt = 51 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true}
+    ];
+    google.protobuf.Timestamp updatedAt = 52 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {not_null: true}
+    ];
+}

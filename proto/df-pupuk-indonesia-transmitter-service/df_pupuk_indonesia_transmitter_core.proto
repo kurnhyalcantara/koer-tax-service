@@ -1,0 +1,37 @@
+syntax = "proto3";;
+
+package df_pupuk_indonesia_transmitter.service.v1;
+option go_package = "./pb";
+
+enum Status{
+    UNKNOWN_STATUS = 0;
+    DRAFT = 1;
+    ON_CHECKER = 2;
+    ON_SIGNER = 3;
+    ON_RELEASER = 4;
+    RETURNED = 5;
+    REJECTED = 6;
+    DELETED = 7;
+    SUSPEND = 8;
+    PROCESS = 9;
+    SUCCESS = 10;
+    FAILED = 11;
+    WAITING = 12;
+};
+
+enum RequestType {
+    UNKNOWN_REQUEST_TYPE = 0;
+    MAPPING_ACCOUNT = 1;
+    PAYMENT = 2;
+}
+
+enum StatusMappingAccount {
+    UNKNOWN_STATUS_MAPPING_ACCOUNT = 0;
+    DRAFT_REQUEST_MAPPING_ACCOUNT = 1;
+    APPROVAL_REQUEST_MAPPING_ACCOUNT = 2;
+    APPROVED_MAPPING_ACCOUNT = 3;
+    REJECTED_MAPPING_ACCOUNT = 4;
+    DELETE_REQUEST_MAPPING_ACCOUNT = 5;
+    DELETED_MAPPING_ACCOUNT = 6;
+    PROCESS_MAPPING_ACCOUNT = 7;
+}

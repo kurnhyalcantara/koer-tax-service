@@ -1,0 +1,1041 @@
+syntax = "proto3";
+
+package do_pertamina.service.v1;
+
+import "google/protobuf/timestamp.proto";
+
+import "do-pertamina-service/do_pertamina_core.proto";
+import "do-pertamina-service/do_pertamina_db.proto";
+import "do-pertamina-service/do_pertamina_task_payload.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "./pb";
+
+message ErrorBodyResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message HealthCheckResponse{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message GroupProduct {
+  string id_group_product = 1 [json_name = "idGroupProduct"];
+  string description = 2 [json_name = "description"];
+}
+
+message SalesOrg {
+  string id_sales_org = 1 [json_name = "idSalesOrg"];
+  string description = 2 [json_name = "description"];
+}
+
+message GetOrderDetailRequest {
+  bool scheduling_agreement = 1;
+  bool generate_application_id = 2;
+}
+
+message GetOrderDetailResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  GetOrderDetailResponseData data = 4;
+}
+
+message GetOrderDetailResponseData {
+  repeated GroupProduct group_products = 1;
+  repeated SalesOrg sales_orgs = 2;
+  repeated DistributionChannel distribution_channels = 3;
+  string application_id = 4;
+}
+
+message EsbGetDistributionChannelRequest {
+  EsbGetDistributionChannelRequestData request = 1;
+}
+
+message EsbGetDistributionChannelRequestData {
+  string external_id = 1 [json_name = "externalId"];
+}
+
+message GetMaterialInfoRequest {
+  string id_group_product = 1 [json_name = "idGroupProduct"];
+}
+
+message GetMaterialInfoResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated EsbMaterial data = 4;
+}
+
+message SimulateCashCarryRequest {
+  string application_id = 1;
+  string sales_organization_id = 2;
+  string sales_organization_name = 3;
+  string product_group_id = 4;
+  string sold_to = 5;
+  string ship_to = 6;
+  string distribution_channel = 7;
+  string debit_credit_note = 8;
+  string debit_account_number = 9;
+  string debit_account_name = 10;
+  repeated DeliveryDetailRequest delivery_detail = 11;
+}
+
+message SimulateCashCarryResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  SimulateCashCarryResponseData data = 4;
+}
+
+message SimulateCashCarryResponseData {
+  string application_id = 1;
+  string debit_account_number = 2;
+  string debit_account_name = 3;
+  google.protobuf.Timestamp transaction_date = 4;
+  string ship_to = 5;
+  string product_group_id = 6;
+  string product_group_name = 7;
+  uint32 total_quantity = 8;
+
+  double net_value = 9;
+  double ppn_tax = 10;
+  double pbbkb_tax = 11;
+  double pph_tax = 12;
+  double gross_value = 13;
+  double fee = 14;
+  double debit_credit_value = 15;
+  double total_amount = 16;
+  double total_payment = 17;
+
+  string depot = 18;
+  string depot_desc = 19;
+
+  repeated EsbSimulateCashCarryResponseDataProductDetail product_detail = 20;
+}
+
+message SimulateProductAllocationRequest {
+  string application_id = 1;
+  string sales_organization_id = 2;
+  string sales_organization_name = 3;
+  string product_group_id = 4;
+  string sold_to = 5;
+  string ship_to = 6;
+  string distribution_channel = 7;
+  string debit_credit_note = 8;
+  string debit_account_number = 9;
+  string debit_account_name = 10;
+  string scheduling_agreement_number = 11;
+  repeated DeliveryDetailRequest delivery_detail = 12;
+}
+
+message SimulateProductAllocationResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  SimulateProductAllocationResponseData data = 4;
+}
+
+message SimulateProductAllocationResponseData {
+  string application_id = 1;
+  string debit_account_number = 2;
+  string debit_account_name = 3;
+  google.protobuf.Timestamp transaction_date = 4;
+  string ship_to = 5;
+  string product_group_id = 6;
+  string product_group_name = 7;
+  uint32 total_quantity = 8;
+
+  double net_value = 9;
+  double ppn_tax = 10;
+  double pbbkb_tax = 12;
+  double pph_tax = 13;
+  double gross_value = 14;
+  double fee = 15;
+  double debit_credit_value = 16;
+  double total_amount = 17;
+  string scheduling_agreement_number = 18;
+  double total_payment = 19;
+
+  string depot = 20;
+  string depot_desc = 21;
+  
+  repeated EsbSimulateProductAllocationResponseDataProductDetail product_detail = 22;
+}
+
+message SimulateQuotationRequest {
+  string application_id = 1;
+  string sales_organization_id = 2;
+  string sales_organization_name = 3;
+  string product_group_id = 4;
+  string sold_to = 5;
+  string ship_to = 6;
+  string distribution_channel = 7;
+  string debit_credit_note = 8;
+  string debit_account_number = 9;
+  string debit_account_name = 10;
+  string quotation_number = 11;
+}
+
+message SimulateQuotationResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  SimulateQuotationResponseData data = 4;
+}
+
+message SimulateQuotationResponseData {
+  string application_id = 1;
+  string debit_account_number = 2;
+  string debit_account_name = 3;
+  google.protobuf.Timestamp transaction_date = 4;
+  string ship_to = 5;
+  string product_group_id = 6;
+  string product_group_name = 7;
+  uint32 total_quantity = 8;
+
+  double net_value = 9;
+  double ppn_tax = 10;
+  double pbbkb_tax = 11;
+  double pph_tax = 12;
+  double gross_value = 13;
+  double fee = 14;
+  double debit_credit_value = 15;
+  double total_amount = 16;
+  string quotation_number = 17;
+  double total_payment = 18;
+
+  string depot = 19;
+  string depot_desc = 20;
+
+  repeated EsbSimulateQuotationResponseDataProductDetail product_detail = 21;
+}
+
+message EsbGetOrderDetailRequest {
+  EsbGetOrderDetailRequestData request = 1;
+}
+
+message EsbGetOrderDetailRequestData {
+  string external_id = 1 [json_name = "externalId"];
+  string channel_id = 2 [json_name = "channelId"];
+  string teller_id = 3 [json_name = "tellerId"];
+}
+
+message EsbGetApplicationIdResponse {
+  EsbGetApplicationIdResponseData response = 1;
+}
+
+message EsbGetApplicationIdResponseData {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  string application_number = 3 [json_name = "applicationNumber"];
+}
+
+message EsbGetGroupProductResponse {
+  EsbGetGroupProductResponseData response = 1;
+}
+
+message EsbGetGroupProductResponseData {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  repeated GroupProduct group_product = 3 [json_name = "groupProduct"];
+}
+
+message EsbGetSalesOrgResponse {
+  EsbGetSalesOrgResponseData response = 1;
+}
+
+message EsbGetSalesOrgResponseData {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  repeated SalesOrg sales_org = 3 [json_name = "salesOrg"];
+}
+
+message EsbGetDistributionChannelResponse {
+  EsbGetDistributionChannelResponseData response = 1;
+}
+
+message EsbGetDistributionChannelResponseData {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  repeated DistributionChannel distribution_channel = 3 [json_name = "distributionChannel"];
+}
+
+message DistributionChannel {
+  string id_distribution_channel = 1 [json_name = "idDistributionChannel"];
+  string description = 2 [json_name = "description"];
+}
+
+message EsbGetMaterialInfoRequest {
+  EsbGetMaterialInfoRequestData request = 1;
+}
+
+message EsbGetMaterialInfoRequestData {
+  string id_group_product = 1 [json_name = "idGroupProduct"];
+  string id_material = 2 [json_name = "idMaterial"];
+  string description = 3 [json_name = "description"];
+  string external_id = 4 [json_name = "externalId"];
+  string channel_id = 5 [json_name = "channelId"];
+  string service_id = 6 [json_name = "serviceId"];
+  string teller_id = 7 [json_name = "tellerId"];
+}
+
+message EsbGetMaterialInfoResponse {
+  EsbGetMaterialInfoResponseData response = 1;
+}
+
+message EsbGetMaterialInfoResponseData {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  repeated EsbMaterial material = 3 [json_name = "material"];
+}
+
+message EsbMaterial {
+  string id_material = 1 [json_name = "idMaterial"];
+  string description = 2 [json_name = "description"];
+}
+
+message EsbSimulateQuotationRequest {
+  EsbSimulateQuotationRequestData request = 1 [json_name = "request"];
+}
+
+message EsbSimulateQuotationRequestData {
+  string external_id = 1 [json_name = "externalId"];
+  string channel_id = 2 [json_name = "channelId"];
+  string teller_id = 3 [json_name = "tellerId"];
+  string service_id = 4 [json_name = "serviceId"];
+  string user_name = 5 [json_name = "userName"];
+  string supervisor_id = 6 [json_name = "supervisorId"];
+  string branch_code = 7 [json_name = "branchCode"];
+  EsbSimulateQuotationHeader header = 8 [json_name = "header"];
+  EsbSimulateQuotationProductDataDetail product_data_detail = 9 [json_name = "productDataDetail"];
+  EsbSimulateQuotationDescriptionMessage description_message = 10 [json_name = "descriptionMessage"];
+}
+
+message EsbSimulateQuotationHeader {
+  string cabang = 1 [json_name = "cabang"];
+  string application_no = 2 [json_name = "applicationNo"];
+  string quotation_number = 3 [json_name = "quotationNumber"];
+  string valid_from = 4 [json_name = "validFrom"];
+  string valid_to = 5 [json_name = "validTo"];
+  string sales_organization = 6 [json_name = "salesOrganization"];
+  string group_product = 7 [json_name = "groupProduct"];
+  string plant = 8 [json_name = "plant"];
+  string sold_to = 9 [json_name = "soldTo"];
+  string ship_to = 10 [json_name = "shipTo"];
+  string payer = 11 [json_name = "payer"];
+  string sales_office = 12 [json_name = "salesOffice"];
+  string sales_group = 13 [json_name = "salesGroup"];
+  string distribution_channel = 14 [json_name = "distributionChannel"];
+  string debet_or_credit_note = 15 [json_name = "debetOrCreditNote"];
+}
+
+message EsbSimulateQuotationProductDataDetail {
+  string material = 1 [json_name = "material"];
+  string trip = 2 [json_name = "trip"];
+  string qty_per_trip = 3 [json_name = "qtyPerTrip"];
+  string uom = 4 [json_name = "UOM"];
+  string requested_delivery_date = 5 [json_name = "requestedDeliveryDate"];
+  string confirm_delivery_date = 6 [json_name = "confirmDeliveryDate"];
+  string transporter = 7 [json_name = "transporter"];
+  string confirmed_qty = 8 [json_name = "confirmedQty"];
+}
+
+message EsbSimulateQuotationDescriptionMessage {
+  string dari_rekening = 1 [json_name = "dariRekening"];
+}
+
+message EsbSimulateProductAllocationRequest {
+  EsbSimulateProductAllocationRequestData request = 1 [json_name = "request"];
+}
+
+message EsbSimulateProductAllocationRequestData {
+  string external_id = 1 [json_name = "externalId"];
+  string channel_id = 2 [json_name = "channelId"];
+  string teller_id = 3 [json_name = "tellerId"];
+  string service_id = 4 [json_name = "serviceId"];
+  string user_name = 5 [json_name = "userName"];
+  string supervisor_id = 6 [json_name = "supervisorId"];
+  string branch_code = 7 [json_name = "branchCode"];
+  EsbSimulateProductAllocationHeader header = 8 [json_name = "header"];
+  repeated EsbSimulateProductAllocationProductDetail product_detail = 9 [json_name = "productDetail"];
+  EsbSimulateProductAllocationDescriptionMessage description_message = 10 [json_name = "descriptionMessage"];
+}
+
+message EsbSimulateProductAllocationHeader {
+  string scheduling_agreement_number = 1 [json_name = "schedulingAgreementNumber"];
+  string sales_organization = 2 [json_name = "salesOrganization"];
+  string group_product = 3 [json_name = "product"];
+  string plant = 4 [json_name = "plant"];
+  string sold_to = 5 [json_name = "soldto"];
+  string ship_to = 6 [json_name = "shipto"];
+  string distribution_channel = 7 [json_name = "distributionChannel"];
+  string debet_or_credit_note = 8 [json_name = "debetOrCreditNote"];
+  string application_no = 9 [json_name = "applicationNo"];
+}
+
+message EsbSimulateProductAllocationProductDetail {
+  string material = 1 [json_name = "material"];
+  string trip = 2 [json_name = "trip"];
+  string qty_per_trip = 3 [json_name = "qtyPerTrip"];
+  string uom = 4 [json_name = "UOM"];
+  string requested_delivery_date = 5 [json_name = "requestedDeliveryDate"];
+  string confirm_delivery_date = 6 [json_name = "confirmDeliveryDate"];
+  string transporter = 7 [json_name = "transporter"];
+  string confirmed_qty = 8 [json_name = "confirmedQty"];
+}
+
+message EsbSimulateProductAllocationDescriptionMessage {
+  string dari_rekening = 1 [json_name = "dariRekening"];
+}
+
+message EsbSimulateCashCarryRequest {
+  EsbSimulateCashCarryRequestData request = 1 [json_name = "request"];
+}
+
+message EsbSimulateCashCarryRequestData {
+  string external_id = 1 [json_name = "externalId"];
+  string channel_id = 2 [json_name = "channelId"];
+  string teller_id = 3 [json_name = "tellerId"];
+  string service_id = 4 [json_name = "serviceId"];
+  EsbSimulateCashCarryHeader header = 8 [json_name = "header"];
+  repeated EsbSimulateCashCarryProductDetail product_detail = 9 [json_name = "productDetail"];
+  EsbSimulateCashCarryDescriptionMessage description_message = 10 [json_name = "descriptionMessage"];
+}
+
+message EsbSimulateCashCarryHeader {
+  string application_no = 1 [json_name = "applicationNo"];
+  string sales_organization = 2 [json_name = "salesOrganization"];
+  string group_product = 3 [json_name = "groupProduct"];
+  string plant = 4 [json_name = "plant"];
+  string sold_to = 5 [json_name = "soldto"];
+  string ship_to = 6 [json_name = "shipto"];
+  string distribution_channel = 7 [json_name = "distributionChannel"];
+  string debet_or_credit_note = 8 [json_name = "debetOrCreditNote"];
+}
+
+message EsbSimulateCashCarryProductDetail {
+  string material = 1 [json_name = "material"];
+  string trip = 2 [json_name = "trip"];
+  string qty_per_trip = 3 [json_name = "qtyPerTrip"];
+  string requested_delivery_date = 4 [json_name = "requestedDeliveryDate"];
+}
+
+message EsbSimulateCashCarryDescriptionMessage {
+  string dari_rekening = 1 [json_name = "dariRekening"];
+}
+
+message EsbSimulateCashCarryResponse {
+  EsbSimulateCashCarryResponseData response = 1;
+}
+
+message EsbSimulateCashCarryResponseData {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  EsbSimulateCashCarryResponseDataHeader header = 3 [json_name = "header"];
+  repeated EsbSimulateCashCarryResponseDataProductDetail product_detail = 4 [json_name = "productDetail"];
+  EsbSimulateCashCarryResponseDataSummarizedPriceResults summarized_price_results = 5 [json_name = "summarizedPriceResults"];
+  EsbSimulateCashCarryResponseDataMessage message = 6 [json_name = "message"];
+  string error_code = 7 [json_name = "errorCode"];
+}
+
+message EsbSimulateCashCarryResponseDataHeader {
+  string application_no = 1 [json_name = "applicationNo"];
+  string dari_rekening = 2 [json_name = "dariRekening"];
+  string ke_rekening = 3 [json_name = "keRekening"];
+  string currency = 4 [json_name = "currency"];
+  string total_value_of_so = 5 [json_name = "totalValueofSO"];
+  string unit_pemasaran = 6 [json_name = "unitPemasaran"];
+  string desc_upms = 7 [json_name = "descUpms"];
+  string product_code = 8 [json_name = "productCode"];
+  string desc_of_product = 9 [json_name = "descOfProduct"];
+  string sold_to_code = 10 [json_name = "soldToCode"];
+  string sold_to_description = 11 [json_name = "soldToDescription"];
+  string ship_to_code = 12 [json_name = "shipToCode"];
+  string ship_to_description = 13 [json_name = "shiptoDescription"];
+  string payer_code = 14 [json_name = "payerCode"];
+  string payer_description = 15 [json_name = "payerDescription"];
+  string depot = 16 [json_name = "depot"];
+  string desc_depot = 17 [json_name = "descDepot"];
+  string sales_office_code = 18 [json_name = "salesOfficeCode"];
+  string sales_office_description = 19 [json_name = "salesOfficeDescription"];
+  string sales_group_code = 20 [json_name = "salesGroupCode"];
+  string sale_group_description = 21 [json_name = "saleGroupDescription"];
+  string distribution_channel_code = 22 [json_name = "distributionChannelCode"];
+  string distribution_channel_desc = 23 [json_name = "distributionChannelDesc"];
+}
+
+message EsbSimulateCashCarryResponseDataSummarizedPriceResults {
+  string so_credit_value = 1 [json_name = "soCreditValue"];
+  string net_value = 2 [json_name = "netValue"];
+  string ppn_tax = 3 [json_name = "ppnTax"];
+  string pph_tax = 4 [json_name = "pphTax"];
+  string pbbkb_tax = 5 [json_name = "pbbkbTax"];
+  string gross_value = 6 [json_name = "grossValue"];
+  string currency = 7 [json_name = "currency"];
+  string debet_or_credit_note_value = 8 [json_name = "debetOrCreditNoteValue"];
+}
+
+message EsbSimulateCashCarryResponseDataMessage {
+  string type = 1 [json_name = "type"];
+  string code = 2 [json_name = "code"];
+  string desc_msg = 3 [json_name = "descMsg"];
+}
+
+message EsbSimulateCashCarryResponseDataProductDetail {
+  string material = 1 [json_name = "material"];
+  string trip = 2 [json_name = "trip"];
+  string qty_per_trip = 3 [json_name = "qtyPerTrip"];
+  string uom = 4 [json_name = "UOM"];
+  string requested_delivery_date = 5 [json_name = "requestedDeliveryDate"];
+  string transporter = 6 [json_name = "transporter"];
+  string confirmed_qty = 7 [json_name = "confirmedQty"];
+  string confirm_delivery_date = 8 [json_name = "confirmDeliveryDate"];
+}
+
+message EsbSimulateQuotationResponse {
+  EsbSimulateQuotationResponseData response = 1 [json_name = "response"];
+}
+
+message EsbSimulateQuotationResponseData {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  string application_no = 3 [json_name = "applicationNo"];
+  EsbSimulateQuotationResponseDataHeader header = 4 [json_name = "header"];
+  repeated EsbSimulateQuotationResponseDataProductDetail product_detail = 5 [json_name = "productDetail"];
+  EsbSimulateQuotationResponseDataSummarizedPriceResults summarized_price_results = 6 [json_name = "summarizedPriceResults"];
+  repeated EsbSimulateQuotationResponseDataMessage message = 7 [json_name = "message"];
+  string error_code = 8 [json_name = "errorCode"];
+}
+
+message EsbSimulateQuotationResponseDataHeader {
+  string dari_rekening = 1 [json_name = "dariRekening"];
+  string ke_rekening = 2 [json_name = "keRekening"];
+  string currency = 3 [json_name = "currency"];
+  string total_value_of_so = 4 [json_name = "totalValueofSO"];
+  string unit_pemasaran = 5 [json_name = "unitPemasaran"];
+  string desc_upms = 6 [json_name = "descUpms"];
+  string product_code = 7 [json_name = "productCode"];
+  string desc_of_product = 8 [json_name = "descOfProduct"];
+  string sold_to_code = 9 [json_name = "soldToCode"];
+  string sold_to_description = 10 [json_name = "soldToDescription"];
+  string ship_to_code = 11 [json_name = "shipToCode"];
+  string ship_to_description = 12 [json_name = "shipToDescription"];
+  string payer_code = 13 [json_name = "payerCode"];
+  string payer_description = 14 [json_name = "payerDescription"];
+  string depot = 15 [json_name = "depot"];
+  string desc_depot = 16 [json_name = "descDepot"];
+  string sales_office_code = 17 [json_name = "salesOfficeCode"];
+  string sales_office_description = 18 [json_name = "salesOfficeDescription"];
+  string sales_group_code = 19 [json_name = "salesGroupCode"];
+  string sale_group_description = 20 [json_name = "saleGroupDescription"];
+  string distribution_channel_code = 21 [json_name = "distributionChannelCode"];
+  string distribution_channel_desc = 22 [json_name = "distributionChannelDesc"];
+}
+
+message EsbSimulateQuotationResponseDataProductDetail {
+  string material = 1 [json_name = "material"];
+  string trip = 2 [json_name = "trip"];
+  string qty_per_trip = 3 [json_name = "qtyPerTrip"];
+  string uom = 4 [json_name = "UOM"];
+  string requested_delivery_date = 5 [json_name = "requestedDeliveryDate"];
+  string transporter = 6 [json_name = "transporter"];
+  string confirmed_qty = 7 [json_name = "confirmedQty"];
+  string confirm_delivery_date = 8 [json_name = "confirmDeliveryDate"];
+}
+
+message EsbSimulateQuotationResponseDataSummarizedPriceResults {
+  string so_credit_value = 1 [json_name = "SOCreditValue"];
+  string net_value = 2 [json_name = "netValue"];
+  string ppn_tax = 3 [json_name = "PPNTax"];
+  string pph_tax = 4 [json_name = "PPHTax"];
+  string pbbkb_tax = 5 [json_name = "PBBKBTax"];
+  string gross_value = 6 [json_name = "grossValue"];
+  string currency = 7 [json_name = "currency"];
+  string debet_or_credit_note_value = 8 [json_name = "debetOrCreditNoteValue"];
+}
+
+message EsbSimulateQuotationResponseDataMessage {
+  string type = 1 [json_name = "type"];
+  string code = 2 [json_name = "code"];
+  string desc_msg = 3 [json_name = "descMsg"];
+}
+
+message EsbSimulateProductAllocationResponse {
+  EsbSimulateProductAllocationResponseData response = 1 [json_name = "response"];
+}
+
+message EsbSimulateProductAllocationResponseData {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  string application_no = 3 [json_name = "applicationNo"];
+  EsbSimulateProductAllocationResponseDataHeader header = 4 [json_name = "header"];
+  repeated EsbSimulateProductAllocationResponseDataProductDetail product_detail = 5 [json_name = "productDetail"];
+  EsbSimulateProductAllocationResponseDataSummarizedPriceResults summarized_price_results = 6 [json_name = "summarizedPriceResults"];
+  repeated EsbSimulateProductAllocationResponseDataMessage message = 7 [json_name = "message"];
+  string error_code = 8 [json_name = "errorCode"];
+}
+
+message EsbSimulateProductAllocationResponseDataHeader {
+  string dari_rekening = 1 [json_name = "dariRekening"];
+  string ke_rekening = 2 [json_name = "keRekening"];
+  string scheduling_agreement_number = 3 [json_name = "schedulingAgreementNumber"];
+  string valid_from = 4 [json_name = "validFrom"];
+  string valid_to = 5 [json_name = "validTo"];
+  string currency = 6 [json_name = "currency"];
+  string total_value_of_do = 7 [json_name = "totalValueOfDO"];
+  string unit_pemasaran = 8 [json_name = "unitPemasaran"];
+  string desc_upms = 9 [json_name = "descUpms"];
+  string product_code = 10 [json_name = "productCode"];
+  string desc_of_product = 11 [json_name = "descOfProduct"];
+  string sold_to_code = 12 [json_name = "soldToCode"];
+  string sold_to_description = 13 [json_name = "soldToDescription"];
+  string ship_to_code = 14 [json_name = "shipToCode"];
+  string ship_to_description = 15 [json_name = "shipToDescription"];
+  string payer_code = 16 [json_name = "payerCode"];
+  string payer_description = 17 [json_name = "payerDescription"];
+  string depot = 18 [json_name = "depot"];
+  string desc_depot = 19 [json_name = "descDepot"];
+  string sales_office_code = 20 [json_name = "salesOfficeCode"];
+  string sales_office_description = 21 [json_name = "salesOfficeDescription"];
+  string sales_group_code = 22 [json_name = "salesGroupCode"];
+  string sale_group_description = 23 [json_name = "saleGroupDescription"];
+  string distribution_channel_code = 24 [json_name = "distributionChannelCode"];
+  string distribution_channel_desc = 25 [json_name = "distributionChannelDesc"];
+}
+
+message EsbSimulateProductAllocationResponseDataProductDetail {
+  string material = 1 [json_name = "material"];
+  string trip = 2 [json_name = "trip"];
+  string qty_per_trip = 3 [json_name = "qtyPerTrip"];
+  string uom = 4 [json_name = "UOM"];
+  string transporter = 5 [json_name = "transporter"];
+  string confirm_qty = 6 [json_name = "confirmQty"];
+  string confirm_delivery_date = 7 [json_name = "confirmDeliveryDate"];
+}
+
+message EsbSimulateProductAllocationResponseDataSummarizedPriceResults {
+  string do_credit_value = 1 [json_name = "DOCreditValue"];
+  string net_value = 2 [json_name = "netValue"];
+  string ppn_tax = 3 [json_name = "PPNTax"];
+  string pph_tax = 4 [json_name = "PPHTax"];
+  string pbbkb_tax = 5 [json_name = "PBBKBTax"];
+  string gross_value = 6 [json_name = "grossValue"];
+  string currency = 7 [json_name = "currency"];
+  string debet_or_credit_note_value = 8 [json_name = "debetOrCreditNoteValue"];
+}
+
+message EsbSimulateProductAllocationResponseDataMessage {
+  string type = 1 [json_name = "type"];
+  string code = 2 [json_name = "code"];
+  string desc_msg = 3 [json_name = "descMsg"];
+}
+
+message Sort {
+  string column = 1;
+  string direction = 2;
+}
+
+message PaginationRequest {
+  int32 limit = 1;
+  int32 page = 2;
+  string search = 3;
+}
+
+message SubmitDOPertaminaRequest {
+  bool is_draft = 1;
+  uint64 task_id = 2;
+  bool is_update = 3;
+  OrderRequest order_request = 4;
+  repeated DeliveryDetailRequest delivery_details = 5;
+  repeated CreateFavoriteAliasRequest favorite_alias = 6 [(validator.field) = {repeated_count_max: 2}];
+}
+
+message SubmitDOPertaminaResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  SaveTaskDOPertaminaResponse data = 4;
+}
+
+message GetDraftSubmitDOPertaminaRequest {
+  string transaction_id = 1;
+}
+
+message GetDraftSubmitDOPertaminaResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  DataDraftSubmitDOPertamina data = 4;
+}
+
+message DataDraftSubmitDOPertamina {
+  uint64 task_id = 1;
+  Orders order = 2;
+  repeated DeliveryDetails delivery_details = 3;
+}
+
+message SaveEditDraftSubmitDOPertaminaRequest {
+  uint64 task_id = 2;
+  OrderRequest order_request = 3;
+  repeated DeliveryDetailRequest delivery_details = 4;
+}
+
+message OrderRequest {
+  ModuleTypes module_type = 1;
+  string application_id = 2;
+  string debit_account = 3;
+  string product_group_id = 4;
+  string product_group_name = 5;
+  string sales_organization_id = 6;
+  string sales_organization_name = 7;
+  string ship_to = 8;
+  string distribution_channel = 9;
+  string sold_to = 10;
+  string debit_credit_note = 11;
+  string quotation_number = 12;
+  string scheduling_agreement_number = 13;
+}
+
+message DeliveryDetailRequest {
+  uint64 delivery_detail_id = 1;
+  string material_id = 2;
+  string material_description = 3;
+  string delivery_date = 4;
+  string transporter = 5;
+  string trip = 6;
+  uint32 quantity = 7;
+}
+
+message CreateFavoriteAliasRequest {
+  string alias = 1 [(validator.field) = {string_not_empty: true}];
+  AliasType type = 2 [(validator.field) = {is_in_enum: true}];
+}
+
+message PaymentRequest {
+  string ship_to = 1;
+  string sold_to = 2;
+  string group_product = 3;
+  string application_no = 4;
+  string debet_or_credit_note = 5;
+  string sales_organization = 6;
+  string distribution_channel = 7;
+  string dari_rekening = 8;
+  repeated ProductDetail product_detail = 9;
+  string quotation_number = 10;
+  string scheduling_agreement_number = 11;
+  uint64 order_id = 12;
+  uint64 task_id = 13;
+  string depot = 14;
+  string data_inquiry = 15;
+  double fee = 16;
+  string process_id = 17;
+  uint64 retry_count_payment = 18;
+}
+
+message ProductDetail {
+  string trip = 1;
+  string material = 2;
+  string qty_per_trip = 3;
+  string requested_delivery_date = 4;
+
+  string uom = 5;
+  string transporter = 6;
+  string confirm_delivery_date = 7;
+  string confirm_qty = 8;
+}
+
+message PaymentResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message DownloadReceiptRequest {
+  repeated string transaction_id = 1;
+  string extension = 3;
+}
+
+message ReceiptData {
+  TaskDataDOPertamina order = 1;
+  PurchaseDetails purchase_detail = 2;
+  repeated DeliveryDetailResponse delivery_details = 3;
+  string updated_at = 4;
+}
+
+message AdditionalSimulateData {
+  string ship_to_description = 1;
+  string sold_to_description = 2;
+  string distribution_channel_name = 3;
+  string depo_id = 4;
+  string depo_name = 5;
+  string payer_id = 6;
+  string payer_name = 7;
+}
+
+message OrderDetailRequest {
+  string transaction_id = 1;
+}
+
+message OrderDetailResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  OrderDataDetail data = 4;
+}
+
+message OrderDataDetail {
+  TransactionInformationResponse transaction_information = 1;
+  PurchaseDetailResponse purchase_detail = 2;
+  TaskDetailResponse task = 3;
+  string workflow_doc = 4;
+  repeated DeliveryDetailResponse material_information = 5;
+}
+
+message TransactionInformationResponse {
+  string application_id = 1;
+  string debit_account_number = 2;
+  string debit_account_name = 3;
+  string transaction_date = 4;
+  string ship_to = 5;
+  string product_group_id = 6;
+  string product_group_name = 7;
+  Status status = 8;
+  string quotation_number = 9;
+  string scheduling_agreement_number = 10;
+  string error_message_payment = 11;
+  string depo_id = 12;
+  string depo_name = 13;
+  string payer_id = 14;
+  string payer_name = 15;
+  string ship_to_desc = 16;
+  string sold_to = 17;
+  string sold_to_desc = 18;
+}
+
+message TaskDetailResponse {
+  uint64 task_id = 1;
+  string status = 2;
+  string reasons = 3;
+  string last_approved_by_name = 4;
+  string last_rejected_by_name = 5;
+  string updated_by_name = 6;
+  string created_by_name = 7;
+  string type = 8;
+  string comment = 9;
+
+  string created_at = 101;
+  string updated_at = 102;
+  string approved_at = 104;
+  string rejected_at = 105;
+}
+
+message DeliveryDetailResponse {
+  string material_id = 1;
+  string material_description = 2;
+  string delivery_date = 3;
+  string transporter = 4;
+  string trip = 5;
+  uint32 quantity = 6;
+  string uom = 7;
+}
+
+message PurchaseDetailResponse {
+  double net_value = 1;
+  double ppn_tax = 2;
+  double pbbkb_tax = 3;
+  double pph_tax = 4;
+  double gross_value = 5;
+  double fee = 6;
+  double debit_credit_value = 7;
+  double total_amount = 8;
+  double total_payment = 9;
+}
+
+message CheckDebitAccountRequest {
+  string account_number = 1;
+}
+
+message CheckDebitAccountResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  CheckDebitAccountResponseData data = 4;
+}
+
+message CheckDebitAccountResponseData {
+  string available_bal = 1;
+}
+
+message ListModelData {
+  string header_data = 1;
+  repeated ModelData model_data = 2;
+  bool is_table = 3;
+  TableSpec table_spec = 4;
+}
+
+message TableSpec {
+  repeated uint32 column_width = 1;
+  repeated TableData table_data = 5;
+}
+
+message TableData {
+  repeated string data = 2;
+}
+
+message ModelData {
+  string key = 1;
+  string value = 2;
+  int32 len_char = 3;
+  int32 height = 4;
+  bool cut_dot = 5;
+  bool is_total_payment = 6;
+}
+
+message FilterListRequest {
+  string field = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  string search = 4;
+  string tab = 5;
+}
+
+message FilterListResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated string data = 4;
+  PaginationResponse pagination = 5;
+}
+
+message GetStatusGroupRequest {
+  string tab = 1;
+  string filter = 2;
+  string query = 3;
+}
+
+message GetStatusGroupResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated StatusGroup data = 4;
+}
+
+message StatusGroup {
+  string code = 1;
+  string name = 2;
+  uint64 count = 3;
+  bool is_pending = 4;
+}
+
+message HistoryStatus {
+  string status = 1;
+  uint64 count = 2;
+}
+
+message GetApplicationIdRequest {
+  bool isProductAllocation = 1;
+}
+
+message GetApplicationIdResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  string application_id = 4;
+}
+
+message ScheduleTime {
+  string startTime = 1 [(validator.field) = {regex: "^\\d{2}:\\d{2}$"}];
+  string endTime = 2 [(validator.field) = {regex: "^\\d{2}:\\d{2}$"}];
+}
+
+message ModuleTypeResponse {
+	bool error = 1;
+	uint32 code = 2;
+	string message = 3;
+	repeated int32 data = 4;
+}
+
+message ScheduledPaymentRequest {
+  string app_key = 1;
+}
+
+message FailedPaymentScheduledRequest {
+  uint64 task_id = 1;
+  Status status = 2;
+  string description_message = 3;
+}
+
+message StandardResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message RetryPaymentRequest {
+  string transaction_id = 1;
+}
+
+message RetryPaymentResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message ListFavoriteAliastRequest {
+  int32 page = 1;
+  int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { description: "limit data per page. Default value '-1' for disable limit",}];
+  string query = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "search by alias, description or number (encode base 64)",
+  }];
+  uint32 typeAlias = 4 [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "Action: '1', '2'"}];
+}
+  
+message ListFavoriteAliasResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated FavoriteAlias data = 4;
+  PaginationResponse pagination = 5;
+}
+  
+message FavoriteAlias {
+  uint64 favorite_alias_id = 1;
+  string alias = 2;
+  string number =3 ;
+  string description =4; 
+  int32 type_alias = 5;
+}
+
+message UpdateFavoriteAliasRequest {
+  uint64 favorite_alias_id = 1;
+  string alias = 2 [(validator.field) = {string_not_empty: true}];
+}
+
+message DeleteFavoriteAliasRequest {
+  repeated uint64 favorite_alias_id = 1;
+}
+
+message DeleteFavoriteAliasResponse {
+  bool error = 1;
+  uint32 code = 2;    
+  string message = 3;
+  int32 total_successful = 4;
+  int32 total_failed = 5;
+  repeated DeleteFavoriteAliasResponses data = 6;
+}
+
+message DeleteFavoriteAliasResponses {
+  bool error = 1;
+  string message = 2;
+  DeleteFavoriteAlias favorite_alias = 3;
+}
+
+message DeleteFavoriteAlias {
+  uint64 favorite_alias_id = 1;
+}

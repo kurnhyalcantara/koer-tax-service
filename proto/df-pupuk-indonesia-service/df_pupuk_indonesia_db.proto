@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package df_pupuk_indonesia.service.v1;
+
+import "df-pupuk-indonesia-service/df_pupuk_indonesia_core.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pb";
+
+/* # region mapping account # */
+message LoanAccount {
+    uint64 loan_account_id = 1;
+    uint64 mapping_account_id = 2;
+    string company_code_pupuk = 3;
+    string loan_account = 4;
+    string loan_account_name = 5;
+    string company_code_pupuk_name = 6;
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+}
+
+message LoanAccountMaster {
+    uint64 loan_account_id = 1;
+    uint64 mapping_account_id = 2;
+    string company_code_pupuk = 3;
+    string loan_account = 4;
+    string loan_account_name = 5;
+    string company_code_pupuk_name = 6;
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+}
+
+message MappingAccountMaster {
+    uint64 mapping_account_id = 1;
+    uint64 task_id = 2;
+    string transaction_id = 3;
+    uint64 company_id = 5;
+    string company_name = 6;
+    uint64 created_by_id = 7;
+    string created_by_name = 8;
+    string customer_number = 9;
+    StatusMappingAccount status = 10;
+    string task_information = 11;
+    google.protobuf.Timestamp created_at = 12;
+    uint64 updated_by_id = 13;
+    string updated_by_name = 14;
+    google.protobuf.Timestamp updated_at = 15;
+}
+/* # end region mapping account # */
+
+message Tasks {
+    uint64 task_id = 1;
+    uint64 company_id = 2;
+    uint64 holding_id = 3;
+    uint64 parents_id = 4;
+    string comment = 5;
+    string data = 6;
+    uint32 status = 7;
+    uint32 step = 8;
+    string type = 9;
+    uint64 feature_id = 10;
+    uint64 parent_id = 11;
+    bool is_parent_active = 12;
+    string reasons = 13;
+    string data_bak = 14;
+    string child_bak = 15;
+    string workflow_doc = 16;
+    google.protobuf.Timestamp approved_at = 17;
+    uint64 last_approved_by_id = 18;
+    string last_approved_by_name = 19;
+    google.protobuf.Timestamp rejected_at = 20;
+    uint64 last_rejected_by_id = 21;
+    string last_rejected_by_name = 22;
+    google.protobuf.Timestamp created_at = 23;
+    uint64 created_by_id = 24;
+    string created_by_name = 25;
+    google.protobuf.Timestamp updated_at = 26;
+    uint64 updated_by_id = 27;
+    string updated_by_name = 28;
+    google.protobuf.Timestamp deleted_at = 29;
+};
+
+message Orders {
+    uint64 order_id = 1;
+    uint64 task_id = 2;
+    string transaction_id = 3;
+    uint64 company_id = 4;
+    string company_name = 5;
+    string debit_account = 6;
+    string debit_account_name = 7;
+    string debit_account_type = 8;
+    string df_invoice_number = 9;
+    google.protobuf.Timestamp due_date = 10;
+    Status status = 11;
+    string data_inquiry = 12;
+    double fee = 13;
+    double amount = 14;
+    double total_amount = 15;
+    string workflow_doc = 16;
+    google.protobuf.Timestamp created_at = 17;
+    uint64 created_by_id = 18;
+    string created_by_name = 19;
+    google.protobuf.Timestamp updated_at = 20;
+    string updated_by_name = 21;
+    uint64 updated_by_id = 22;
+    google.protobuf.Timestamp transaction_date = 23;
+    string company_code = 24;
+    string fee_account = 25;
+    string customer_number = 26;
+};

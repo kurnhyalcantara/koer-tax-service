@@ -1,0 +1,1922 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "auth-service/auth_api.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ApiService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/auth/change-password": {
+      "post": {
+        "summary": "Auth change password",
+        "description": "This API for change password to addons services",
+        "operationId": "ApiService_ChangePassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ChangePasswordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ChangePasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/change-password-profile": {
+      "post": {
+        "summary": "Auth change password",
+        "description": "This API for change password to addons services",
+        "operationId": "ApiService_ChangePasswordWithProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ChangePasswordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ChangePasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ]
+      }
+    },
+    "/api/auth/delete-token": {
+      "get": {
+        "summary": "Delete Token user when company or user status change",
+        "description": "This API for delete all user token when their company or user status change",
+        "operationId": "ApiService_DeleteAccessTokenWhenCompanyOrUserStatusChange",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteAccessTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "companyID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "userID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ]
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "summary": "Auth forgot password",
+        "description": "This API for forgot password to addons services",
+        "operationId": "ApiService_ForgotPassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ForgotPasswordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ForgotPasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/login": {
+      "get": {
+        "summary": "Auth login",
+        "description": "This API for login to addons services",
+        "operationId": "ApiService_BricamsLogin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "USERID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "SESSIONID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "DTTIME",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tokenFCM",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/login/init-token": {
+      "post": {
+        "summary": "Auth login 11",
+        "description": "This API for login to addons services from Qlola",
+        "operationId": "ApiService_SSOLoginWithInitToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SSOLoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1InitTokenLoginReqEncrypted"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/login/password": {
+      "post": {
+        "summary": "Auth login",
+        "description": "This API for login to addons services",
+        "operationId": "ApiService_Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1LoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/login/qlola": {
+      "post": {
+        "summary": "Auth login 11",
+        "description": "This API for login to addons services from Qlola",
+        "operationId": "ApiService_QlolaLogin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1InitLoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1QlolaLoginReq"
+            }
+          },
+          {
+            "name": "X-Signature",
+            "description": "signature",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/logout": {
+      "get": {
+        "summary": "Auth logout",
+        "description": "This API for logout to addons services",
+        "operationId": "ApiService_Logout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Empty"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "accessToken",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "DTTIME",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "USERID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "SESSIONID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "SESSIONTYPE",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ]
+      }
+    },
+    "/api/auth/logout/qlola": {
+      "post": {
+        "summary": "Auth login 11",
+        "description": "This API for login to addons services from Qlola",
+        "operationId": "ApiService_QlolaLogout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Empty"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1QlolaLogoutReq"
+            }
+          },
+          {
+            "name": "X-Signature",
+            "description": "signature",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "summary": "Get me use token",
+        "description": "This API for login to addons services",
+        "operationId": "ApiService_GetMe",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1FilteredVerifyTokenRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "accessToken",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ]
+      }
+    },
+    "/api/auth/me/session": {
+      "get": {
+        "summary": "Get me use session",
+        "description": "This API for login to addons services",
+        "operationId": "ApiService_GetTokenBySession",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "USERID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "SESSIONID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/qlola/forgot-password": {
+      "post": {
+        "summary": "Auth forgot password",
+        "description": "This API for forgot password to addons services",
+        "operationId": "ApiService_QlolaForgotPassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1QlolaForgotPasswordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1QlolaForgotPasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "QLOLA"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/qlola/validation": {
+      "post": {
+        "summary": "Auth user validation",
+        "description": "This API is used for providing qlola to validate user",
+        "operationId": "ApiService_QLolaUserValidation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1QlolaUserValidationBrigateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1LoginV2Request"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ]
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "summary": "Auth refresh token",
+        "description": "This API for refresh auth token",
+        "operationId": "ApiService_RefreshToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RefreshResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RefreshRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/signature/key": {
+      "get": {
+        "summary": "Get key to generate signature",
+        "description": "This API is used for providing key to generate signature",
+        "operationId": "ApiService_GetSignatureKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetSigKeyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/token-data": {
+      "post": {
+        "summary": "Auth is expired token",
+        "description": "This API for check token expired",
+        "operationId": "ApiService_GetTokenData",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetTokenDataResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetTokenDataRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/user/{userId}": {
+      "get": {
+        "summary": "Auth login",
+        "description": "This API for login to addons services",
+        "operationId": "ApiService_RequestAuthData",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1AuthenticationData"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/v2/login": {
+      "post": {
+        "summary": "Auth login",
+        "description": "This API for login to addons services",
+        "operationId": "ApiService_LoginV2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LoginV2Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1LoginV2Request"
+            }
+          },
+          {
+            "name": "X-Signature",
+            "description": "signature",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/v2/login/qlola": {
+      "post": {
+        "summary": "Auth login 11",
+        "description": "This API for login to addons services from Qlola",
+        "operationId": "ApiService_QlolaLoginV2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1InitLoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1QlolaLoginReq"
+            }
+          },
+          {
+            "name": "X-Signature",
+            "description": "signature",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/verify": {
+      "get": {
+        "summary": "Auth login",
+        "description": "This API for login to addons services",
+        "operationId": "ApiService_BricamsVerify2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiHttpBody"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "USERID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "SESSIONID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      },
+      "post": {
+        "summary": "Auth login",
+        "description": "This API for login to addons services",
+        "operationId": "ApiService_BricamsVerify",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiHttpBody"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BricamsVerifyReq"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/verify-change-password-token": {
+      "post": {
+        "summary": "Verify Token for Change Password",
+        "description": "This API for checking token when change password",
+        "operationId": "ApiService_VerifyChangePasswordToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1VerifyChangePasswordTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyChangePasswordTokenRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/verify-question": {
+      "post": {
+        "summary": "Verify User Question in Forgot Password form",
+        "description": "This API for checking user question",
+        "operationId": "ApiService_VerifyUserQuestion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1VerifyUserQuestionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1VerifyUserQuestionRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/api/user/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "This API for check health server",
+        "operationId": "ApiService_HealthCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1HealthCheckResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/qlola/signature-test": {
+      "post": {
+        "summary": "Qlola signature Test",
+        "description": "This API for login to addons services from Qlola",
+        "operationId": "ApiService_QlolaTestGenerateSignature",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1QlolaSignatureTestRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1QlolaLoginReq"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    },
+    "/qlola/signature-test-string": {
+      "post": {
+        "summary": "Qlola signature Test",
+        "description": "This API for login to addons services from Qlola",
+        "operationId": "ApiService_QlolaTestSignatureBystring",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1QlolaSignatureTestRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SignatureReq"
+            }
+          }
+        ],
+        "tags": [
+          "ApiService"
+        ],
+        "security": []
+      }
+    }
+  },
+  "definitions": {
+    "apiHttpBody": {
+      "type": "object",
+      "properties": {
+        "contentType": {
+          "type": "string",
+          "description": "The HTTP Content-Type header value specifying the content type of the body."
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "description": "The HTTP request/response body as raw binary."
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          },
+          "description": "Application specific response metadata. Must be set in the first response\nfor streaming APIs."
+        }
+      },
+      "description": "Message that represents an arbitrary HTTP body. It should only be used for\npayload formats that can't be represented as JSON, such as raw binary or\nan HTML page.\n\n\nThis message can be used both in streaming and non-streaming API methods in\nthe request as well as the response.\n\nIt can be used as a top-level request field, which is convenient if one\nwants to extract parameters from either the URL or HTTP template into the\nrequest fields and also want access to the raw HTTP body.\n\nExample:\n\n    message GetResourceRequest {\n      // A unique request id.\n      string request_id = 1;\n\n      // The raw HTTP body is bound to this field.\n      google.api.HttpBody http_body = 2;\n\n    }\n\n    service ResourceService {\n      rpc GetResource(GetResourceRequest)\n        returns (google.api.HttpBody);\n      rpc UpdateResource(google.api.HttpBody)\n        returns (google.protobuf.Empty);\n\n    }\n\nExample with streaming methods:\n\n    service CaldavService {\n      rpc GetCalendar(stream google.api.HttpBody)\n        returns (stream google.api.HttpBody);\n      rpc UpdateCalendar(stream google.api.HttpBody)\n        returns (stream google.api.HttpBody);\n\n    }\n\nUse of this type only changes how the request and response bodies are\nhandled, all other features will continue to work unchanged."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\nExample 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\nExample 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "servicev1AccessToken": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        }
+      }
+    },
+    "servicev1RefreshToken": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "userID": {
+          "type": "string"
+        },
+        "companyID": {
+          "type": "string"
+        }
+      }
+    },
+    "v1AuthenticationData": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/v1AuthenticationDataResponse"
+        }
+      }
+    },
+    "v1AuthenticationDataResponse": {
+      "type": "object",
+      "properties": {
+        "answerQuestion1": {
+          "type": "string"
+        },
+        "answerQuestion2": {
+          "type": "string"
+        },
+        "initCred": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BricamsVerifyReq": {
+      "type": "object",
+      "properties": {
+        "USERID": {
+          "type": "string"
+        },
+        "SESSIONID": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ChangePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "branchCode": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "tempPassword": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "confirmPassword": {
+          "type": "string"
+        },
+        "answerQuestion1": {
+          "type": "string"
+        },
+        "answerQuestion2": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ChangePasswordResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Credential": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DeleteAccessTokenResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "isSuccess": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1Empty": {
+      "type": "object"
+    },
+    "v1FilteredVerifyTokenRes": {
+      "type": "object",
+      "properties": {
+        "isValid": {
+          "type": "boolean"
+        },
+        "isExpired": {
+          "type": "boolean"
+        },
+        "userID": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "username": {
+          "type": "string"
+        },
+        "userType": {
+          "type": "string"
+        },
+        "productRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ProductAuthority"
+          }
+        },
+        "companyID": {
+          "type": "string",
+          "format": "uint64",
+          "title": "repeated string authoritis = 7;"
+        },
+        "holdingID": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "roleIDs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        },
+        "companyName": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "companyCode": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ForgotPasswordRequest": {
+      "type": "object",
+      "properties": {
+        "branchCode": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "emailAddress": {
+          "type": "string"
+        },
+        "answerQuestion1": {
+          "type": "string"
+        },
+        "answerQuestion2": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ForgotPasswordResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetDetailAuthenticationResponse": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
+        },
+        "salt": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetSigKeyResponse": {
+      "type": "object",
+      "properties": {
+        "signatureKey": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetTokenDataRequest": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1GetTokenDataResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/v1TokenDataRsp"
+        }
+      }
+    },
+    "v1HealthCheckResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InitLoginResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "respCode": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/v1InitToken"
+        }
+      }
+    },
+    "v1InitToken": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InitTokenLoginReqEncrypted": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "type": "string"
+        }
+      }
+    },
+    "v1LoginRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "tokenFCM": {
+          "type": "string"
+        }
+      }
+    },
+    "v1LoginResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/servicev1AccessToken"
+        }
+      }
+    },
+    "v1LoginV2Request": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "branchCode": {
+          "type": "string"
+        }
+      }
+    },
+    "v1LoginV2Response": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/v1LoginV2ResponseAccessToken"
+        }
+      }
+    },
+    "v1LoginV2ResponseAccessToken": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "isRedirectToChangePassword": {
+          "type": "boolean"
+        },
+        "changePasswordToken": {
+          "type": "string"
+        },
+        "isQlola": {
+          "type": "boolean"
+        },
+        "dashboardAnnouncementMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ProductAuthority": {
+      "type": "object",
+      "properties": {
+        "productName": {
+          "type": "string"
+        },
+        "authorities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "baseHreff": {
+          "type": "string"
+        }
+      }
+    },
+    "v1QLolaUserValidationResponse": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "valid": {
+          "type": "boolean"
+        },
+        "category": {
+          "type": "string"
+        },
+        "categoryId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "status": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "companyStatus": {
+          "type": "string"
+        }
+      }
+    },
+    "v1QlolaForgotPasswordRequest": {
+      "type": "object",
+      "properties": {
+        "branchCode": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "emailAddress": {
+          "type": "string"
+        },
+        "answerQuestion1": {
+          "type": "string"
+        },
+        "answerQuestion2": {
+          "type": "string"
+        }
+      }
+    },
+    "v1QlolaForgotPasswordResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1QlolaLoginReq": {
+      "type": "object",
+      "properties": {
+        "COMPANYID": {
+          "type": "string"
+        },
+        "USERID": {
+          "type": "string"
+        },
+        "SESSIONID": {
+          "type": "string"
+        },
+        "URL": {
+          "type": "string"
+        }
+      }
+    },
+    "v1QlolaLogoutReq": {
+      "type": "object",
+      "properties": {
+        "COMPANYID": {
+          "type": "string"
+        },
+        "USERID": {
+          "type": "string"
+        },
+        "SESSIONID": {
+          "type": "string"
+        }
+      }
+    },
+    "v1QlolaSignatureTestRes": {
+      "type": "object",
+      "properties": {
+        "signature": {
+          "type": "string"
+        },
+        "jsonbody": {
+          "type": "string"
+        }
+      }
+    },
+    "v1QlolaUserValidationBrigateResponse": {
+      "type": "object",
+      "properties": {
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        },
+        "responseData": {
+          "$ref": "#/definitions/v1QLolaUserValidationResponse"
+        },
+        "responseError": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RefreshRequest": {
+      "type": "object",
+      "properties": {
+        "refreshToken": {
+          "type": "string"
+        }
+      }
+    },
+    "v1RefreshResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/servicev1RefreshToken"
+        }
+      }
+    },
+    "v1RegisterUserIntoAuthRes": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/v1Credential"
+        }
+      }
+    },
+    "v1ResetUserLoginTimeAttemptRes": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "isSuccess": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1SSOLoginResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "respCode": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "$ref": "#/definitions/servicev1AccessToken"
+        },
+        "redirectUrl": {
+          "type": "string"
+        },
+        "agent": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SetMeRes": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "boolean"
+        },
+        "isExist": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1SignatureReq": {
+      "type": "object",
+      "properties": {
+        "sessionid": {
+          "type": "string"
+        },
+        "jsonstring": {
+          "type": "string"
+        }
+      }
+    },
+    "v1TokenData": {
+      "type": "object",
+      "properties": {
+        "exp": {
+          "type": "string",
+          "format": "int64"
+        },
+        "iat": {
+          "type": "string",
+          "format": "int64"
+        },
+        "index": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1TokenDataRsp": {
+      "type": "object",
+      "properties": {
+        "currentTime": {
+          "type": "string",
+          "format": "int64"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TokenData"
+          }
+        }
+      }
+    },
+    "v1VerifyChangePasswordTokenRequest": {
+      "type": "object",
+      "properties": {
+        "changePasswordToken": {
+          "type": "string"
+        }
+      }
+    },
+    "v1VerifyChangePasswordTokenResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "isValid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1VerifyTokenRes": {
+      "type": "object",
+      "properties": {
+        "isValid": {
+          "type": "boolean"
+        },
+        "isExpired": {
+          "type": "boolean"
+        },
+        "userID": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "username": {
+          "type": "string"
+        },
+        "userType": {
+          "type": "string"
+        },
+        "productRoles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ProductAuthority"
+          }
+        },
+        "authorities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "companyIDs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        },
+        "sessionID": {
+          "type": "string"
+        },
+        "companyID": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "companyName": {
+          "type": "string"
+        },
+        "dateTime": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "roleIDs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        },
+        "holdingID": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "idToken": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "companyCode": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        }
+      }
+    },
+    "v1VerifyUserQuestionRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "emailAddress": {
+          "type": "string"
+        },
+        "branchCode": {
+          "type": "string"
+        }
+      }
+    },
+    "v1VerifyUserQuestionResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "isVerif": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "bearer": {
+      "type": "apiKey",
+      "description": "Authentication token, prefixed by Bearer: Bearer \u003ctoken\u003e",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ]
+}

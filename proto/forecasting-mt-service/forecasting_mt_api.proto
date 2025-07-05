@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/httpbody.proto";
+
+import "forecasting-mt-service/forecasting_mt_payload.proto";
+
+package forecasting_mt.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+    
+
+    rpc InquiryAccountStatement(InquiryAccountStatementRequest) returns (InquiryAccountStatementResponse) {
+        option (google.api.http) = {
+            post: "/api/forecasting-mt/inquiry/request"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+    rpc CheckAccountStatement(CheckAccountStatementRequest) returns (InquiryAccountStatementResponse) {
+        option (google.api.http) = {
+            post: "/api/forecasting-mt/inquiry/check"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+
+
+    rpc CancelAccountStatement(CheckAccountStatementRequest) returns (InquiryAccountStatementResponse) {
+        option (google.api.http) = {
+            post: "/api/forecasting-mt/inquiry/cancel"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+
+    rpc ProcessFile(FindFileRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/forecasting-mt/file/{id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+    rpc ProcessFileByte(FindFileRequest) returns (ByteResponse) {
+        option (google.api.http) = {
+            get: "/api/forecasting-mt/byte/{id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+    rpc ProcessFileByteSchedule(FindFileRequest) returns (ByteResponse) {
+        option (google.api.http) = {
+            get: "/api/forecasting-mt/byte/schedule/{id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+    
+}

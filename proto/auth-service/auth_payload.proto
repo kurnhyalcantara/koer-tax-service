@@ -1,0 +1,376 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/descriptor.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+
+package auth.service.v1;
+option go_package = "./pb";
+
+message LoginRequest {
+    string username = 1 [(validator.field) = {msg_exists : true}];
+    string password = 2 [(validator.field) = {msg_exists : true}];
+    string tokenFCM = 3;
+}
+
+message AccessToken {
+    string accessToken = 1;
+    string refreshToken = 2;
+}
+
+message InitToken {
+    string accessToken = 1;
+}
+
+message RefreshToken {
+    string accessToken = 1;
+    string refreshToken = 2;
+    string userID = 3;
+    string companyID = 4;
+}
+
+message RefreshRequest {
+    string refreshToken = 1;
+}
+
+message GetTokenDataRequest {
+    repeated string tokens = 1;
+}
+
+message TokenData {
+    int64 exp = 1;
+    int64 iat = 2;
+    int32 index = 3;
+}
+
+message TokenDataRsp {
+    int64 currentTime = 1;
+    repeated TokenData data = 2;
+}
+
+message GetTokenDataResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TokenDataRsp data = 4;
+}
+
+message LoginResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    AccessToken data = 4;
+}
+
+message InitTokenLoginReqEncrypted {
+    string request = 1;
+}
+
+message InitLoginResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string respCode = 3;
+    string message = 4;
+    InitToken data = 5;
+}
+
+message SSOLoginResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string respCode = 3;
+    string message = 4;
+    AccessToken data = 5;
+    string redirectUrl = 6;
+    string agent = 7;
+}
+
+message RefreshResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    RefreshToken data = 4;
+}
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message Empty {}
+
+message ErrorBodyResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ProductAuthority {
+    string productName = 1;
+    repeated string authorities = 2;
+    string baseHreff = 3;
+}
+
+message LogoutRequest {
+    string accessToken = 1;
+    string DTTIME = 2;
+    string USERID = 3;
+    string SESSIONID = 4;
+    string SESSIONTYPE = 5;
+}
+
+message VerifyTokenReq {
+    string accessToken = 1;
+}
+
+message VerifySessionReq {
+    string USERID = 1;
+    string SESSIONID = 2;
+}
+
+message VerifyTokenRes {
+    bool isValid = 1;
+    bool isExpired = 2;
+    uint64 userID = 3;
+    string username = 4;
+    string userType = 5;
+    repeated ProductAuthority productRoles = 6;
+    repeated string authorities = 7;
+    repeated uint64 companyIDs = 8;
+    string sessionID = 9;
+    uint64 companyID = 10;
+    string companyName = 11;
+    string dateTime = 12;
+    google.protobuf.Timestamp createdAt = 13;
+
+    repeated uint64 roleIDs = 14;
+    uint64 holdingID = 15;
+
+    string idToken = 16;
+    string country_code = 17;
+    string company_code = 18;
+    string region = 19;
+}
+
+message SetMeRes {
+    bool status = 1;
+    bool isExist = 2;
+}
+
+message FilteredVerifyTokenRes {
+    bool isValid = 1;
+    bool isExpired = 2;
+    uint64 userID = 3;
+    string username = 4;
+    string userType = 5;
+    repeated ProductAuthority productRoles = 6;
+    // repeated string authoritis = 7;
+    uint64 companyID = 8;
+    uint64 holdingID = 9;
+    repeated uint64 roleIDs = 10;
+    string companyName = 11;
+    string country_code = 12;
+    string company_code = 13;
+    string region = 14;
+}
+
+message LoginV2Request {
+    string username = 1 [(validator.field) = {msg_exists : true}];
+    string password = 2 [(validator.field) = {msg_exists : true}];
+    string branchCode = 3 [(validator.field) = {msg_exists : true}];
+}
+
+message LoginV2Response {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message AccessToken {
+        string accessToken = 1;
+        string refreshToken = 2;
+        bool isRedirectToChangePassword = 3;
+        string changePasswordToken = 4;
+        bool isQlola = 5;
+        string dashboardAnnouncementMessage = 6;
+    }
+
+    AccessToken data = 4;
+}
+
+message ForgotPasswordRequest {
+    string branchCode = 1 [(validator.field) = {msg_exists : true, string_not_empty : true}];
+    string username = 2 [(validator.field) = {msg_exists : true, string_not_empty : true}];
+    string emailAddress = 3 [(validator.field) = {msg_exists : true, string_not_empty : true}];
+    string answerQuestion1 = 4 [(validator.field) = {msg_exists : true}];
+    string answerQuestion2 = 5 [(validator.field) = {msg_exists : true}];
+}
+
+message ForgotPasswordResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ChangePasswordRequest {
+    string branchCode = 1 [(validator.field) = {msg_exists : true, string_not_empty : true}];
+    string username = 2 [(validator.field) = {msg_exists : true, string_not_empty : true}];
+    string tempPassword = 3 [(validator.field) = {msg_exists : true, string_not_empty : true}];
+    string password = 4 [(validator.field) = {msg_exists : true, string_not_empty : true}];
+    string confirmPassword = 5 [(validator.field) = {msg_exists : true, string_not_empty : true}];
+    string answerQuestion1 = 6 [(validator.field) = {msg_exists : true}];
+    string answerQuestion2 = 7 [(validator.field) = {msg_exists : true}];
+    string token = 8 [(validator.field) = {msg_exists : true, string_not_empty : true}];
+}
+
+message ChangePasswordResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message VerifyUserQuestionRequest {
+    string username = 1;
+    string emailAddress = 2;
+    string branchCode = 3;
+}
+
+message VerifyUserQuestionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    bool is_verif = 4;
+}
+
+message VerifyChangePasswordTokenRequest {
+    string changePasswordToken = 1;
+}
+
+message VerifyChangePasswordTokenResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    bool is_valid = 4;
+}
+
+message RegisterUserIntoAuthReq {
+    uint64 userId = 1;
+    uint64 companyId = 2;
+    string username = 3;
+    string method = 4;
+}
+
+message RegisterUserIntoAuthRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Credential data = 4;
+}
+message Credential {
+    string username = 1;
+    string password = 2;
+}
+
+message DeleteAccessTokenRequest{
+    string companyID = 1;
+    string userID = 2;
+}
+
+message DeleteAccessTokenResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    bool isSuccess = 4;
+}
+
+message AuthenticationData {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    message Response {
+        string answerQuestion1 = 1;
+        string answerQuestion2 = 2;
+        string initCred = 3;
+    }
+    Response data = 4;
+}
+message RequestUserId {
+    uint64 userId = 1;
+}
+
+message QLolaUserValidationResponse{
+    uint64 userId = 1;
+    bool valid = 2;
+    string category = 3;
+    uint64 categoryId = 7;
+    string status = 4;
+    uint64 companyId = 5;
+    string companyStatus = 6;
+}
+
+message QlolaUserValidationBrigateResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    QLolaUserValidationResponse responseData = 3;
+    string responseError = 4;
+}
+
+message QlolaForgotPasswordRequest {
+    string branchCode = 1 [(validator.field) = {msg_exists : true}];
+    string username = 2 [(validator.field) = {msg_exists : true}];
+    string emailAddress = 3 [(validator.field) = {msg_exists : true}];
+    string answerQuestion1 = 4 [(validator.field) = {msg_exists : true}];
+    string answerQuestion2 = 5 [(validator.field) = {msg_exists : true}];
+}
+
+message QlolaForgotPasswordResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message GetSigKeyReq {}
+
+message GetSigKeyResponse {
+    string signatureKey = 1;
+}
+
+message RollbackAuthenticationByCompanyIdRPCRequest {
+    uint64 companyID = 1;
+}
+
+message DeleteAuthByUsersIdAndCompanyIdReq{
+    repeated uint64 usersID = 1;
+    uint64 companyID = 2;
+}
+
+message HistoryChangePassword {
+    string login_code = 1;
+    uint64 company_id = 2;
+    string email = 3;
+    uint64 user_id = 4;
+    string username = 5;
+    string token = 6;
+    string old_password = 7;
+    string new_password = 8;
+    string ip_address = 9;
+    string x_forwarded_for = 10;
+    string action = 11;
+}
+
+message GetDetailAuthenticationRequest {
+    string username = 1;
+    uint64 company_id = 2;
+}
+
+message GetDetailAuthenticationResponse {
+    string password = 1;
+    string salt = 2;
+}
+
+message PayloadSendMailSuccessChangePassword {
+    string username = 1;
+    string loginModuleID = 2;
+    string eventID = 3;
+    uint64 company_id = 4;
+    string compamny_name = 5;
+    uint64 user_id = 6;
+    string email = 7;
+}

@@ -1,0 +1,394 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "ukln-ift/ukln_ift_payload.proto";
+import "ukln-ift/ukln_ift_core.proto";
+
+package ukln.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  security_definitions: {
+      security: {
+              key: "bearer"
+              value: {
+              type: TYPE_API_KEY
+              in: IN_HEADER
+              name: "Authorization"
+              description: "Authentication token, prefixed by Bearer: Bearer <token>"
+          }
+      }
+  }
+  security: {
+      security_requirement: {
+          key: "bearer"
+      }
+  }
+};
+
+service ApiService {
+    rpc HealthCheck(Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            tags: ["Utility"]
+            summary: "Health Check"
+            description: "This API for check server's health"
+        };
+    };
+
+    rpc SaveTask(GlobalRequest) returns (SaveTaskResponse) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/task"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            tags: ["Task"]
+            summary: "Save Task"
+            description: "This API Save task ift ukln"
+        };
+    };
+    
+    rpc GetTransactionActionSearchCriteria(GetTransactionActionSearchCriteriaRequest) returns (GetTransactionActionSearchCriteriaResponse) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/transaction-action/search-criteria"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Action"]
+            summary: "Get Search Criteria Transaction Action"
+            description: "This API for get data search criteria on transaction action"
+        };
+    };
+     
+    rpc GetTransactionActionSearchCriteriaV2(GetTransactionActionSearchCriteriaRequest) returns (GetTransactionActionSearchCriteriaV2Response) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/v2/transaction-action/search-criteria"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Action"]
+            summary: "Get Search Criteria Transaction Action V2"
+            description: "This API for get data search criteria on transaction action V2"
+        };
+    };
+
+    rpc GetTransactionAction(GetTransactionActionRequest) returns (GetTransactionActionResponse) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/transaction-action/data"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Action"]
+            summary: "Get Data Transaction Action"
+            description: "This API for get data transaction action"
+        };
+    };
+    rpc GetTransactionActionV2(GetTransactionActionRequestV2) returns (GetTransactionActionV2Response) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/v2/transaction-action/data"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Action"]
+            summary: "Get Data Transaction Action"
+            description: "This API for get data transaction action"
+        };
+    };
+
+    rpc GetTransactionActionDetails(GetTransactionActionDetailsRequest) returns (GetTransactionActionDetailsResponse) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/transaction-action/details/{batch_reff_no}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Action"]
+            summary: "Transaction Action"
+            description: "This API for get data transaction action details"
+        };
+    }
+    
+    rpc GetTransactionActionDetailsV2(GetTransactionActionDetailsRequest) returns (GetTransactionActionDetailsV2Response) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/v2/transaction-action/details/{batch_reff_no}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Action"]
+            summary: "Transaction Action V2"
+            description: "This API for get data transaction action details V2"
+        };
+    }
+
+    rpc DownloadTransactionAction(FileListTransactionActionRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/transaction-action/data/file/{extension}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Download File"]
+            summary: "Download transaction action UKLN IFT"
+            description: "This API for download transaction action UKLN IFT"
+        };
+    };
+
+    rpc DownloadTransactionActionDetails(FileListTransactionActionDetailRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/transaction-action/details/{batch_reff_no}/file/{extension}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Download File"]
+            summary: "Download transaction action UKLN IFT"
+            description: "This API for download transaction action UKLN IFT"
+        };
+    };
+
+    rpc GetTransactionInquirySearchCriteria(GetTransactionInquirySearchCriteriaRequest) returns (GetTransactionInquirySearchCriteriaResponse) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/transaction-inquiry/search-criteria"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Inquiry"]
+            summary: "Get Search Criteria Transaction Inquiry"
+            description: "This API for get data search criteria on transaction action"
+        };
+    };
+
+    rpc GetTransactionInquiry(GetTransactionInquiryRequest) returns (GetTransactionInquiryResponse) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/transaction-inquiry/data"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Inquiry"]
+            summary: "Get Data Transaction Inquiry"
+            description: "This API for get data transaction action"
+        };
+    };
+    rpc GetTransactionInquiryV2(GetTransactionInquiryV2Request) returns (GetTransactionInquiryV2Response) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/v2/transaction-inquiry/data"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Inquiry"]
+            summary: "Get Data Transaction Inquiry V2"
+            description: "This API for get data transaction inquiry"
+        };
+    };
+
+    rpc GetTransactionInquiryDetails(GetTransactionInquiryDetailsRequest) returns (GetTransactionInquiryDetailsResponse) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/transaction-inquiry/details/{batch_reff_no}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Inquiry"]
+            summary: "Transaction Inquiry"
+            description: "This API for get data transaction action details"
+        };
+    }
+
+    rpc GetTransactionInquiryDetailsV2(GetTransactionInquiryDetailsRequest) returns (GetTransactionInquiryDetailsV2Response) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/v2/transaction-inquiry/details/{batch_reff_no}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Inquiry"]
+            summary: "Transaction Inquiry"
+            description: "This API for get data transaction inquiry details"
+        };
+    }
+
+    rpc DownloadListTransactionInquiry(FileListTransactionInquiryRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/transaction-inquiry/data/file/{extension}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Download File"]
+            summary: "Download list UKLN IFT transaction inquiry"
+            description: "This API for download list UKLN IFT transaction inquiry"
+        };
+    };
+
+    rpc DownloadTransactionInquiryDetails(FileTransactionInquiryDetailsRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/transaction-inquiry/details/{batch_reff_no}/file/{extension}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Download File"]
+            summary: "Download transaction inquiry UKLN IFT details"
+            description: "This API for download transaction inquiry UKLN IFT details"
+        };
+    };
+
+    rpc UklnCustomerDetail(UklnCustomerDetailRequest) returns (UklnCustomerDetailResponse) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/detail/{batch_reff_no}/{customer_reff_number}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Inquiry"]
+            summary: "Get Transaction Inquiry Customer Detail By Reff Number"
+            description: "This API for Get Transaction Inquiry Customer Detail By Reff Number"
+        };
+    }
+    
+    rpc UklnCustomerDetailV2(UklnCustomerDetailRequest) returns (UklnCustomerDetailV2Response) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/v2/detail/{batch_reff_no}/{customer_reff_number}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction Inquiry"]
+            summary: "Get Transaction Inquiry Customer Detail By Reff Number V2"
+            description: "This API for Get Transaction Inquiry Customer Detail By Reff Number V2"
+        };
+    }
+
+    rpc ValidateCustomerReffNumber(ValidateCustomerReffNumberReq) returns (ValidateCustomerReffNumberRes){};
+
+    rpc ValidateBatchReffNo(ValidateBatchReffNoReq) returns (ValidateBatchReffNoRes){
+        option (google.api.http) = {
+            get: "/api/ukln-ift/validate/{batch_reff_no}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Validate UKLN IFT by batch reff no"
+            description: "This API for validate UKLN IFT by batch reff no"
+        };
+    };
+
+    rpc TaskAction(TaskActionRequest) returns (TaskActionResponse) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/task/action"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Set Task UKLN IFT with Action"
+            description: "This API for set Task UKLN IFT with Action"
+        };
+    };
+
+    rpc ExecGlobalInternalTransferTransaction(ExecGlobalInternalTransferTransactionRequest) returns (ExecGlobalInternalTransferTransactionResponse) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/test-transfer"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Set Task UKLN IFT with Action"
+            description: "This API for set Task UKLN IFT with Action"
+        };
+    };
+
+    rpc CreateGlobalInternalTransferTransaction(CreateGlobalInternalTransferTransactionRequest) returns (CreateGlobalInternalTransferTransactionResponse) {};
+
+    // for testing
+    // rpc ApiFundTransferUkln(FundTransferRequest) returns (FundTransferLocalData){
+    //     option (google.api.http) = {
+    //         post: "/api/ukln-ift/transfer"
+    //         body: "*"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         tags: ["Transfer Internal"]
+    //         summary: "Set Task UKLN IFT with Action"
+    //         description: "This API for set Task UKLN IFT with Action"
+    //     };
+    // }
+    
+    rpc AddUKLNBeneficiaryAccountToList(AddUKLNBeneficiaryAccountToListRequest) returns (AddUKLNBeneficiaryAccountToListResponse) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/beneficiary-account"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Add Beneficiary Account to List"
+            description: "This API for add beneficiary account to list"
+        };
+    };
+
+    rpc ListUKLNBeneficiaryAccount(ListUKLNBeneficiaryAccountRequest) returns (ListUKLNBeneficiaryAccountResponse) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/beneficiary-account/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "List beneficiary account data"
+            description: "This API for get list account"
+        };
+    };
+
+    rpc GetUklnFundTransferByBatchReffNo(GetUklnFundTransferByBatchReffNoRequest) returns (GetUklnFundTransferByBatchReffNoResponse) {
+        option (google.api.http) = {
+            get: "/api/ukln-ift/{batch_reff_no}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get Ukln Fund Transfer by Batch Reff No"
+            description: "This API for get ukln fund transfer by batch reff no"
+        };
+    }
+
+    rpc DownloadReceiptFile(DownloadReceiptRequest) returns (google.api.HttpBody){
+        option (google.api.http) = {
+          get: "/api/ukln-ift/receipt/{batch_reff_no}/{customer_reff_number}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Download File"]
+            summary: "Download Receipt"
+            description: "Download Receipt by Customer Reff Number"
+        };
+    }
+
+    rpc SendNotification(SendNotificationRequest) returns (SendNotificationResponse){
+        option (google.api.http) = {
+            post: "/api/ukln-ift/notification"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Notification"]
+            summary: "Send Notification for UKLN IFT"
+            description: "Send Notification for UKLN IFT"
+        };
+    }
+
+    rpc SendNotificationByTransaction(SendNotificationByTransactionRequest) returns (SendNotificationByTransactionResponse){
+        option (google.api.http) = {
+            post: "/api/ukln-ift/notification-transaction"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Notification"]
+            summary: "Send Notification per transaction UKLN IFT"
+            description: "Send Notification per transaction UKLN IFT"
+        };
+    }
+
+    rpc GetAllStatus(GetAllStatusRequest) returns (GetAllStatusResponse) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/mapping/status"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Data Mapping"]
+            summary: "Get Data Mapping All Status"
+            description: "This API for get data mapping all status"
+        };
+    }
+
+    
+    rpc GetAllStatusV2(GetAllStatusRequest) returns (GetAllStatusResponse) {
+        option (google.api.http) = {
+            post: "/api/ukln-ift/v2/mapping/status"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Data Mapping"]
+            summary: "Get Data Mapping All Status V2"
+            description: "This API for get data mapping all status V2"
+        };
+    }
+}

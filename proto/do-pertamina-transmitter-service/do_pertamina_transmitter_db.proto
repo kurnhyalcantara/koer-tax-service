@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "do-pertamina-transmitter-service/do_pertamina_transmitter_payload.proto";
+
+package do_pertamina_transmitter.service.v1;
+option go_package = "./pb";
+
+message Result {
+  uint64 result_id = 1;
+  uint64 order_id = 2;
+  uint32 http_status_code = 3;
+  ModuleTypes module_type = 4;
+  string response_code = 5;
+  string response_message = 6;
+  string external_id = 7;
+  string request_data = 8;
+  string response_data = 9;
+  google.protobuf.Timestamp date_hit = 10;
+  google.protobuf.Timestamp date_response = 11;
+  string created_by = 12;
+  google.protobuf.Timestamp created_dt = 13;
+  string updated_by = 14;
+  google.protobuf.Timestamp updated_dt = 15;
+}
+

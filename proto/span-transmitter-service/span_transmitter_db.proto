@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package span_transmitter.service.v1;
+option go_package = "./pb";
+
+import "span-transmitter-service/span_transmitter_core.proto";
+import "google/protobuf/timestamp.proto";
+
+message Span {
+    uint64 span_id = 1;
+    uint64 task_id = 2;
+    string transaction_id = 3;
+    Status status = 4;
+    uint64 company_id = 5;
+    string company_name = 6;
+    string file_description = 7;
+    string file_format = 8;
+    uint64 file_total_record = 9;
+    string file_name = 10;
+    uint64 valid_data = 11;
+    uint64 invalid_data = 12;
+    double total_amount = 13;
+    double total_valid_amount = 14;
+    double total_invalid_amount = 15;
+    uint64 transaction_completed = 16;
+    uint64 transaction_successful = 17;
+    uint64 transaction_failed = 18;
+    double transaction_total_amount = 19;
+    double transaction_valid_amount = 20;
+    double transaction_invalid_amount = 21;
+    string transaction_type = 22;
+    string currency= 23;
+    string reason_message = 49;
+    string workflow_doc = 50;
+    string created_by_name = 51;
+    uint64 created_by_id = 52;
+    google.protobuf.Timestamp created_at = 53;
+    string updated_by_name = 54;
+    uint64 updated_by_id = 55;
+    google.protobuf.Timestamp updated_at = 56;
+}
+
+message SpanItem {
+    uint64 span_item_id = 1;
+    uint64 task_id = 2;
+    string document_date = 3;
+    string document_number = 4;
+    string beneficiary_name = 5;
+    string beneficiary_bank_code = 6;
+    string beneficiary_bank = 7;
+    string beneficiary_account = 8;
+    double amount = 9;
+    string currency_target = 10;
+    string description = 11;
+    string agent_bank_code  = 12;
+    string agent_bank_account_number = 13;
+    string agent_bank_account_name = 14;
+    string email_address = 15;
+    string swift_code = 16;
+    string iban_code = 17;
+    string payment_method = 18;
+    string transaction_type = 19;
+    string supplier_name = 20;
+    string satker_code = 21;
+    string address = 22;
+    string sp2d_count = 23;
+    StatusSpanItem status_validation = 24;
+    StatusSpanItem status_transaction = 25;
+    string reason_message = 26;
+    string status_code = 27;
+    string status_desc = 28;
+    google.protobuf.Timestamp created_at = 50;
+    google.protobuf.Timestamp updated_at = 51;
+}
+
+message SpanAction {
+    uint64 span_action_id = 1;
+    StatusSpanAction status = 4;
+    string beneficiary_account = 5;
+    string beneficiary_name = 6;
+    string beneficiary_bank = 7;
+    string beneficiary_bank_code = 8;
+    string agent_bank_account_number = 9;
+    string agent_bank_account_name = 10;
+    string agent_bank_code = 11;
+    string currency = 12;
+    SpanActionType type = 13;
+    string amount = 14;
+    uint64 company_id = 15;
+    string company_name = 16;
+    string document_date = 17;
+    string document_number = 18;
+    string description = 19;
+    string email_address = 20;
+    string swift_code = 21;
+    string iban_code = 22;
+    string payment_method = 23;
+    string reason_message = 24;
+    string created_by_name = 51;
+    uint64 created_by_id = 52;
+    google.protobuf.Timestamp created_at = 53;
+    string updated_by_name = 54;
+    uint64 updated_by_id = 55;
+    google.protobuf.Timestamp updated_at = 56;
+}
+
+message Task {
+    uint64 task_id = 1;
+    uint64 company_id = 2;
+    uint64 holding_id = 3;
+    uint64 parents_id = 4;
+    string comment = 5;
+    string data = 6;
+    uint32 status = 7;
+    uint32 step = 8;
+    string type = 9;
+    uint64 feature_id = 10;
+    uint64 parent_id = 11;
+    bool is_parent_active = 12;
+    string reasons = 13;
+    string data_bak = 14;
+    string child_bak = 15;
+    string workflow_doc = 16;
+    google.protobuf.Timestamp approved_at = 17;
+    uint64 last_approved_by_id = 18;
+    string last_approved_by_name = 19;
+    google.protobuf.Timestamp rejected_at = 20;
+    uint64 last_rejected_by_id = 21;
+    string last_rejected_by_name = 22;
+    google.protobuf.Timestamp created_at = 23;
+    uint64 created_by_id = 24;
+    string created_by_name = 25;
+    google.protobuf.Timestamp updated_at = 26;
+    uint64 updated_by_id = 27;
+    string updated_by_name = 28;
+    google.protobuf.Timestamp deleted_at = 29;
+};
+
+message Result {
+    uint64 result_id = 1;
+    uint64 task_id = 2;
+    RequestType type = 3;
+    uint32 http_status_code = 4;
+    string response_code = 5;
+    string response_message = 6;
+    string request_data = 7;
+    string response_data = 8;
+    google.protobuf.Timestamp date_hit = 9;
+    google.protobuf.Timestamp date_response = 10;
+    string created_by = 11;
+    google.protobuf.Timestamp created_at = 12;
+    string updated_by = 13;
+    google.protobuf.Timestamp updated_at = 14;
+}
+  
+

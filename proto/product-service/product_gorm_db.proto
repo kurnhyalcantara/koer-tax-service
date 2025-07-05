@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+
+package product.service.v1;
+option go_package = "./pb";
+
+message Product {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "products",
+    };
+
+    uint64 productID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "ProductID" primary_key: true not_null: true auto_increment: true}];
+    string name = 2 [(gorm.field).tag = {column: "Name" type: "varchar(100)" unique: true not_null: true}, (validator.field) = {msg_exists : true}];
+    bool is3rdParty = 3 [(gorm.field).tag = {column: "Is3rdParty" default: "false" not_null: true }, (validator.field) = {msg_exists : true}];
+    bool IsTransactional = 4 [(gorm.field).tag = {column: "IsTransactional" default: "false" not_null: true}, (validator.field) = {msg_exists : true}];
+    bool IsSa = 12 [(gorm.field).tag = {column: "IsSa" default: "false" not_null: true}, (validator.field) = {msg_exists : true}];
+    bool IsBa = 5 [(gorm.field).tag = {column: "IsBa" default: "false" not_null: true}, (validator.field) = {msg_exists : true}];   
+    bool IsCa = 6 [(gorm.field).tag = {column: "IsCa" default: "false" not_null: true}, (validator.field) = {msg_exists : true}];   
+    bool IsCu = 7 [(gorm.field).tag = {column: "IsCu" default: "false" not_null: true}, (validator.field) = {msg_exists : true}];  
+    bool RefByTask = 8 [(gorm.field).tag = {column: "RefByTask" default: "false" not_null: true}, (validator.field) = {msg_exists : true}];  
+    uint64 ParentID = 9 [(gorm.field).tag = {column: "ParentID"}];
+    string BaseHreff = 10 [(gorm.field).tag = {column: "BaseHreff"}];
+    string SharefolderQueueName = 11 [(gorm.field).tag = {column: "SharefolderQueueName"}];
+    bool IsUKLN = 13 [(gorm.field).tag = {column: "IsUKLN" default: "false" not_null: true}, (validator.field) = {msg_exists : true}];
+
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "CreatedAt"}];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "UpdatedAt"}];
+    google.protobuf.Timestamp deletedAt = 53 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "DeletedAt"}];
+}
+
+message User {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "users",
+    };
+    uint64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    string username = 2 [(google.api.field_behavior) = REQUIRED, (validator.field) = {msg_exists : true}, (gorm.field).tag = {unique: true not_null: true}];
+    string password = 3 [(google.api.field_behavior) = REQUIRED, (validator.field) = {msg_exists : true}, (gorm.field).tag = {not_null: true}];
+    string role = 4 [(validator.field) = {msg_exists : true}, (gorm.field).tag = {default: "user" not_null: true}];
+    google.protobuf.Timestamp created_at = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updated_at = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deleted_at = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+}

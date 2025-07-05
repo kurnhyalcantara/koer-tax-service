@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+
+package transaction.service.v1;
+option go_package = "./pb";
+
+message Currency {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "currency",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string name = 2;
+    google.protobuf.Timestamp createdAt = 51 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true}
+    ];
+    google.protobuf.Timestamp updatedAt = 52 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {not_null: true}
+    ];
+}
+
+message Transaction {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "transactions",
+    };
+    uint64 transactionId = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    string status = 2 [(gorm.field).tag = {type: 'varchar(5)' default: '1'}]; // "status": 1 | 2 | 3 | 4,
+    bool isSchedule = 3 ; 
+    google.protobuf.Timestamp schedule_date = 4;
+    uint64 moduleId = 5;
+    string feature = 6 [(gorm.field).tag = {type: 'varchar(255)'}];
+    uint64 featureId = 7;
+    bool isRetry = 8;
+    uint32 retryNumber = 9;
+    string debitAmount = 10;
+    string debitCurrency = 11;
+    string debitAccount = 12;
+    string creditAmount = 13;
+    string creditCurrency = 14;
+    string creditAccount = 15;
+    string feeAmount = 16;
+    uint64 companyId = 17;
+    uint64 holdingId = 18;
+    string externalId = 19 [(gorm.field).tag = {type: 'text'}];
+    string jurnalSeq = 20 [(gorm.field).tag = { type: "jsonb" default: "[]" }];
+    string requestDetail = 21 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+    string responseDetail = 22 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+    string responseCode = 23 [(gorm.field).tag = {not_null: false}];
+    string errorCode = 24 [(gorm.field).tag = {not_null: false}];
+    string rootId = 25 [(gorm.field).tag = {not_null: false}];
+    string kurs = 26 [(gorm.field).tag = {not_null: false}];
+    string kursCurrency = 27 [(gorm.field).tag = {not_null: false}];
+    uint64 taskID = 28 [(gorm.field).tag = {not_null: false}];
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: false}];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: false}];
+    google.protobuf.Timestamp deletedAt = 103 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: false}];
+}
+
+message Scheduler {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "schedulers",
+    };
+    uint64 schedulerId = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    Transaction transaction = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).belongs_to = { foreignkey: "transaction_id" }];
+    uint32 status = 3[(gorm.field).tag = {default: "0"}]; // 0 = status pending, 1 = status success, 2 status error/failed
+    google.protobuf.Timestamp schedule_date = 4 [(gorm.field).tag = {not_null: false, default: "NULL"}];
+    bool is_cut_off = 5 [(gorm.field).tag = {not_null: false, default: "false"}];
+    bool inQueue = 6 [(gorm.field).tag = {not_null: false, default: "false"}];
+    google.protobuf.Timestamp createdAt = 20 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: false}];
+}
+
+message HostToHostConfig {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "host_to_host_configs",
+    };
+
+    uint64 configId = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+
+    string directoryUrl = 2[(gorm.field).tag = {not_null: true}];
+    string directoryUsername = 3[(gorm.field).tag = {not_null: true}];
+    string directoryPassword = 4[(gorm.field).tag = {not_null: true}];
+    uint64 hostToHostUserId = 5[(gorm.field).tag = {not_null: true}];
+    string encryption = 6;
+    string encryptionPrivateKey = 7[(gorm.field).tag = {type: 'text' not_null: true }];
+    string encryptionPublicKey = 8[(gorm.field).tag = {type: 'text' not_null: true}];
+}

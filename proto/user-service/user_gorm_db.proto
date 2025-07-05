@@ -1,0 +1,552 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package user.service.v1;
+option go_package = "./pb";
+
+message User {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "users",
+    };
+    uint64 userID = 1 [
+        (gorm.field).tag = {column: "user_id" primary_key: true not_null: true auto_increment: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string username = 2 [
+        (gorm.field).tag = {column: "username" not_null: true}
+    ];
+    
+    enum IDType{
+        NULL = 0;
+        KTP = 1;
+        SIM = 2;
+        PASSPORT = 3;
+        KITAS = 4;
+        KITAP = 5;
+    }
+
+    IDType idType = 3 [
+        (gorm.field).tag = {column: "id_type" not_null: true}
+    ];
+
+    string idNumber = 4 [
+        (gorm.field).tag = {column: "id_number" not_null: true}
+    ];
+
+    uint64 userTypeID = 5 [
+        (gorm.field).tag = {column: "user_type_id" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string userTypeName = 6 [
+        (gorm.field).tag = {column: "user_type_name" not_null: true}
+    ];
+
+    uint64 companyID = 7 [
+        (gorm.field).tag = {column: "company_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string companyName = 8 [
+        (gorm.field).tag = {column: "company_name"}
+    ];
+
+    bool isBlocked = 9 [
+        (gorm.field).tag = {column: "is_blocked"}
+    ];
+    
+    uint64 createdByID = 10 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "created_by_id" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 updatedByID = 11 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "updated_by_id" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 deletedByID = 12 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "deleted_by_id" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string authority = 13 [
+        (gorm.field).tag = {column: "authority"}
+    ];
+    
+    string tokenFcm = 14 [
+        (gorm.field).tag = {column: "token_fcm"}
+    ];
+
+    string motherOriginName = 15 [
+        (gorm.field).tag = {column: "mother_origin_name"}
+    ];
+
+    string address = 16 [
+        (gorm.field).tag = {column: "address"}
+    ];
+
+    string zipCode = 17 [
+        (gorm.field).tag = {column: "zip_code"}
+    ];
+
+    string emailAddress = 18 [
+        (gorm.field).tag = {column: "email_address"}
+    ];
+
+    string phoneNumber = 19 [
+        (gorm.field).tag = {column: "phone_number"}
+    ];
+
+    string mobileNumber = 20 [
+        (gorm.field).tag = {column: "mobile_number"}
+    ];
+
+    string taxId = 21 [
+        (gorm.field).tag = {column: "tax_id"}
+    ];
+
+    string firstName = 22 [
+        (gorm.field).tag = {column: "first_name"}
+    ];
+
+    string lastName = 23 [
+        (gorm.field).tag = {column: "last_name"}
+    ];
+
+    string gender = 24 [
+        (gorm.field).tag = {column: "gender"}
+    ];
+
+    string status = 25 [
+        (gorm.field).tag = {column: "status"}
+    ];
+
+    string dataTask = 26 [(gorm.field).tag = { type: "jsonb" }];
+
+    string region = 27 [
+        (gorm.field).tag = {column: "region"}
+    ];
+
+    string channel = 28 [
+        (gorm.field).tag = {column: "channel"}
+    ];
+
+    string idCard = 29 [
+        (gorm.field).tag = {column: "id_card"}
+    ];
+
+    string employeeIdCard = 30 [
+        (gorm.field).tag = {column: "employee_id_card"}
+    ];
+
+    string referenceLetter = 31 [
+        (gorm.field).tag = {column: "reference_letter"}
+    ];
+
+    string statementLetter = 32 [
+        (gorm.field).tag = {column: "statement_letter"}
+    ];
+
+    string branchId = 33 [
+        (gorm.field).tag = {column: "branch_id"}
+    ];
+
+    string branchName = 34 [
+        (gorm.field).tag = {column: "branch_name"}
+    ];
+
+    string oldUserData = 35 [
+        (gorm.field).tag = { type: "jsonb" default: "{}"}
+    ];
+
+    uint32 requestType = 36 [
+        (gorm.field).tag = {column: "request_type"}
+    ];
+
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp deletedAt = 53 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+
+}
+
+message UserLogin {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "users",
+    };
+
+    uint64 userID = 1 [
+        (gorm.field).tag = {column: "user_id" primary_key: true not_null: true auto_increment: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string username = 2 [
+        (gorm.field).tag = {column: "username" not_null: true}
+    ];
+
+    uint64 userTypeID = 5 [
+        (gorm.field).tag = {column: "user_type_id" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string userTypeName = 6 [
+        (gorm.field).tag = {column: "user_type_name" not_null: true}
+    ];
+
+    uint64 companyID = 7 [
+        (gorm.field).tag = {column: "company_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string companyName = 8 [
+        (gorm.field).tag = {column: "company_name"}
+    ];
+
+    string status = 9 [
+        (gorm.field).tag = {column: "status"}
+    ];
+
+    string authority = 13 [
+        (gorm.field).tag = {column: "authority"}
+    ];
+    
+    string tokenFcm = 14 [
+        (gorm.field).tag = {column: "token_fcm"}
+    ];
+
+    uint64 createdByID = 10 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "created_by_id" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+}
+
+enum statuses{
+    NullStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+    DeleteRequest = 6;
+    Deleted = 7;
+    Cancelled = 8;
+}
+
+enum steps{
+    NullStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+}
+
+message Task {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "user_tasks",
+    };
+    uint64 TaskID = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {primary_key: true not_null: true}];
+
+    string type = 2 [(gorm.field).tag = { not_null: true}];
+    
+    statuses status = 3 [(gorm.field).tag = { default: "1" not_null: true}];
+
+    steps step = 4 [(gorm.field).tag = { default: "1" not_null: true}];
+    
+    uint64 createdByID = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = { not_null: true}];
+
+    uint64 lastApprovedByID = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+    uint64 lastRejectedByID = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    
+    string data = 8 [(gorm.field).tag = { type: "jsonb" }];
+    
+    string comment = 9 [(gorm.field).tag = { type: "text" }];
+    
+    uint64 featureID = 10;
+    
+    repeated Task childs = 11  [(gorm.field).has_many = {
+        foreignkey: "ParentID"
+        append: true
+        preload: false
+    }];
+    
+    bool isParentActive = 12 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {default: "false" }];
+    
+    string reasons = 13 [(gorm.field).tag = { type: "varchar(255)" }];
+
+    string lastApprovedByName = 14 [(google.api.field_behavior) = OPTIONAL];
+
+    string lastRejectedByName = 15 [(google.api.field_behavior) = OPTIONAL];
+    
+    uint64 updatedByID = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+    string updatedByName = 17 [(google.api.field_behavior) = OPTIONAL];
+
+    string createdByName = 18 [(google.api.field_behavior) = OPTIONAL];
+
+    string dataBak = 19 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = { type: "jsonb" }];
+
+    string childBak = 20 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = { type: "jsonb" default: "[]" }];
+
+    string workflowDoc = 21 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+
+    uint64 companyID = 22 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+    uint64 holdingID = 23 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+    google.protobuf.Timestamp createdAt = 101;
+    google.protobuf.Timestamp updatedAt = 102;
+    google.protobuf.Timestamp deletedAt = 103;
+    google.protobuf.Timestamp approvedAt = 104;
+    google.protobuf.Timestamp rejectedAt = 105;
+}
+
+// The UserWithCompany table is a table view
+// to combine several data of users, companies, and tasks
+// to fulfill the data requirements to be displayed on the history table.
+message UserWithCompany {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "user_with_company",
+    };
+
+    string companyID = 1 [
+        (gorm.field).tag = {column: "company_id"}
+    ];
+
+    string companyCode = 2 [
+        (gorm.field).tag = {column: "company_code"}
+    ];
+
+    string companyName = 3 [
+        (gorm.field).tag = {column: "company_name"}
+    ];
+
+    string countryCode = 4 [
+        (gorm.field).tag = {column: "country_code"}
+    ];
+
+    string countryName = 5 [
+        (gorm.field).tag = {column: "country_name"}
+    ];
+
+    string userID = 6 [
+        (gorm.field).tag = {column: "user_id" primary_key: true not_null: true auto_increment: true}
+    ];
+
+    string username = 7 [
+        (gorm.field).tag = {column: "username" not_null: true}
+    ];
+
+    string fullName = 8 [
+        (gorm.field).tag = {column: "full_name"}
+    ];
+
+    uint64 userTypeID = 9 [
+        (gorm.field).tag = {column: "user_type_id" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string userTypeName = 10 [
+        (gorm.field).tag = {column: "user_type_name" not_null: true}
+    ];
+
+    enum IDType{
+        NULL = 0;
+        KTP = 1;
+        SIM = 2;
+        PASSPORT = 3;
+        KITAS = 4;
+        KITAP = 5;
+    }
+
+    IDType idType = 11 [
+        (gorm.field).tag = {column: "id_type" not_null: true}
+    ];
+
+    string gender = 12 [
+        (gorm.field).tag = {column: "gender"}
+    ];
+
+    string authority = 13 [
+        (gorm.field).tag = {column: "authority"}
+    ];
+
+    string channel = 14 [
+        (gorm.field).tag = {column: "channel"}
+    ];
+
+    string status = 15 [
+        (gorm.field).tag = {column: "status"}
+    ];
+
+    string region = 16 [
+        (gorm.field).tag = {column: "region"}
+    ];
+
+    string createdAt = 17 [
+        (gorm.field).tag = {column: "created_at"}
+    ];
+
+    string updatedAt = 18 [
+        (gorm.field).tag = {column: "updated_at"}
+    ];
+
+    string createdByName = 19 [
+        (gorm.field).tag = {column: "created_by_name"}
+    ];
+
+    string reviewedByName = 20 [
+        (gorm.field).tag = {column: "reviewed_by_name"}
+    ];
+
+    string taskStatus = 21 [
+        (gorm.field).tag = {column: "status_task"}
+    ];
+
+    string data_task = 22 [
+        (gorm.field).tag = {column: "data_task"}
+    ];
+
+    bool isActiveTask = 23 [
+        (gorm.field).tag = {column: "is_active_task"}
+    ];
+}
+
+
+// table user task with company
+message UserTaskWithCompany {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "user_task_with_company",
+    };
+
+    string companyID = 1 [
+        (gorm.field).tag = {column: "company_id"}
+    ];
+
+    string companyCode = 2 [
+        (gorm.field).tag = {column: "company_code"}
+    ];
+
+    string companyName = 3 [
+        (gorm.field).tag = {column: "company_name"}
+    ];
+
+    string countryCode = 4 [
+        (gorm.field).tag = {column: "country_code"}
+    ];
+
+    string countryName = 5 [
+        (gorm.field).tag = {column: "country_name"}
+    ];
+
+
+    string userID = 6 [
+        (gorm.field).tag = {column: "user_id" primary_key: true not_null: true auto_increment: true}
+    ];
+
+    string username = 7 [
+        (gorm.field).tag = {column: "username" not_null: true}
+    ];
+
+    string fullName = 8 [
+        (gorm.field).tag = {column: "full_name"}
+    ];
+
+    uint64 userTypeID = 9 [
+        (gorm.field).tag = {column: "user_type_id" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string userTypeName = 10 [
+        (gorm.field).tag = {column: "user_type_name" not_null: true}
+    ];
+
+    enum IDType{
+        NULL = 0;
+        KTP = 1;
+        SIM = 2;
+        PASSPORT = 3;
+        KITAS = 4;
+        KITAP = 5;
+    }
+
+    IDType idType = 11 [
+        (gorm.field).tag = {column: "id_type" not_null: true}
+    ];
+
+    string gender = 12 [
+        (gorm.field).tag = {column: "gender"}
+    ];
+
+
+
+    string createdByName = 13 [
+        (gorm.field).tag = {column: "created_by_name"}
+    ];
+
+    string reviewedByName = 14 [
+        (gorm.field).tag = {column: "reviewed_by_name"}
+    ];
+
+    string channel = 15 [
+        (gorm.field).tag = {column: "channel"}
+    ];
+
+    string status = 16 [
+        (gorm.field).tag = {column: "status"}
+    ];
+
+    string taskStatus = 17 [
+        (gorm.field).tag = {column: "task_status"}
+    ];
+
+    string region = 18 [
+        (gorm.field).tag = {column: "region"}
+    ];
+
+    uint64 taskID = 19 [
+        (gorm.field).tag = {column: "task_id"}
+    ];
+
+    string createdAt = 20 [
+        (gorm.field).tag = {column: "created_at"}
+    ];
+
+    string updatedAt = 21 [
+        (gorm.field).tag = {column: "updated_at"}
+    ];
+
+    string dataTask = 22 [
+        (gorm.field).tag = {column: "data_task"}
+    ];
+
+    string authority = 23 [
+        (gorm.field).tag = {column: "authority"}
+    ];
+
+    string reasons = 24 [
+        (gorm.field).tag = {column: "reasons"}
+    ];
+
+    string comment = 25 [
+        (gorm.field).tag = {column: "comment"}
+    ];
+
+    //    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    //    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+
+}

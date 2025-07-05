@@ -1,0 +1,221 @@
+syntax = "proto3";
+
+package workflow.service.v1;
+option go_package = "./pb";
+
+import "google/protobuf/timestamp.proto";
+
+message Participant {
+    uint64 userID = 1;
+    string userName = 2;
+    uint64 roleID = 3;
+    bool isReject = 5;
+    google.protobuf.Timestamp approvedAt = 6;
+    string step = 7;
+    int32 priorityNumber = 8;
+}
+
+message Participants {
+    int32 approvedCount = 1;
+    int32 rejectedCount = 2;
+    int32 Requirement = 3;
+    repeated Participant participants = 4;
+}
+
+message Flow {
+    uint64 workflowLogicID = 1;
+    Participants verifier = 2;
+    Participants approver = 3;
+    Participants releaser = 4;
+    bool isRejected = 5;
+    google.protobuf.Timestamp completedAt = 7;
+    int32 verCurrPriority = 8;
+    int32 appCurrPriority = 9;
+    int32 relCurrPriority = 10;
+    repeated uint64 approvedUserIDs = 11;
+    repeated uint32 listRoles = 12;
+}
+
+message WorkflowRecords {
+    google.protobuf.Timestamp lastUpdatedAt = 1;
+    uint64 topRange = 2;
+    uint64 bottomRange = 3;
+    repeated Flow flows = 4;
+}
+
+message UserData {
+    uint64 userID = 1;
+    string username = 2;
+}
+
+message MakerData {
+    uint64 userID = 1;
+    string userName = 2;
+}
+
+message WorkflowHeader {
+    uint64 productID = 1;
+    string productName = 2;
+    uint64 currencyID = 3;
+    string currencyName = 5;
+    uint64 companyID = 6;
+    string companyName = 7;
+    uint64 transactionalNumber = 10;
+    uint64 workflowID = 11;
+    MakerData maker = 12;
+    uint64 uaID = 13; // used account id
+}
+
+message RejectedBy {
+    uint64 userID = 1;
+    string rejecterName = 2;
+    uint64 roleID = 3;
+    string roleName = 4;
+    google.protobuf.Timestamp rejectedAt = 5;
+}
+
+message WorkflowPayload {
+    WorkflowHeader header = 1;
+    WorkflowRecords records = 2;
+    UserData createdBy = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    bool isDefault = 5;
+    bool isTransactional = 6;
+    repeated uint64 currentRoleIDs = 7;
+    string currentStep = 8;
+    repeated uint64 participantUserIDs = 9;
+}
+
+message ValidateWorkflowData {
+    WorkflowPayload workflow = 1;
+    string nextStatus = 2;
+    string nextStep = 3;
+}
+
+message ValidateWorkflowRequest {
+    WorkflowPayload currentWorkflow = 1;
+    enum Action {
+        null = 0;
+        APPROVE = 1;
+        REJECT = 2;
+        REQUEST_CHANGE = 3;
+        REQUEST_DELETE = 4;
+    }
+    Action action = 2;
+    bool isDebitRDN = 3;
+}
+
+message GenerateWorkflowRequest {
+    uint64 CompanyID = 1;
+    uint64 ProductID = 2;
+    uint64 transactionalNumber = 3;
+    bool isTransactional = 4;
+    string currency = 5;
+    uint64 selectedAccountID = 6;
+    bool isDebitRDN = 7;
+}
+
+message GenerateWorkflowMassTransferData {
+    uint64 company_id = 1;
+    uint64 product_id = 2;
+    string currency = 3;
+}
+
+message GenerateWorkflowMassTransferRequest {
+    repeated GenerateWorkflowMassTransferData data = 1;
+}
+message WorkflowLogicRange {
+    uint64 bottomRange = 1;
+    uint64 topRange = 2;
+}
+message WorkflowData {
+    repeated WorkflowLogicRange workflow_logic_range = 1;
+    string error = 2;
+}
+
+message CurrencyWorkflows {
+    map<string, WorkflowData> currency = 1;
+}
+
+message GenerateWorkflowMassTransferResponse {
+    map<uint64, CurrencyWorkflows> product_id = 1;
+}
+
+message ValidateWorkflowWithoutSessionReq {
+    WorkflowPayload currentWorkflow = 1;
+    enum Action {
+        null = 0;
+        APPROVE = 1;
+        REJECT = 2;
+        REQUEST_CHANGE = 3;
+        REQUEST_DELETE = 4;
+    }
+    Action action = 2;
+    UserWorkflow user = 3;
+}
+
+message UserWorkflow {
+    uint64 userID = 1;
+    uint64 companyID = 2;
+    string companyName = 3;
+    string userName = 4;
+    repeated uint64 roleIDs = 5;
+    string userType = 6;
+}
+
+message ValidateWorkflowAccountRegisterResponse {
+    bool isValid = 1;
+    string message = 2;
+    ValidateWorkflowAccountRegisterData data = 3;
+}
+
+message ValidateWorkflowAccountRegisterData {
+    WorkflowAccountRegisterPayload workflow = 1;
+    string nextStatus = 2;
+    string nextStep = 3;
+}
+
+message WorkflowAccountRegisterPayload {
+    WorkflowHeader header = 1;
+    WorkflowAccountRegisterRecords records = 2;
+    UserData createdBy = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    bool isDefault = 5;
+    repeated uint64 currentRoleIDs = 6;
+    string currentStep = 7;
+    repeated uint64 participantUserIDs = 8;
+}
+
+message WorkflowAccountRegisterRecords {
+    google.protobuf.Timestamp lastUpdatedAt = 1;
+    repeated FlowAccountRegister flows = 2;
+}
+
+message FlowAccountRegister {
+    uint64 workflowLogicID = 1;
+    Participants verifier = 2;
+    Participants verifierNds = 3;
+    Participants approverNds = 4;
+    Participants reviewerBri = 5;
+    Participants approverBri = 6;
+    bool isRejected = 7;
+    google.protobuf.Timestamp completedAt = 8;
+    repeated uint64 approvedUserIDs = 9;
+    repeated uint32 listRoles = 10;
+}
+
+message ValidateAccountRegisterWorkflowReq {
+    WorkflowAccountRegisterPayload currentWorkflow = 1;
+    enum Action {
+        null = 0;
+        APPROVE = 1;
+        REJECT = 2;
+        REQUEST_CHANGE = 3;
+        REQUEST_DELETE = 4;
+    }
+    Action action = 2;
+    uint64 userStep = 3;
+    string username = 4;
+    uint64 userId = 5;
+    string application = 6;
+}

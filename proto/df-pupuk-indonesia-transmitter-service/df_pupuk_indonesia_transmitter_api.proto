@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/empty.proto";
+import "df-pupuk-indonesia-transmitter-service/df_pupuk_indonesia_transmitter_payload.proto";
+
+package df_pupuk_indonesia_transmitter.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "DF Pupuk Transmitter";
+    version: "1.0";
+  }
+
+  schemes: HTTP;
+  // schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service DFPupukTransmitterService {
+  rpc HealthCheck(google.protobuf.Empty) returns (StandardResponse) {
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/transmitter/health-check"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Heath Check"]
+      summary: "Health Check"
+      description: "This API for Health Check"
+    };
+  };
+
+  rpc DFPupukIndonesiaTransmitter(DFPupukIndonesiaTransmitterRequest) returns (StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/df-pupuk-indonesia/transmitter/process"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Transmitter"]
+      summary: "Process Registration Account Number"
+      description: "This API for process registration account number"
+    };
+  };
+}

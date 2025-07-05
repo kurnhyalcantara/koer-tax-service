@@ -1,0 +1,917 @@
+syntax = "proto3";
+
+
+package system.service.v1;
+option go_package = "./pb";
+
+import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+
+import "system-service/system_gorm_db.proto";
+
+message LoginRequest {
+    string username = 1 [(validator.field) = {msg_exists : true}];
+    string password = 2 [(validator.field) = {msg_exists : true}];
+}
+
+message LoginResponse {
+    string access_token = 1;
+}
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message Empty {}
+
+enum Direction {
+    DESC = 0;
+    ASC = 1;
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;
+    int32 totalPages = 4;
+    string sort = 5;
+    Direction dir = 6;
+    string filter = 7;
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message AddSystemRequest {}
+
+// message CreateSystemRequest {
+//     uint64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+//     string key = 2;
+//     string productID = 3;
+//     string type = 4;
+//     string value = 5 ; 
+//     string description = 6;
+// }
+
+message CreateSystemRequest {
+    SystemSchemes data = 1;
+    uint64 taskID = 2;
+    bool isDraft = 3;
+    string processId = 4;
+}
+
+message CreateTaskSystemResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    uint64 taskID = 4;
+    string processId = 5;
+}
+
+message ListSystemRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+    int32 limit = 3;
+    int32 page = 4;
+    string sort = 5;
+    Direction dir = 6;
+    string filter = 7;
+    string query = 8;
+    string in = 9;
+    string filterOr = 10;
+}
+
+
+message ListSystemResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated SystemTask data = 4;
+    PaginationResponse pagination = 5;
+    string processId = 6;
+}
+
+message SystemTask {
+    SystemSchemes system = 1;
+    Task task = 2;
+}
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string comment = 11;
+    string reasons = 12;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message CreateRequest {
+    SystemSchemes data = 1;
+    uint64 taskID = 2;
+}
+
+message CreateResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    SystemSchemes data = 4;
+}
+
+message GetMyTasksIDRequest {
+    uint64 taskID = 1;
+    string processId = 2;
+}
+
+message GetMyTasksIDResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    SystemTask data = 4;
+    string processId = 5;
+}
+
+message SystemFilterInputRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    string taskID = 1;
+    string key = 8;
+    string value = 2;
+    string description = 3;
+    statuses status = 4;
+    steps step = 5;
+
+    message DateFilter {
+        string from = 1;
+        string to = 2;
+    }
+
+    DateFilter createdAt = 6;
+    DateFilter updatedAt = 7;
+}
+
+
+message SystemFilterRequest {
+
+
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name, available names: partner, changelog, status",
+    }];
+    Direction dir = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order direction",
+    }];
+    SystemFilterInputRequest filter = 5[(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "filter data"
+    }];
+    string search = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "search data"
+    }];
+    string processId = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Process ID"
+    }];
+}
+message ListSystemDataRequest {
+    SystemSchemes system = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+
+message ListSystemDataResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated SystemSchemes data = 4;
+    PaginationResponse pagination = 5;
+}
+
+// MdBiccc
+// MdBenefType
+// MdCountry
+// MdEmploymentIndustry
+// MdEmploymentPosition
+// MdEmploymentStatus
+// MdGender
+// MdIdType
+// MdKota
+// MdProvince
+// MdPurpose
+// MdPurposeIntended
+// MdRelationToSender
+
+message ListMdBicccRequest {
+    MdBiccc data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdBenefTypeRequest {
+    MdBenefType data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdCountryRequest {
+    MdCountry data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdEmploymentIndustryRequest {
+    MdEmploymentIndustry data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdEmploymentPositionRequest {
+    MdEmploymentPosition data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdEmploymentStatusRequest {
+    MdEmploymentStatus data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdGenderRequest {
+    MdGender data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdIdTypeRequest {
+    MdIdType data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdKotaRequest {
+    MdKota data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdProvinceRequest {
+    MdProvince data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdPurposeRequest {
+    MdPurpose data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdPurposeIntendedRequest {
+    MdPurposeIntended data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdRelationToSenderRequest {
+    MdRelationToSender data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdBankKliringRequest {
+    MdBankKliring data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+message ListMdBranchRequest {
+    MdBranch data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+
+
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+
+message GetBenCategoryRequest {
+    BenCategory data = 1;
+    int32 limit = 2;
+    int32 page = 3;
+    string sort = 4;
+    Direction dir = 5;
+    string filter = 6;
+    string query = 7;
+    string filterOr = 8;
+    string in = 9;
+}
+
+message GetBenCategoryResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated BenCategory data = 4;
+    PaginationResponse Pagination = 5;
+}
+
+message GetBITRXCodeRequest {
+    BITRXCode data = 1;
+    int32 limit = 2;
+    int32 page = 3;
+    string sort = 4;
+    Direction dir = 5;
+    string filter = 6;
+    string query = 7;
+    string filterOr = 8;
+    string in = 9;
+}
+
+message GetBITRXCodeResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated BITRXCode data = 4;
+    PaginationResponse Pagination = 5;
+}
+
+message BenCategory {
+    uint64 beneficiary_category_id = 1;
+    string code = 2;
+    string description = 3;
+    string information = 4;
+}
+
+message BITRXCode {
+    uint64 bi_transaction_code_id = 1;
+    string name = 2;
+    uint64 parent = 3;
+    string description = 4;
+    string code = 5;
+}
+
+message ListMdBicccResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdBiccc data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdBenefTypeResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdBenefType data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdCountryResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdCountry data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdEmploymentIndustryResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdEmploymentIndustry data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdEmploymentPositionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdEmploymentPosition data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdEmploymentStatusResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdEmploymentStatus data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdGenderResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdGender data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdIdTypeResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdIdType data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdKotaResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdKota data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdProvinceResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdProvince data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdPurposeResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdPurpose data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdPurposeIntendedResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdPurposeIntended data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdRelationToSenderResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdRelationToSender data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdBankKliringResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdBankKliring data = 4;
+    PaginationResponse Pagination = 5;
+}
+message ListMdBranchResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdBranch data = 4;
+    PaginationResponse Pagination = 5;
+}
+
+message SystemDetailRequest {
+    uint64 systemID = 1;
+}
+
+message SystemDetailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    SystemSchemes data = 4;
+}
+
+message SystemDetailByKeyRequest {
+    string systemKey = 1;
+}
+
+message SystemDetailByKeyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    SystemSchemes data = 4;
+}
+
+message ResponseMappingRequest {
+    uint32 productId = 1;
+}
+
+message ResponseMappingRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated ResponseMapping data = 4;
+}
+
+// request to check status suspend mdbankkliring
+message CheckMdBankliringSuspendReq {
+    string bank_code = 1;
+    string code = 2;
+    uint64 productID = 3;
+}
+
+message  CheckMdBankliringSuspendRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ListMdJhrateRequest {
+    MdJhrate data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    Direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+
+message ListMdJhrateResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdJhrate data = 4;
+    PaginationResponse Pagination = 5;
+}
+
+message UpdateRTGSBankRequest {
+    string key = 1;
+}
+
+message UpdateRTGSBankResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ListMdBankKliringARRequest {
+    MdBankKliring data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+	uint64 mandate_category_id = 10;
+}
+
+
+
+message ListMdRemarkToBankBenefRequest {
+    MdRemarkToBankBenef data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    // string filterOr = 8;
+    // string in = 9;
+}
+
+message ListMdRemarkToBankBenefResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MdRemarkToBankBenef data = 4;
+    PaginationResponse Pagination = 5;
+}
+
+message GetMappingCurrencyForCrossBorderTransferRequest {
+    uint32 idCountry = 1;
+}
+
+message GetMappingCurrencyForCrossBorderTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    MappingCurrencyForCrossBorderTransfer data = 4;
+}

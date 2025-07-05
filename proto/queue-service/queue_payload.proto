@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+// import "queue_gorm_db.proto";
+
+package queue.service.v1;
+option go_package = "./pb";
+
+// import "mwitkow/go-proto-validators/validator.proto";
+// import "google/protobuf/timestamp.proto";
+// import "google/api/field_behavior.proto";
+// import "protoc-gen-openapiv2/options/annotations.proto";
+// import "google/protobuf/struct.proto";
+
+// ** Main **
+
+message QueueMetadata {
+    uint64 taskID = 1;
+    string type = 2;
+}
+
+// ** Payload **
+
+message HealthCheckRequest {}
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message PublishJobRequest {
+    QueueMetadata metadata = 1;
+    string payload = 2;
+    string queue = 3;
+}
+message PublishJobResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message QueuePayrollMetadata {
+    uint64 taskID = 1;
+    uint64 jobID = 2;
+    string type = 3;
+}
+
+message PublishPayrollJobRequest {
+    QueuePayrollMetadata metadata = 1;
+    string payload = 2;
+    string queue = 3;
+    int64 delay = 4;
+}
+message PublishPayrollJobResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message QueueBulkTransferMetadata {
+    uint64 taskID = 1;
+    uint64 jobID = 2;
+    string type = 3;
+}
+
+message PublishBulkTransferJobRequest {
+    QueueBulkTransferMetadata metadata = 1;
+    string payload = 2;
+    string queue = 3;
+    int64 delay = 4;
+}
+message PublishBulkTransferJobResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message QueueDepositoMetadata {
+    uint64 taskID = 1;
+    uint64 jobID = 2;
+}
+
+message PublishDepositoJobRequest {
+    QueueDepositoMetadata metadata = 1;
+    string payload = 2;
+    string queue = 3;
+    int64 delay = 4;
+}
+message PublishDepositoJobResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message PublishLiquidityJobRequest {
+    QueueLiquidityMetadata metadata = 1;
+    string payload = 2;
+    int64 delay = 3;
+}
+message PublishLiquidityJobResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message QueueLiquidityMetadata {
+    // uint64 taskID = 1;
+    uint64 jobID = 2;
+}
+
+message QueueMpnMetadata {
+    uint64 taskID = 1;
+    uint64 jobID = 2;
+    string type = 3;
+}
+
+message PublishMpnJobRequest {
+    QueueMpnMetadata metadata = 1;
+    string payload = 2;
+    string queue = 3;
+    int64 delay = 4;
+}
+
+message PublishMpnJobResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message QueueReportGenerateMetadata {
+    uint64 taskID = 1;
+    uint64 jobID = 2;
+    string type = 3;
+}
+
+message PublishReportGenerateRequest {
+    QueueReportGenerateMetadata metadata = 1;
+    string payload = 2;
+    string queue = 3;
+    int64 delay = 4;
+}
+
+message PublishReportGenerateResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+

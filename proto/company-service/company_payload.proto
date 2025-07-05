@@ -1,0 +1,1789 @@
+syntax = "proto3";
+
+import "company-service/company_gorm_db.proto";
+
+package company.service.v1;
+option go_package = "./pb";
+
+import "mwitkow/go-proto-validators/validator.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+message LoginRequest {
+    string username = 1 [(validator.field) = {msg_exists : true}];
+    string password = 2 [(validator.field) = {msg_exists : true}];
+}
+
+message LoginResponse {
+    string access_token = 1;
+}
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message Empty {}
+
+message InvalidKeyError {
+    string key = 1;
+    string message = 2;
+}
+
+message JWTTokenResponse {
+    string token = 1;
+    int64 expiredAt = 2;
+}
+
+message ListRequest {
+
+}
+
+message GeneralResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message DetailCurrencyRequest {
+    uint64 id =1;
+}
+
+
+message DetailCurrencyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Currency data = 4;
+}
+
+
+message ListCompanyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated CompanyResponse data = 4;
+}
+
+message CompanyResponse {
+    uint64 id = 1;
+    string name = 2;
+    string branchCode = 3;
+    string shortName = 4;
+}
+
+message ListCurrencyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Currency data = 4;
+}
+
+message ListCompanyDataReq {
+    uint64 companyID = 1;
+    uint64 holdingID = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string in = 11;
+    string customOrder = 9;
+    string companyName = 10;
+
+}
+
+message ListGroupLimitReq {
+    uint64 holdingID = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+}
+
+message ListLimitReq{
+    uint64 companyID = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+}
+
+message ListLimitReqByHoldingID{
+    uint64 holdingID = 1;
+    uint64 companyID = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+}
+
+message ListCurrencyReq{
+    uint64 currencyID = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message ListGroupLimitRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated CompanyGroupLimit data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ListCompanyDataRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Company data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ListLimitRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated CompanyLimit data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ListCurrencyRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Currency data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message CompanyGroupDetailRequest {
+    uint64 id =1;
+}
+
+
+message CompanyGroupDetailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Company data = 4;
+}
+
+
+message CompanyGroupTask {
+    uint64 taskID = 1;
+    uint64 featureID = 6;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    bool isValidFeatureID = 7;
+    uint64 lastApprovedByID = 8;
+    uint64 lastRejectedByID = 9;
+    string lastApprovedByName = 10;
+    string lastRejectedByName = 11;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+message CreateCompanyGroupTask {
+    CreateCompanyGroupRequest companyGroupRequest = 1;
+    CompanyGroupTask task = 2;
+}
+message ListCompanyGroupTaskRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3;
+    int32 page = 4;
+    string sort = 5;
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;
+    int32 totalPages = 4;
+}
+
+message ListCompanyGroupTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated CreateCompanyGroupTask data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message CreateCompanyGroupTaskRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: "{\"isDraft\":true,\"data\":{\"companyGroup\":{\"name\":\"string\",\"holdingCompanyID\":0},\"groupLimit\":[{\"currencyID\":0,\"limit\":\"string\"}],\"companyLimit\":[{\"companyID\":0,\"currencyID\":0,\"limit\":\"string\"}],\"groupSubsidiaries\":[{\"parentCompanyID\":0,\"subsidiaryCompanyID\":0}],\"companyWorkflow\":{\"companyID\":0,\"isTransactionSTP\":true,\"isTransactionChecker\":true,\"isTransactionSigner\":true,\"isTransactionReleaser\":true,\"isNonTransactionSTP\":true,\"isNonTransactionChecker\":true,\"isNonTransactionSigner\":true,\"isNonTransactionReleaser\":true}}}"
+    };
+
+    uint64 taskID = 1;
+    CreateCompanyGroupRequest data = 2;
+    bool isDraft = 3;
+}
+
+message CreateCompanyGroupRequest {
+    Company company = 1;
+    repeated CreateGroupLimitRequest groupLimit = 2;
+    repeated CreateCompanyLimitRequest companyLimit = 3;
+    repeated CreateGroupSubsdiaryRequest groupSubsidiaries = 4;
+    CreateCompanyWorkflowRequest companyWorkflow = 5;
+    uint64 taskID = 6;
+}
+
+message CreateCompanyLimitRequest {
+    uint64 companyID = 1;
+    uint64 currencyID = 2;
+    uint64 limit = 3;
+    CurrencyRequest currency = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message CreateGroupLimitRequest {
+    uint64 currencyID = 2;
+    uint64 limit = 3;
+    CurrencyRequest currency = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+message CurrencyRequest {
+    uint64 currencyID = 1;
+    string name = 2;
+    string code = 3;
+}
+
+message CreateCompanyWorkflowRequest {
+    uint64 companyID = 1;
+    bool isTransactionSTP = 2;
+    bool isTransactionChecker = 3;
+    bool isTransactionSigner = 4;
+    bool isTransactionReleaser = 5;
+    bool isNonTransactionSTP = 6;
+    bool isNonTransactionChecker = 7;
+    bool isNonTransactionSigner = 8;
+    bool isNonTransactionReleaser = 9;
+}
+
+message CreateGroupSubsdiaryRequest {
+    uint64 parentCompanyID = 1;
+    uint64 subsidiaryCompanyID = 2;
+}
+
+message CreateCompanyGroupResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+
+message BricamsGetCustomerReq {
+    string id = 1;
+    string name = 2;
+    uint32 page = 3;
+    uint32 limit = 4;
+}
+
+message BricamsGetCustomerGroupReq {
+    string id = 1;
+    string query = 2;
+    uint32 page = 3;
+    uint32 limit = 4;
+}
+
+message BricamsGetCustomerByIdReq {
+    string id = 1;
+}
+
+message BricamsGetCustomerByUserReq {
+    string username = 1;
+}
+
+message BricamsGetCustomerResMulti {
+    uint32 totalData = 1;
+    string responseCode = 2;
+    string responseMessage = 3;
+    repeated BricamsGetCustomerData data = 4;
+    message Detail {
+        string status = 2;
+        string header = 3;
+    }
+    Detail detail = 5;
+}
+
+message BricamsGetCustomerResSingel {
+    uint32 totalData = 1;
+    string responseCode = 2;
+    string responseMessage = 3;
+    BricamsGetCustomerData data = 4;
+    message Detail {
+        string status = 2;
+        string header = 3;
+    }
+    Detail detail = 5;
+}
+
+message BricamsResponseDatas {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    BricamsGetCustomerResMulti data = 4;
+}
+
+message BricamsResponseData {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    BricamsGetCustomerResSingel data = 4;
+}
+
+message BricamsGetCustomerData {
+    string dType = 1;
+    int64 id = 2;
+    string authorizationBusinessDate = 3;
+    string createdByUri = 4;
+    string creationTimeStamp = 5;
+    string lastUpdatedByUri = 6;
+    string lastUpdatedTimeStamp = 7;
+    int32 persistenceStatus = 8;
+    string snapshotRecord = 9;
+    string systemModifiableOnly = 10;
+    string uuid = 11;
+    string makeBusinessDate = 12;
+    string tenantId = 13;
+    int32 activeFlag = 14;
+    int32 approvalStatus = 15;
+    string reviewedByUri = 16;
+    string reviewedTimeStamp = 17;
+    string description = 18;
+    string name = 19;
+    string branchCode = 20;
+    int32 hasParentBranchCalender = 21;
+    int32 isEmailFilterEnabled = 22;
+    int32 isLogAfterWorkHoursEnabled = 23;
+    int32 isOutOfWorkHLoginAllow = 24;
+    string maximumEmails = 25;
+    string parentBranchIds = 26;
+    string productOffered = 27;
+    string shortName = 28;
+    string systemName = 29;
+    string persistentFormData = 30;
+    string contactInfo = 31;
+    string primaryContactPerson = 32;
+    int64 branchCalendar = 33;
+    int32 organizationType = 34;
+    string signatureAuthority = 35;
+    string headOffice = 36;
+    int32 offlineFlag = 37;
+    string gStin = 38;
+    int32 isStopFreshBooking = 39;
+    string bankBranchCode = 40;
+    string bankBranchName = 41;
+}
+
+message WorkflowStep {
+    bool verifier = 1;
+    bool approver = 2;
+    bool releaser = 3;
+}
+
+message Workflow {
+    bool isTansactionalStp = 1;
+    bool isNonTansactionalStp = 2;
+    WorkflowStep tansactionalStpStep = 3;
+    WorkflowStep nonTansactionalStpStep = 4;
+}
+
+message WorkflowV2 {
+    bool isTransactionalStp = 1;
+    bool isNonTransactionalStp = 2;
+    WorkflowStep transactionalStpStep = 3;
+    WorkflowStep nonTransactionalStpStep = 4;
+    bool needToken = 5;
+}
+
+message AdminDetail {
+    enum Type {
+        SYSTEM_ADMIN = 0;
+        ADMIN = 1;
+    }
+
+    Type type = 1;
+    string IdName = 2;
+    string MotherOriginName = 3;
+    string Address = 4;
+    string ZipCode = 5;
+    string EmailAddress = 6;
+    string PhoneNumber = 7;
+    string MobileNumber = 8;
+    string TaxId = 9;
+    string TokenNumber = 10;
+    string idNumber = 11;
+    uint32 idType = 12;
+    string initialCode = 13;
+    string Gender = 14;
+}
+
+message Admin {
+    AdminDetail SystemAdmin = 1;
+    AdminDetail Admin = 2;
+}
+
+message Accounts {
+    string AccountCifNumber = 1;
+    string AccountNumber = 2;
+    string AccountHolderName = 3;
+    string AccountProductType = 4;
+    string AccountProductName = 5;
+    string AccountStatus = 6;
+    string AccountType = 7;
+    repeated string AccountAlias = 8;
+    string AccessLevel = 9;
+    string AccountOwner = 10;
+    string RelationshipManager = 11;
+    string AccountCurrency = 12;
+}
+
+message Account {
+    string cif = 1;
+    repeated Accounts accounts = 2;
+}
+
+message AccountsTRB {
+    string accountCifNumber = 1;
+    string accountNumber = 2;
+    string accountHolderName = 3;
+    string accountProductType = 4;
+    string accountProductName = 5;
+    string accountStatus = 6;
+    string accountType = 7;
+    string accountAlias = 8;
+    string accessLevel = 9;
+    string accountOwner = 10;
+    string relationshipManager = 11;
+    string accountCurrency = 12;
+}
+
+message AccountTRB {
+    string cif = 1;
+    repeated AccountsTRB accounts = 2;
+}
+
+message CreateCompanyTaskReq {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: "{\"isDraft\":false,\"company\":{\"companyID\":0,\"holdingID\":0,\"groupName\":\"string\",\"companyName\":\"string\",\"holdingCompanyName\":\"string\",\"companyLimits\":[{\"companyID\":0,\"currencyID\":0,\"currency\":{\"currencyID\":0,\"name\":\"string\",\"code\":\"string\"},\"limit\":0}],\"companyGroupLimits\":[{\"holdingCompanyID\":0,\"currencyID\":0,\"currency\":{\"currencyID\":0,\"name\":\"string\",\"code\":\"string\"},\"limit\":0}],\"subsidiaryCompanies\":[{\"companyID\":0,\"holdingID\":0,\"companyName\":\"string\",\"holdingCompanyName\":\"string\",\"companyLimits\":[{\"companyID\":0,\"currencyID\":0,\"currency\":{\"currencyID\":0,\"name\":\"string\",\"code\":\"string\"},\"limit\":0}]}]},\"workflow\":{\"isTansactionalStp\":true,\"isNonTansactionalStp\":true,\"tansactionalStpStep\":{\"verifier\":true,\"approver\":true,\"releaser\":true},\"nonTansactionalStpStep\":{\"verifier\":true,\"approver\":true,\"releaser\":true}}}"
+    };
+
+    Company company = 1;
+    Workflow workflow = 2;
+    bool isDraft = 4;
+    uint64 taskID = 3;
+}
+
+message ListCompanyTaskV2Request {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3;
+    int32 page = 4;
+    string sort = 5;
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7;
+    string query = 8;
+    string in = 9;
+    string filterOr = 10;
+}
+
+message ListCompanyTaskV2Response {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated CompanyTaskV2 data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message CreateCompanyTaskReqV2 {
+    Company company = 1;
+    Admin admin = 2;
+    WorkflowV2 workflow = 3;
+    repeated Account account = 4;
+    bool isDraft = 5;
+    uint64 taskID = 6;
+    string comment = 7;
+    uint64 featureID = 8;
+    string status = 10;
+    string accountNumberCompany = 11;
+    bool isManual = 12;
+    uint32 usersLimit = 13;
+    string channel = 14;
+
+    uint64 lastApprovedByID = 15;
+    string lastApprovedByName = 16;
+    uint64 createdByID = 17;
+    string createdByName = 18;
+}
+
+message CompanyParams {
+    uint64 companyID = 1;
+}
+
+message CreateCompanyTask {
+    uint64 taskID = 1;
+}
+
+message CreateCompanyTaskRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+}
+
+message CreateCompanyTaskResV2 {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+}
+
+message DeleteCompanyTaskReq {
+    uint64 taskID = 1;
+}
+
+message DeleteCompanyTaskRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+}
+
+message GetCompanyTaskByHoldingIDReq {
+    uint64 holdingID = 1;
+}
+
+message GetCompanyTaskByHoldingIDCompanyIDReq {
+    uint64 holdingID = 1;
+    uint64 companyID = 2;
+}
+
+message GetCompanyTaskByIDReq {
+    string taskID = 1;
+}
+
+message GetCompanyTaskByIDRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    CompanyTask data = 4;
+}
+
+message ListCompanyTaskReq {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3;
+    int32 page = 4;
+    string sort = 5;
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7;
+    string query = 8;
+    string in = 9;
+    string filterOr = 10;
+}
+
+message GetCompanyTaskByIDRequest {
+    uint64 taskID = 1;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    bool isValidFeatureID = 10;
+    string reasons = 11;
+    string comment = 12;
+    uint64 createdByID = 13;
+    string createdByName = 14;
+    uint64 updatedByID = 15;
+    string updatedByName = 16;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp approvedAt = 103 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp rejectedAt = 104 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message CompanyTask {
+    Company company = 1;
+    Workflow workflow = 2;
+    Task task = 3;
+    // repeated Role roles = 3;
+}
+
+message ListCompanyTaskRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated CompanyTask data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message CreateCompanyReq {
+    CreateCompanyTaskReq data = 1;
+    uint64 taskID = 2;
+}
+
+message CreateCompanyRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Company data = 4;
+}
+
+message BRICaMSSvcCompanyV2 {
+    string dType = 1;
+    int64 id = 2;
+    // string authorizationBusinessDate = 3;
+    // string createdByUri = 4;
+    string creationTimeStamp = 5;
+    // string lastUpdatedByUri = 6;
+    // string lastUpdatedTimeStamp = 7;
+    // int64 persistenceStatus = 8;
+    // int64 snapshotRecord = 9;
+    // int64 systemModifiableOnly = 10;
+    // string uuid = 11;
+    // string makeBusinessDate = 12;
+    // int64 tenantId = 13;
+    // int64 activeFlag = 14;
+    // int64 approvalStatus = 15;
+    // string reviewedByUri = 16;
+    // string reviewedTimeStamp = 17;
+    string description = 18;
+    string name = 19;
+    string branchCode = 20;
+    // int64 hasParentBranchCalender = 21;
+    // int64 isEmailFilterEnabled = 22;
+    // int64 isLogAfterWorkHoursEnabled = 23;
+    // int64 isOutOfWorkHLoginAllow = 24;
+    // int64 maximumEmails = 25;
+    // string parentBranchIds = 26;
+    // string productOffered = 27;
+    // string shortName = 28;
+    // string systemName = 29;
+    // int64 persistentFormData = 30;
+    // int64 contactInfo = 31;
+    // int64 primaryContactPerson = 32;
+    // int64 branchCalendar = 33;
+    // int64 organizationType = 34;
+    // int64 signatureAuthority = 35;
+    // int64 headOffice = 36;
+    // int64 offlineFlag = 37;
+    // string gStin = 38;
+    // int64 isStopFreshBooking = 39;
+    string bankBranchCode = 40;
+    string bankBranchName = 41;
+    string taxId = 42;
+    string address = 43;
+    string telephone = 44;
+    string handphone = 45;
+    string remarks = 46;
+
+    CompanyGroupBRICaMS companyGroup = 61;
+}
+
+message GetGroupIDStoreReq {
+    uint64 companyID = 1;
+}
+
+message GetGroupIDStoreRes {
+    repeated uint64 companyIDs = 1;
+    uint64 holdingID = 2;
+}
+
+message DeleteCompanyRes {
+    bool success = 1;
+}
+
+message DetailCompanyRes {
+    uint64 companyID = 1;
+    uint64 holdingID = 2;
+    string groupName = 3;
+    string companyName = 4;
+    string holdingCompanyName = 5;
+    string countryCode = 6;
+}
+
+message CekCompanyIDAvaibilityReq {
+    uint64 companyID = 1;
+    // uint64 taskID = 2;
+    // uint64 holdingID = 3;
+}
+
+message CompanySubsidiaryValidationReq {
+    uint64 companyID = 1;
+    uint64 taskID = 2;
+    uint64 holdingID = 3;
+}
+
+message CompanySubsidiaryValidationRes {
+    bool valid = 1;
+    string message = 2;
+}
+
+message CheckCompanyIDTaskAndData {
+    uint64 companyID = 1;
+    uint64 taskID = 2;
+    uint64 holdingID = 3;
+}
+
+message CekCompanyIDAvaibilityRes {
+    bool available = 1;
+    string status = 2;
+
+}
+
+message CekCompanyStatusRes {
+    string statusTask = 1;
+    string statusCompany = 2;
+
+}
+
+message TempGenToken {
+    enum Role {
+        bankadmin = 0;
+        companyadmin = 1;
+        companyuser = 2;
+    }
+    Role role = 1;
+}
+
+message BRICaMSSvcCompanyV2CG {
+    string dType = 1;
+    int64 id = 2;
+
+    string creationTimeStamp = 5;
+
+    string description = 18;
+    string name = 19;
+
+    string bankBranchCode = 40;
+    string bankBranchName = 41;
+    CompanyGroupBRICaMS companyGroup = 61;
+}
+
+message CompanyGroupBRICaMS {
+    int64 holdingID = 1;
+    string groupName = 2;
+}
+
+message BRICaMSSvcPagionationV2 {
+    int64 page = 1;
+    int64 limit = 2;
+    int64 totalRow = 3;
+    int64 totalPage = 4;
+}
+
+message BRICaMSSvcMultipleResV2 {
+    BRICaMSSvcPagionationV2 pagination = 1;
+    int64 totalData = 2;
+    string responseCode = 3;
+    string responseMessage = 4;
+    repeated BRICaMSSvcCompanyV2 data = 5;
+}
+
+message BRICaMSSvcMultipleResV2CG {
+    PaginationResponse pagination = 1;
+    int64 totalData = 2;
+    string responseCode = 3;
+    string responseMessage = 4;
+    repeated BRICaMSSvcCompanyV2CG data = 5;
+}
+
+message BRICaMSSvcSingleResV2 {
+    string responseCode = 1;
+    string responseMessage = 2;
+    BRICaMSSvcCompanyV2 data = 3;
+}
+
+message FileListCompanyTaskRequest {
+
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 1;
+
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status =2;
+    steps step = 3;
+
+    int32 limit = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 7;
+    string filter = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Company => Where task_id = 1 AND type = 'Company' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Company => Where name = 'Company' OR type = 'Company' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+}
+
+message FileListCompany {
+
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 1;
+
+    enum StatusCompany {
+        NULL_STATUS_USER = 0;
+        hold = 1;
+        inactive = 2;
+        active = 3;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    StatusCompany status =2;
+    steps step = 3;
+
+    int32 limit = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 7;
+    string filter = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Company => Where task_id = 1 AND type = 'Company' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Company => Where name = 'Company' OR type = 'Company' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+}
+
+message ErrorBodyResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ValidateCompanyByCIFRequest {
+    string accountCifNumber = 1;
+}
+
+message ValidateCompanyByCIFResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        string nik = 1;
+        string cif = 2;
+        string branch = 3;
+        string customerName = 4;
+        string phoneNumber = 5;
+        string email = 6;
+        string address1 = 7;
+        string address2 = 8;
+        string address3 = 9;
+        string address4 = 10;
+        string zipCode = 11;
+        string rtNo = 12;
+        string rwNo = 13;
+        string placeOfBirth = 14;
+        string dateOfBirth = 15;
+        string sex = 16;
+        string citizenship = 17;
+        uint32 idType = 18;
+        string idNumber = 19;
+        string religion = 20;
+        string martialStatus = 21;
+        string motherName = 22;
+        string npwp = 23;
+        string accountOpeningPurpose = 24;
+        string typeOfWork = 25;
+        string educationCode = 26;
+        string educationDesc = 27;
+        string correspondenceAddress = 28;
+        string city = 29;
+        string district = 30;
+        string subDistrict = 31;
+        string officeAddress = 32;
+        string officeCity = 33;
+        string officeDistrict = 34;
+        string officeSubDistrict = 35;
+        string officeName = 36;
+        string officePhoneNumber = 37;
+        string officeZipCode = 38;
+        string income = 39;
+        string province = 40;
+        string primarySourceOfFunds = 41;
+        string primarySourceOfFundsDesc = 42;
+        string occupation = 43;
+        string occupationDesc = 44;
+        string dailyTransaction = 45;
+        string position = 46;
+        string positionDesc = 47;
+        string creditCardCode = 48;
+        string businessSector = 49;
+    }
+
+    Response data = 4;
+}
+
+message ValidateCompanyByAccountNumberRequest {
+    string accountNumber = 1;
+}
+
+message ValidateCompanyByAccountNumberResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        string accountNumber = 1;
+        string identityNumber = 2;
+        string cifNumber = 3;
+        string branchNumber = 4;
+        string customerName = 5;
+        string phoneNumber = 6;
+        string emailAddress = 7;
+        string address1 = 8;
+        string address2 = 9;
+        string address3 = 10;
+        string address4 = 11;
+        string zipCode = 12;
+        string neighbourhoodUnitNumber = 13;
+        string communityUnitNumber = 14;
+        string placeOfBirth = 15;
+        string dateOfBirth = 16;
+        string sex = 17;
+        string citizenship = 18;
+        uint32 idType = 19;
+        string idNumber = 20;
+        string religion = 21;
+        string martialStatus = 22;
+        string motherName = 23;
+        string taxNumber = 24;
+        string accountOpeningPurpose = 25;
+        string typeOfWork = 26;
+        string educationCode = 27;
+        string educationName = 28;
+        string correspondenceAddress = 29;
+        string city = 30;
+        string district = 31;
+        string subDistrict = 32;
+        string officeAddress = 33;
+        string officeCity = 34;
+        string officeDistrict = 35;
+        string officeSubDistrict = 36;
+        string officeName = 37;
+        string officePhoneNumber = 38;
+        string officeZipCode = 39;
+        string income = 40;
+        string province = 41;
+        string primarySourceOfFundsCode = 42;
+        string primarySourceOfFundsName = 43;
+        string occupationCode = 44;
+        string occupationName = 45;
+        string dailyTransaction = 46;
+        string positionCode = 47;
+        string positionName = 48;
+        string creditCardCode = 49;
+        string businessSector = 50;
+    }
+
+    Response data = 4;
+}
+
+message CompanyTaskV2 {
+    Company company = 1;
+    Admin admin = 2;
+    WorkflowV2 workflow = 3;
+    repeated Account account = 4;
+    Task task = 5;
+
+    message OldData {
+        Company company = 1;
+        Admin admin = 2;
+        WorkflowV2 workflow = 3;
+        repeated Account account = 4;
+        string accountNumberCompany = 5;
+        bool isManual = 6;
+        uint32 usersLimit = 7;
+    }
+    OldData oldData = 6;
+    string accountNumberCompany = 7;
+    bool isManual = 8;
+    uint32 usersLimit = 9;
+    string channel = 10;
+}
+
+message CreateCompanyV2Request {
+    CreateCompanyTaskReqV2 data = 1;
+    uint64 taskID = 2;
+}
+
+message CreateCompanyV2Response {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Company data = 4;
+}
+
+message DeleteCompanyV2Response {
+    bool success = 1;
+}
+
+message GetCompanyTaskByIDV2Request {
+    string taskID = 1;
+}
+message GetCompanyDataByIDV2Request {
+    string companyID = 1;
+}
+
+message GetCompanyTaskByIDV2Response {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    CompanyTaskV2 data = 4;
+}
+
+message TaskActionV2Request {
+    uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject', 'delete'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+    string passcode = 5;
+}
+
+message TaskActionV2Response {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+}
+
+message CompanyNotificationData {
+    string USERNAME_MAKER = 1 [json_name='USERNAME_MAKER'];
+    string USERNAME_APPROVER = 2 [json_name='USERNAME_APPROVER'];
+    string CREATED_DATETIME = 3 [json_name='CREATED_DATETIME'];
+    string CREATED_DATE = 4 [json_name='CREATED_DATE'];
+    string CREATED_TIME = 5 [json_name='CREATED_TIME'];
+    string EVENT_DATETIME = 6 [json_name='EVENT_DATETIME'];
+    string EVENT_DATE = 7 [json_name='EVENT_DATE'];
+    string EVENT_TIME = 8 [json_name='EVENT_TIME'];
+    string TASK_ID = 14 [json_name='TASK_ID'];
+    string USERNAME_REJECTOR = 15 [json_name='USERNAME_REJECTOR'];
+    string COMPANY_NAME = 16 [json_name='COMPANY_NAME'];
+    string USERNAME_CHECKER = 17 [json_name='USERNAME_CHECKER'];
+    string USERNAME_RELEASER = 18 [json_name='USERNAME_RELEASER'];
+    string MODULE = 19 [json_name='MODULE'];
+    string MESSAGE = 20 [json_name='MESSAGE'];
+    string TEMPLATE = 21 [json_name='TEMPLATE'];
+    string STATUS_SEND = 22 [json_name='STATUS_SEND'];
+    string STATUS_ACTION = 23 [json_name='STATUS_ACTION'];
+    string STATUS_REQUEST_DELETE = 24 [json_name='STATUS_REQUEST_DELETE'];
+    string REASON = 25 [json_name='REASON'];
+    string COMMENT = 26 [json_name='COMMENT'];
+}
+
+message CreateCompanyFieldResV2 {
+
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    CreateCompanyTaskReqV2 data = 4;
+}
+
+message Subscription {
+    string deadlineDate = 1;
+    uint32 amount = 2;
+}
+
+message CreateCompanyTrbV2Req {
+    string externalId = 1;
+    string referralCode = 2;
+    Company company = 3;
+    Admin admin = 4;
+    repeated AccountTRB account = 5;
+    Subscription subscription = 6;
+    uint32 userLimit = 7;
+}
+
+message CreateCompanyTrbResV2 {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DetailCompanyTrbResV2 data = 4;
+}
+
+message DetailCompanyTrbResV2 {
+    Company company = 1;
+    Admin admin = 2;
+    // Subscription subscription = 3;
+    // uint64 usersLimit = 4;
+    Credentials credential = 5;
+}
+
+message Credentials {
+    CredentialAdmin SystemAdmin = 1;
+    CredentialAdmin Admin = 2;
+}
+
+message CredentialAdmin {
+    string email = 1;
+    string username = 2;
+    string password = 3;
+    string levelUser = 4;
+    string fullname = 5;
+    uint64 id = 6;
+}
+
+message CekCompanyTrbAvaibilityReq {
+    string companyLoginCode = 1;
+}
+
+message CekCompanyLoginCodeAvaibilityReq {
+    string companyLoginCode = 1;
+}
+
+message CekCompanyStatusV2Res {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        string loginCode = 1;
+        string status = 2;
+        uint64 companyId = 3;
+        string country_code = 4;
+        uint64 interval_change_password = 5;
+    }
+
+    Response data = 4;
+}
+
+message ListCompanyDataV2Request {
+
+    int32 limit = 1;
+    int32 page = 2;
+    string sort = 3;
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 4;
+    string filter = 5;
+    string query = 6;
+    string in = 7;
+    string filterOr = 8;
+}
+
+enum StatusCompany {
+    NULL_STATUS_USER = 0;
+    hold = 1;
+    inactive = 2;
+    active = 3;
+}
+
+message SetStatusCompanyReq {
+    uint64 taskID = 1;
+    uint64 companyID = 2;
+    StatusCompany statusCompany = 3;
+}
+
+message SetStatusCompanyRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message AdminsCompanyV2Res {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        repeated string createdByName = 1;
+        repeated string updatedByName = 2;
+    }
+
+    Response data = 4;
+}
+
+message CheckCompanyLoginCodeAvaibilityReqV2 {
+    string companyLoginCode = 1;
+    uint64 companyId = 2;
+    uint64 taskId = 3;
+}
+
+
+message QlolaCompany {
+    string name = 1;
+    uint64 companyId = 2;
+    string companyCode = 3;
+    string createdAt = 4;
+    string updatedAt = 5;
+}
+
+message QlolaGetListCompanyResponse {
+    repeated QlolaCompany companyList = 1;
+    Pagination pagination = 2;
+}
+
+message QlolaGetListCompanyBrigateResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    QlolaGetListCompanyResponse responseData = 3;
+    string responseError = 4;
+}
+
+message QlolaGetListCompanyRequest {
+    int32 page = 1;
+    int32 limit = 2;
+    string name = 3;
+    QlolaSort sort = 6;
+}
+
+message QlolaGetDetailCompanyRequest {
+    string companyCode = 1;
+}
+
+message QlolaCompanyDetail {
+    string name = 1;
+    uint64 companyId = 2;
+    string companyCode = 3;
+    string NPWP = 4;
+    string city = 5;
+    string district = 6;
+    string province = 7;
+    string zipCode = 8;
+    string Address = 9;
+    string BusinessField = 10;
+    string Status = 11;
+}
+
+message QlolaGetDetailCompanyBrigateResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    QlolaGetDetailCompanyResponse responseData = 3;
+    string responseError = 4;
+}
+
+message QlolaGetDetailCompanyResponse {
+    string name = 1;
+    uint64 companyId = 2;
+    string companyCode = 3;
+    string NPWP = 4;
+    string Address = 5;
+    string companyType = 6;
+    string Status = 7;
+    string updatedAt = 20;
+}
+
+message Pagination {
+    int32 page = 1;
+    int32 limit = 2;
+    int32 totalPage = 3;
+    int32 totalData = 4;
+}
+
+message QlolaSort {
+    string field = 1;
+    string order = 2;
+}
+
+message QlolaResponseError {
+    string code = 1;
+    string message = 2;
+}
+
+
+message QlolaCheckStatusCompanyByIdRequest {
+    uint64 company_id = 1;
+}
+
+message QlolaCheckStatusCompanyByIdResponse {
+    string company_name = 1;
+    string company_status = 2;
+    repeated CompanyProduct product_info = 3;
+}
+
+message CompanyProduct {
+    uint64 product_id = 1;
+    string product_name = 2;
+    string product_href = 3;
+    repeated uint64 role_id = 4;
+}
+
+message ValidateAccountByCIFRequest {
+    string accountCifNumber = 1;
+    string accountNumber = 2;
+}
+
+message ValidateAccountByCIFResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        string accountCifNumber = 1;
+        string accountNumber = 2;
+        string accountType = 3;
+        string accountCurrency = 4;
+        string accountStatus = 5;
+        string accountName = 6;
+        string accountProductType = 7;
+        string accountProductName = 8;
+    }
+
+    repeated Response data = 4;
+}
+
+message ValidateAccountRequest{
+    string accountNo = 1;
+    string remark = 2;
+    string productName = 3;
+    uint64 companyId = 4;
+    string countryCode = 5;
+}
+
+message ValidateAccountDataResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        string remark2 = 1;
+        string acctNo = 2;
+        string errorCode = 3;
+        string responseCode = 4;
+        string responseMessage = 5;
+        string shortName = 6;
+        string acctCurr = 7;
+        string status = 9 ;
+        string cif = 10 ;
+        string productCode = 11 ;
+        string statusCode = 12 ;
+        string idNumber = 13;
+        string availableBalance = 14;
+    }
+
+    Response data = 4;
+}
+
+message GetCompanyDataByCompanyIDsRequest {
+    repeated uint64 companyIDs = 1;
+}
+
+message GetCompanyDataByCompanyIDsResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    repeated DataGetCompanyDataByCompanyIDsResponse data = 4;
+}
+
+message DataGetCompanyDataByCompanyIDsResponse {
+    uint64 companyID = 1;
+    string name = 2;
+    string loginCode = 3;
+    string countryName = 4;
+    string countryCode = 5;
+    string address = 6;
+}
+
+message ExecProcessCompanyTRBV3 {
+    CompanyDataExecTRB company = 1;
+    bool isNeedToken = 2;
+    UserNonSession userNonSessiion = 3;
+    repeated AccountTRB account = 4;
+    uint64 sysAdminId = 5;
+    uint64 adminId = 6;
+    string companyLoginCode = 7;
+    repeated uint64 accountTaskIds = 8;
+    repeated string accountNumbers = 9;
+    uint64 abonTaskId = 10;
+    string referenceCode = 11;
+}
+
+message Companies {
+    uint64 company_id = 1;
+    string name = 2;
+    string login_code = 3;
+}
+
+message CompanyLimitResponse {
+    uint64 company_id = 1;
+    string created_at = 2;
+    uint64 created_by_id = 3;
+    uint64 currency_id = 4;
+    uint64 limit = 5;
+    string updated_at = 6;
+    uint64 updated_by_id = 7;
+}
+
+message CompanyGroupLimitResponse {
+    string created_at = 1;
+    uint64 created_by_id = 2;
+    uint64 currency_id = 3;
+    uint64 holding_company_id = 4;
+    uint64 limit = 5;
+    string updated_at = 6;
+    uint64 updated_by_id = 7;
+}
+message CompanyDataExecTRB {
+    uint64 company_id = 1;
+    string company_name = 2;
+    uint64 created_by_id = 3;
+}
+
+message UserNonSession {
+    uint64 user_id = 1;
+    string username = 2;
+    string user_type = 3;
+}
+
+message MappingRoleToUser{
+    string role = 1;
+    uint64 role_id = 2;
+    string role_name = 3;
+}
+
+
+message GetSystemParamByCompanyLimitHelperRequest {
+    uint64 company_id = 1;
+    uint64 holding_id = 2;
+    string system_key_company_limit = 3;
+    string system_key_group_limit = 4;
+    string prefix_info = 5;
+    string prefix_error = 6;
+}
+
+message SaveNewCompanyChannelTRBHelperRequest {
+    CreateCompanyTrbV2Req create_company_trb_request = 1;
+    repeated CompanyLimit company_limit = 2;
+    repeated CompanyGroupLimit company_group_limit = 3;
+    uint64 package_id = 4;
+    string prefix_info = 5;
+    string prefix_error = 6;
+}
+
+message CreateNewAccountCompanyTRBHelperRequest {
+    uint64 company_id = 1;
+    repeated AccountTRB account = 2;
+    uint64 sys_admin_id = 3;
+    uint64 admin_id = 4;
+    string prefix_info = 5;
+    string prefix_error = 6;
+    string country_code = 7;
+}
+
+message SaveMenuLicenseCompanyTRBHelperRequest {
+    uint64 company_id = 1;
+    string company_name = 2;
+    uint64 sys_admin_id = 3;
+    uint64 admin_id = 4;
+    repeated uint64 account_task_id = 5;
+    repeated string account_number = 6;
+    uint64 subscription_task_id = 7;
+    uint64 subscription_id = 8;
+    string prefix_info = 9;
+    string prefix_error = 10;
+}
+
+message RegisterSubscriptionCompanyTRBHelperRequest {
+    Subscription subscription = 1;
+    repeated AccountTRB account = 2;
+    uint64 company_id = 3;
+    string company_name = 4;
+    uint64 sys_admin_id = 5;
+    uint64 admin_id = 6;
+    uint64 account_id = 7;
+    repeated uint64 account_task_id = 8;
+    repeated string account_number = 9;
+    uint64 menu_license_task_id = 10;
+    string prefix_info = 11;
+    string prefix_error = 12;
+}
+
+enum AuthorityLevel {
+    authority_level = 0;
+    data_entry = 1;
+    batch = 2;
+    upload_file = 3;
+    template = 4;
+    modify = 5;
+    delete = 6;
+    verify = 7;
+    approve = 8;
+    releaser = 9;
+    download_report = 10;
+    view_online_activity = 11;
+    transfer_overview = 12;
+}
+
+message CreateCompanyWorkflowTRBHelperRequest {
+    uint64 company_id = 1;
+    bool is_need_token = 2;
+    string prefix_info = 3;
+    string prefix_error = 4;
+}
+
+message GetCompanyDataNativeByIDReq {
+    uint64 company_id = 1;
+}
+
+message GetCompanyDataNativeByIDRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Company data = 4;
+}
+
+message ExecProcessCompanyTRBV3Response {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message GetCompanyWithIntervalChangePasswordResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated GetCompanyWithIntervalChangePasswordResponseData data = 4;
+}
+
+message GetCompanyWithIntervalChangePasswordResponseData {
+    uint64 company_id = 1;
+    uint64 interval_change_password = 2;
+}

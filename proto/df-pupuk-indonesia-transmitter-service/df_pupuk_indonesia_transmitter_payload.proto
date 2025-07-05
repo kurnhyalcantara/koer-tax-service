@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package df_pupuk_indonesia_transmitter.service.v1;
+
+import "df-pupuk-indonesia-transmitter-service/df_pupuk_indonesia_transmitter_core.proto";
+
+option go_package = "./pb";
+
+message StandardResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message DFPupukIndonesiaTransmitterRequest {
+  string app_key = 1;
+  uint64 task_id = 2;
+  RequestType request_type = 3;
+  string process_id = 4;
+}
+
+message SendReportPushRequest {
+  uint64 task_id = 1;
+  Status status = 2;
+  string response_message = 3;
+}
+
+/* #start region esb */
+message EsbRegistrationAccountNumberRequest {
+  EsbRegistrationAccountNumberRequestData request = 1 [json_name="REQUEST"];
+};
+
+message EsbRegistrationAccountNumberRequestData {
+  string company_code = 1 [json_name="COMPANY_CODE"];
+  string customer_no = 2 [json_name="CUSTOMER_NO"];
+  string account_no = 3 [json_name="ACCOUNT_NO"];
+  string email = 4 [json_name="EMAIL"];
+  string update_by = 5 [json_name="UPDATE_BY"];
+  string id = 6 [json_name="ID"];
+}
+
+message EsbRegistrationAccountNumberResponse {
+  EsbRegistrationAccountNumberResponses response = 1 [json_name="RESPONSE"];
+}
+
+message EsbRegistrationAccountNumberResponses {
+  string error_code = 1 [json_name = "ERROR_CODE"];
+  string response_code = 2 [json_name = "RESPONSE_CODE"];
+  string response_message = 3 [json_name = "RESPONSE_MESSAGE"];
+  EsbRegistrationAccountNumberResponseData data = 4 [json_name = "DATA"];
+}
+
+message EsbRegistrationAccountNumberResponseData {
+  string company_code = 1 [json_name = "COMPANY_CODE"];
+  string account_no = 2 [json_name = "ACCOUNT_NO"];
+  string customer_no = 3 [json_name = "CUSTOMER_NO"];
+  string customer_name = 4 [json_name = "CUSTOMER_NAME"];
+  string email = 5 [json_name = "EMAIL"];
+  string updated_by = 6 [json_name = "UPDATED_BY"];
+  string id = 7 [json_name = "ID"];
+  string last_update = 8 [json_name = "LAST_UPDATE"];
+  string action = 9 [json_name = "ACTION"];
+  string old_account_no = 10 [json_name = "OLD_ACCOUNT_NO"];
+}
+
+message EsbInquiryGiroRequest {
+  string com_code = 1 [json_name = "comCode"];
+}
+
+message EsbInquiryGiroResponse {
+  string company_name = 1 [json_name = "companyName"];
+  string company_account_no = 2 [json_name = "companyAccountNo"];
+}
+
+message EsbPaymentRequest {
+  EsbPaymentRequestData request = 1 [json_name = "request"];
+}
+
+message EsbPaymentRequestData {
+  string debit_account = 1 [json_name = "debitAccount"];
+  string credit_account = 2 [json_name = "creditAccount"];
+  string amount = 3 [json_name = "amount"];
+  string fee_account = 4 [json_name = "feeAccount"];
+  string fee_amount = 5 [json_name = "feeAmount"];
+  string remark2 = 6 [json_name = "remark2"];
+  string remark3 = 7 [json_name = "remark3"];
+  string company_code = 8 [json_name = "companyCode"];
+  string company_name = 9 [json_name = "companyName"];
+  string customer_no = 10 [json_name = "customerNo"];
+  string document_no = 11 [json_name = "documentNo"];
+  string channel_id = 12 [json_name = "channelId"];
+  string service_id = 13 [json_name = "serviceId"];
+  string user_name = 14 [json_name = "userName"];
+  string limit_type = 15 [json_name = "limitType"];
+  string limit_trx = 16 [json_name = "limitTrx"];
+  string external_id = 17 [json_name = "externalId"];
+}
+
+message EsbPaymentResponse {
+  EsbPaymentResponseData response = 1 [json_name = "response"];
+}
+
+message EsbPaymentResponseData {
+  string error_code = 1 [json_name = "errorCode"];
+  string response_code = 2 [json_name = "responseCode"];
+  string response_message = 3 [json_name = "responseMessage"];
+  string journal_sequence = 4 [json_name = "journalSequence"];
+  string trancode = 5 [json_name = "trancode"];
+  string nas_response = 6 [json_name = "nasResponse"];
+  string need_approval = 7 [json_name = "needApproval"];
+}
+/* #end region esb */

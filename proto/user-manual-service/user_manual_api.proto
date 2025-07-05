@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+import "user-manual-service/user_manual_payload.proto";
+
+package user_manual.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "User Manual GRPC Service";
+        version: "1.0";
+    };
+    security_definitions: {
+        security: {
+            key: "bearer"
+            value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service UserManualService {
+
+    // #region Utility
+    
+    rpc HealthCheck(google.protobuf.Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/user-manual/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            tags: ["Utility"]
+            summary: "Health Check"
+            description: "This API for check server's health"
+        };
+    };
+
+    rpc ListUserManual(ListUserManualRequest) returns (ListUserManualResponse) {
+        option (google.api.http) = {
+            post: "/api/user-manual/list"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            tags: ["User Manual"]
+            summary: "List User Manual"
+            description: "This API for list user manual"
+        };
+    };
+
+    rpc CreateTaskUserManual(CreateTaskUserManualRequest) returns (CreateTaskUserManualResponse) {
+        option (google.api.http) = {
+            post: "/api/user-manual/edit"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            tags: ["User Manual"]
+            summary: "Create Task User Manual"
+            description: "This API for create task user manual"
+        };
+    }
+
+    rpc GetDetailUserManual(GetDetailUserManualRequest) returns (GetDetailUserManualResponse) {
+        option (google.api.http) = {
+            post: "/api/user-manual/detail"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            tags: ["User Manual"]
+            summary: "Get Detail User Manual"
+            description: "This API for get detail user manual"
+        };
+    };
+
+    rpc GetPendingTaskUserManual(GetPendingTaskUserManualRequest) returns (GetPendingTaskUserManualResponse) {
+        option (google.api.http) = {
+            post: "/api/user-manual/pending-task"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            tags: ["User Manual"]
+            summary: "Get Pending Task User Manual"
+            description: "This API for get pending task user manual"
+        };
+    }
+
+    rpc ActionUserManual(ActionUserManualRequest) returns (ActionUserManualResponse){
+        option (google.api.http) = {
+            post: "/api/user-manual/action"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            tags: ["User Manual"]
+            summary: "Action User Manual"
+            description: "This API for action user manual"
+        };
+    }
+
+
+    // #endregion
+}

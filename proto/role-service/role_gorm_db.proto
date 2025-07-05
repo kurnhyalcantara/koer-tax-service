@@ -1,0 +1,548 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+// import "mwitkow/go-proto-validators/validator.proto";
+
+package role.service.v1;
+option go_package = "./pb";
+
+message User {
+    uint64 id = 1;
+    string username = 2;
+    string password = 3;
+    string role = 4;
+    google.protobuf.Timestamp created_at = 5 ;
+    google.protobuf.Timestamp updated_at = 6 ;
+    google.protobuf.Timestamp deleted_at = 7 ;
+}
+
+message Role {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "roles",
+    };
+
+    uint64 roleID = 1 [
+        (gorm.field).tag = {column: "RoleID" primary_key: true not_null: true auto_increment: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 userTypeID = 2 [
+        (gorm.field).tag = {column: "UserTypeID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    UserType userType = 103 [
+        (gorm.field).belongs_to = {
+            foreignkey: "UserTypeID"
+            foreignkey_tag: {column: "UserTypeID" not_null: true}
+            preload: true
+        },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    string name = 3 [(gorm.field).tag = {column: "Name" type: "varchar(255)" not_null: true}];
+    string description = 4 [(gorm.field).tag = {column: "Description" type: "text" not_null: true}];
+    uint64 companyID = 5 [
+        (gorm.field).tag = {column: "CompanyID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 createdByID = 6 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "CreatedByID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 updatedByID = 7 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "UpdatedByID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 deletedByID = 8 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "DeletedByID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string companyName = 9 [
+        (gorm.field).tag = {column: "companyName" type: "varchar(255)"}
+    ];
+
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp deletedAt = 53 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    repeated AccountID accountID = 54;
+    repeated BeneficiaryAccountID beneficiaryAccountID = 55;
+    repeated DepositoAccount depositoAccount = 56;
+
+    repeated UserRole userRoles = 101 [(gorm.field).has_many = {
+        foreignkey: "RoleID"
+        foreignkey_tag: {column: "RoleID" primary_key: true not_null: true}
+        preload: false
+    }];
+
+    repeated RoleAuthority roleAuthorities = 102 [(gorm.field).has_many = {
+        foreignkey: "RoleID"
+        foreignkey_tag: {column: "RoleID" not_null: true}
+        preload: true
+    }];
+
+    repeated CorpCodeAccess corpCodeAccess = 104 [(gorm.field).has_many = {
+        foreignkey: "role_id"
+        foreignkey_tag: {column: "role_id" not_null: true}
+        preload: true
+    }];
+}
+
+message RoleV2{
+    option (gorm.opts) = {
+        ormable: true,
+        table: "tasks_company_role",
+    };
+
+    uint64 roleID = 1 [
+        (gorm.field).tag = {column: "role_id" primary_key: true not_null: true auto_increment: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 taskId = 2 [
+        (gorm.field).tag = {column: "task_id" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string roleName = 3 [(gorm.field).tag = {column: "role_name" type: "varchar(255)" not_null: true}];
+
+    uint64 status = 4 [
+        (gorm.field).tag = {column: "status" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string companyId = 5 [
+        (gorm.field).tag = {column: "company_id" not_null: true}
+    ];
+
+    uint64 companyIdTask = 6 [
+        (gorm.field).tag = {column: "data_company_id_task" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string companyName = 7 [
+        (gorm.field).tag = {column: "company_name" type: "varchar(255)"}
+    ];
+
+    string companyCode = 8 [
+        (gorm.field).tag = {column: "company_code" type: "varchar(255)"}
+    ];
+
+    string countryCode = 9 [
+        (gorm.field).tag = {column: "country_code" type: "varchar(255)"}
+    ];
+
+    string countryName = 10 [
+        (gorm.field).tag = {column: "country_name" type: "varchar(255)"}
+    ];
+
+    string lastApprovedByName = 11 [
+        (gorm.field).tag = {column: "last_approved_by_name" type: "varchar(255)"}
+    ];
+
+    string lastRejectedByName = 12 [
+        (gorm.field).tag = {column: "last_rejected_by_name" type: "varchar(255)"}
+    ];
+
+    string reviewedBy = 13 [
+        (gorm.field).tag = {column: "reviewed_by" type: "varchar(255)"}
+    ];
+
+    string createdByName = 14 [
+        (gorm.field).tag = {column: "created_by_name" type: "varchar(255)"}
+    ];
+
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column:"created_at" not_null: true}];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column:"updated_at" not_null: true}];
+}
+
+message AccountID {
+    uint64 accountID = 1;
+    string accountName = 2;
+    string accountAlias = 3;
+    string accountNumber = 6;
+    string accountType = 4 [(google.api.field_behavior) = OUTPUT_ONLY ];
+    string currency = 5 [(google.api.field_behavior) = OUTPUT_ONLY ];
+}
+message BeneficiaryAccountID {
+    uint64 beneficiaryAccountID = 1;
+    string accountName = 2;
+    string accountAlias = 3;
+    string accountNumber = 6;
+    string accountType = 4 [(google.api.field_behavior) = OUTPUT_ONLY ];
+    string currency = 5 [(google.api.field_behavior) = OUTPUT_ONLY ];
+}
+
+message DepositoAccount{
+    string deposito_id = 1;
+    string deposito_account = 2;
+    string deposito_name = 3;
+    string company_id = 4;
+    string currency = 5;
+}
+
+message CorporateCode{
+    string briva_corp = 1;
+    string corporate_name = 2;
+    string company_id = 3;
+    string map_id = 4;
+    string company_name = 5;
+    string institution_code = 6;
+    string real_account = 7;
+    string open_payment = 8;
+    string billing_payment = 9;
+}
+
+
+message UserRole {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "user_roles",
+    };
+    uint64 userID = 1 [
+        (gorm.field).tag = {column: "UserID" primary_key: true not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 roleID = 2 [(gorm.field).tag = {column: "RoleID" primary_key: true not_null: true}];
+    uint64 createdByID = 3 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "CreatedByID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 updatedByID = 4 [
+        (gorm.field).tag = {column: "UpdatedByID" },
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+
+}
+
+message UserType {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "user_types",
+    };
+    uint64 userTypeID = 1 [
+        (gorm.field).tag = {column: "UserTypeID" primary_key: true not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    string name = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "Name" type: "varchar(255)" unique: true not_null: true}];
+
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp deletedAt = 53 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+
+}
+
+message RoleAuthority {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "role_authorities",
+    };
+    uint64 roleAuthorityID = 1 [
+        (gorm.field).tag = {column: "RoleAuthorityID" primary_key: true not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 roleID = 2 [(gorm.field).tag = {column: "RoleID" not_null: true}];
+    uint64 productID = 3 [
+        (gorm.field).tag = {column: "ProductID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 authorityLevelID = 4 [
+        (gorm.field).tag = {column: "AuthorityLevelID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    AuthorityLevel authorityLevel = 101 [
+        (gorm.field).belongs_to = {
+            foreignkey: "AuthorityLevelID",
+            foreignkey_tag: {column: "AuthorityLevelID" not_null: true},
+            preload: true
+        },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    Product product = 102;
+
+    uint64 createdByID = 5 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "CreatedByID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 updatedByID = 6 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "UpdatedByID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+}
+
+
+message ProductAuthority {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "product_authorities",
+    };
+    uint64 productAuthorityID = 1 [
+        (gorm.field).tag = {column: "productAuthorityID" primary_key: true not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 productID = 3 [
+        (gorm.field).tag = {column: "ProductID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 authorityLevelID = 4 [
+        (gorm.field).tag = {column: "AuthorityLevelID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    AuthorityLevel authorityLevel = 101 [
+        (gorm.field).belongs_to = {
+            foreignkey: "AuthorityLevelID",
+            foreignkey_tag: {column: "AuthorityLevelID" not_null: true},
+            preload: true
+        },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    Product product = 102;
+
+    uint64 createdByID = 5 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "CreatedByID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 updatedByID = 6 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "UpdatedByID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+}
+
+message AuthorityLevel {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "authority_levels",
+    };
+    uint64 authorityLevelID = 1 [
+        (gorm.field).tag = {column: "AuthorityLevelID" primary_key: true not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    string name = 2 [(gorm.field).tag = {unique: true column: "Name" type: "varchar(255)" not_null: true}];
+    string step = 3 [(gorm.field).tag = {column: "Step" type: "varchar(255)"}];
+
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp deletedAt = 53 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+}
+
+message Product {
+    uint64 productID = 1;
+    string productName = 2;;
+}
+
+message UserByAuthority {
+    string username = 1;
+    uint64 company_id = 2;
+    string company_name = 3;
+    string id_number = 4;
+    uint64 id_type = 5;
+    string is_blocked = 6;
+    uint64 user_id = 7;
+    uint64 user_type_id = 8;
+    string user_type_name = 9;
+    string authority = 10;
+    string email_address = 11;
+    string mobile_number = 12;
+    string status = 13;
+}
+
+message TaskRoleWithCompany{
+    option (gorm.opts) = {
+        ormable: true,
+        table: "view_task_roles",
+    };
+
+    string companyID = 1 [
+        (gorm.field).tag = {column: "company_id"}
+    ];
+
+    string companyCode = 2 [
+        (gorm.field).tag = {column: "company_code"}
+    ];
+
+    string companyName = 3 [
+        (gorm.field).tag = {column: "company_name"}
+    ];
+
+    string countryCode = 4 [
+        (gorm.field).tag = {column: "country_code"}
+    ];
+
+    string countryName = 5 [
+        (gorm.field).tag = {column: "country_name"}
+    ];
+
+    string taskID = 6 [
+        (gorm.field).tag = {column: "task_id"}
+    ];
+
+    string roleID = 7 [
+        (gorm.field).tag = {column: "role_id"}
+    ];
+
+    string roleName = 8 [
+        (gorm.field).tag = {column: "role_name"}
+    ];
+
+    string status = 9 [
+        (gorm.field).tag = {column: "status"}
+    ];
+
+    string createdByName = 10 [
+        (gorm.field).tag = {column: "created_by_name"}
+    ];
+
+    string reviewedByName = 11 [
+        (gorm.field).tag = {column: "reviewed_by_name"}
+    ];
+
+    string userTypeID = 12 [
+        (gorm.field).tag = {column: "user_type_id"}
+    ];
+
+    string createdAt = 17 [
+        (gorm.field).tag = {column: "created_at"}
+    ];
+
+    string updatedAt = 18 [
+        (gorm.field).tag = {column: "updated_at"}
+    ];
+
+}
+
+message ViewUserRoles{
+    option (gorm.opts) = {
+        ormable: true,
+        table: "view_user_roles",
+    };
+
+    string userTaskID = 1 [
+        (gorm.field).tag = {column: "user_task_id"}
+    ];
+
+    string roleID = 2 [
+        (gorm.field).tag = {column: "role_id"}
+    ];
+
+    string userID = 3 [
+        (gorm.field).tag = {column: "user_id"}
+    ];
+
+    string username = 4 [
+        (gorm.field).tag = {column: "username"}
+    ];
+
+    string companyID = 5 [
+        (gorm.field).tag = {column: "company_id"}
+    ];
+
+    string region = 6 [
+        (gorm.field).tag = {column: "region"}
+    ];
+}
+
+message GetRoleIDsByCompanyIDs{
+    option (gorm.opts) = {
+        ormable: true,
+        table: "roles",
+    };
+
+    uint64 roleID = 1 [
+        (gorm.field).tag = {column: "RoleID"}
+    ];
+
+    uint64 companyID = 2 [
+        (gorm.field).tag = {column: "CompanyID"}
+    ];
+
+    string companyName = 3 [
+        (gorm.field).tag = {column: "companyName"}
+    ];
+
+    string name = 4 [
+        (gorm.field).tag = {column: "Name"}
+    ];
+}
+
+
+message CorpCodeAccess {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "corporate_code_access",
+    };
+    uint64 id = 1 [
+        (gorm.field).tag = {column: "id" primary_key: true not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 role_id = 2 [
+        (gorm.field).tag = {column: "role_id" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 company_id = 3 [
+        (gorm.field).tag = {column: "company_id" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 map_id = 4 [
+        (gorm.field).tag = {column: "map_id" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string corporate_code = 5 [
+        (gorm.field).tag = {column: "corporate_code" not_null: true}
+    ];
+
+     string type = 6 [
+        (gorm.field).tag = {column: "type" not_null: true}
+    ];
+
+    string created_by = 7 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "created_by" }
+    ];
+
+    string updated_by = 8 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "updated_by" }
+    ];
+
+    string corporate_name = 9 [
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    google.protobuf.Timestamp created_at = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp updated_at = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+}

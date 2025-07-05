@@ -1,0 +1,230 @@
+// Basic Payload Structure
+
+syntax = "proto3";
+
+import "gorm_db.proto";
+
+package deposito.service.v1;
+option go_package = "./pb";
+
+import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+}
+
+enum TaskStatus {
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+    RequestForDelete = 6;
+    Deleted = 7;
+}
+
+enum TaskStep {
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string updatedByName = 11;
+    string reasons = 12;
+    string comment = 13;
+    string workflow = 14;
+    uint64 companyID = 15;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+enum SortDirection {
+    DESC = 0;
+    ASC = 1;
+}
+
+message TaskCreateRequest{
+    uint64 taskID = 1;
+    DepositoData data = 2;
+}
+
+message TaskData {
+    Task task = 1;
+    DepositoData data = 2;
+}
+
+message TaskCreateResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskData data = 4; 
+}
+
+message TaskActionRequest{
+    uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject', 'delete'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+}
+
+message TaskActionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskData data = 4;
+}
+
+message TaskListRequest {
+    message TaskListFilter{
+        // string beneficiaryCountryCode = 1;
+        // string beneficiaryBank = 2;
+        // string dateCreated = 3;
+        // string dateModified = 4;
+        // string createdBy = 5;
+        // string reviewerName = 6;
+        // string currency = 7;
+        // string beneficiaryCountryName = 8;
+
+        string status = 50;
+        string custom = 51;
+    }
+    
+    TaskStatus status = 1;
+    TaskStep step = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5;
+    SortDirection dir = 6;
+    TaskListFilter filter = 7;
+    string search = 8;
+    bool myTaskOnly = 9;
+}
+
+message TaskListResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TaskData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message FileTaskListRequest {
+    
+    TaskStatus status = 1;
+    TaskStep step = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 5;
+    SortDirection dir = 6;
+    TaskListRequest.TaskListFilter filter = 7;
+    string search = 8;
+    bool myTaskOnly = 9;
+
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 25;
+}
+
+message TaskDetailRequest {
+    uint64 taskID = 1;
+}
+
+message TaskDetailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskData data = 4;
+}
+
+message DataListRequest {
+    message DataListFilter{
+        // string beneficiaryCountry = 1;
+        // string beneficiaryBank = 2;
+        // string dateCreated = 3;
+        // string dateModified = 4;
+        // string createdBy = 5;
+        // string reviewerName = 6;
+        // string currency = 7;
+
+        string custom = 50;
+    }
+
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 3;
+    SortDirection dir = 4;
+    DataListFilter filter = 5;
+    string search = 6;
+
+}
+
+message DataListResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated DepositoData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message DataDetailRequest {
+    uint64 dataID = 1;
+}
+
+message DataDetailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DepositoData data = 4;
+}
+
+message SaveDataRequest {
+    DepositoData data = 1;
+}
+
+message SaveDataResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DepositoData data = 4;
+}

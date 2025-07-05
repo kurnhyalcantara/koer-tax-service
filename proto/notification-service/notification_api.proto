@@ -1,0 +1,460 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "notification-service/notification_payload.proto";
+import "notification-service/notification_gorm_db.proto";
+import "google/api/httpbody.proto";
+
+package notification.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+
+    rpc HealthCheck(Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/notification/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Health Check"
+            description: "This API for check health server"
+        };
+    };
+
+    rpc GetNotifications(GetNotificationsReq) returns (ListNotificationRes) {}
+
+    rpc GetNotificationsHttp(GetNotificationsReq) returns (ListNotificationRes) {
+        option (google.api.http) = {
+            get: "/api/notification/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } 
+            summary: "Get notification data"
+            description: "This API for get notification list"
+        };
+    };
+
+    rpc GetListNotification(GetNotificationsReq) returns (ListNotificationFCMRes) {
+        option (google.api.http) = {
+            get: "/api/notification/notification-fcm"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } 
+            summary: "Get notification from fcm"
+            description: "This API for get notification list from fcm"
+        };
+    };
+
+        
+    rpc CreateNotification(CreateNotificationRequest) returns (CommonResponse) {
+        option (google.api.http) = {
+            post: "/api/notification/data"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Create notification data"
+            description: "This API for crete notification"
+        };
+    };
+
+    rpc DeleteNotification(CreateNotificationRequest) returns (CommonResponse);
+
+    rpc SendPushNotification(SendPushNotificationRequest) returns (CommonResponse) {
+        option (google.api.http) = {
+            post: "/api/send/notification"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Send Push notification data"
+            description: "This API for send notification"
+        };
+    };
+
+    rpc SendPushNotificationV2(SendPushNotificationRequest) returns (CommonResponse) {
+        option (google.api.http) = {
+            post: "/api/notification/send-notification"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Send Push notification data"
+            description: "This API for send notification"
+        };
+    };
+
+    rpc CreateNotificationTask(CreateNotificationTaskRequest) returns (CreateNotificationTaskResponse) {
+        option (google.api.http) = {
+            post: "/api/notification/task"
+            body: "*"
+            additional_bindings: [
+				{
+					post: "/api/notification/task/edit/{taskID}"
+					body: "*"
+				}
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Create task notification data"
+            description: "This API for crete task notification"
+        };
+    };
+
+    // rpc GetNotificationTask(GetNotificationTaskRequest) returns (GetNotificationTaskResponse) {
+    //     option (google.api.http) = {
+    //         get: "/api/notification/task"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { }
+    //         summary: "Get notification task"
+    //         description: "This API for get notification task"
+    //     };
+    // }
+
+    rpc GetMyTasks(GetNotificationTaskRequest) returns (GetNotificationTaskResponse) {
+        option (google.api.http) = {
+//            get: "/api/notification/task"
+            // get: "/api/notification/task/me"
+            // additional_bindings: [
+            //     {
+            //         get: "/api/notification/task"
+            //     }
+            // ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my notifications tasks"
+            description: "This API for get list notificationss task"
+        };
+    };
+
+    rpc GetListTaskNotificationV2(ListNotificationTaskV2Request) returns (ListNotificationTaskV2Response) {
+        option (google.api.http) = {
+            get: "/api/notification/v2/task"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my notifications tasks V2"
+            description: "This API for get list notifications task V2"
+        };
+    };
+
+    rpc GetNotificationTaskByID(GetNotificationTaskByIDRequest) returns (GetDetailNotificationTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/notification/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get notification task by id"
+            description: "Get notification task by id from services task"
+        };
+    }
+
+
+    rpc GetNotificationModules(ListRequest) returns (ListNotificationModuleResponse) {
+        option (google.api.http) = {
+            get: "/api/notification/module/{countryName}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Create task notification modules data"
+            description: "This API for crete task notification modules"
+        };
+    };
+
+    rpc GetModuleEvents(ListRequest) returns (ListModuleEventResponse) {
+        option (google.api.http) = {
+            get: "/api/notification/event"
+            additional_bindings: [
+                {
+                    get: "/api/notification/module-event"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Get module events"
+            description: "This API for get module events"
+        };
+    };
+
+    rpc GetModuleEventsByModuleID(GetModuleEventsByModileIDRequest) returns (ListModuleEventResponse) {
+        option (google.api.http) = {
+            get: "/api/notification/event/module/{moduleID}"
+            additional_bindings: [
+                {
+                    get: "/api/notification/module-event/module/{moduleID}"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Get module events"
+            description: "This API for get module events"
+        };
+    };
+
+    rpc BRIGateSendEmail(SendEmailRequest) returns (BRIGateNotificationResponse){
+        option (google.api.http) = {
+            get: "/api/notification/send/email"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Send email"
+            description: "This API for Send email"
+        };
+    }
+
+    rpc BRIGateSendSms(SendSmsRequest) returns (BRIGateNotificationResponse){
+        option (google.api.http) = {
+            get: "/api/notification/send/sms"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Send sms"
+            description: "This API for Send sms"
+        };
+    }
+
+    rpc SaveNotificationModule(NotificationModule) returns (NotificationModule) {
+        option (google.api.http) = {
+            post: "/api/notification/module"
+            body: "*"
+            additional_bindings: [
+				{
+					post: "/api/notification/module/edit/{moduleID}"
+					body: "*"
+				}
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Save notification module"
+            description: "This API for save notification module"
+        };
+    }
+
+    rpc SaveModuleEvent(ModuleEvent) returns (ModuleEvent) {
+        option (google.api.http) = {
+            post: "/api/notification/module-event"
+            body: "*"
+            additional_bindings: [
+				{
+					post: "/api/notification/module-event/edit/{eventID}"
+					body: "*"
+				}
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Save notification event"
+            description: "This API for save notification event"
+        };
+    }
+
+    rpc ListEventVariable(Empty) returns (ListVariableResponse){
+        option (google.api.http) = {
+            get: "/api/notification/event-variable"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list event variable"
+            description: "This API for Get list event variable"
+        };
+    }
+
+    rpc SaveEventVariable(EventVariable) returns (EventVariable) {
+        option (google.api.http) = {
+            post: "/api/notification/event-variable"
+            body: "*"
+            additional_bindings: [
+				{
+					post: "/api/notification/event-variable/edit/{variableID}"
+					body: "*"
+				}
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Save event variable"
+            description: "This API for Save event variable"
+        };
+    }
+
+    rpc ListClient(Empty) returns (ListClientResponse){
+        option (google.api.http) = {
+            get: "/api/notification/temporary/client"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list client"
+            description: "This API for Get list client"
+        };
+    }
+
+    rpc SaveClient(TempClient) returns (TempClient) {
+        option (google.api.http) = {
+            post: "/api/notification/temporary/client"
+            body: "*"
+            additional_bindings: [
+				{
+					post: "/api/notification/temporary/client/edit/{clientID}"
+					body: "*"
+				}
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Save client"
+            description: "This API for Save client"
+        };
+    }
+
+    rpc DownloadListNotificationTasks(FileListNotificationTaskRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/notification/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list notification task"
+            description: "This API for download list notification task"
+        };
+    };
+    
+    rpc RequestDeleteNotificationTask(GetNotificationTaskByIDRequest) returns (GetDetailNotificationTaskResponse){
+        option (google.api.http) = {
+            post: "/api/notification/task/delete/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Delete request notification task"
+            description: "This API for deletes notification task"
+        };
+    }
+    rpc SendNotification(SendNotificationRequest) returns (SendNotificationResponse){
+        option (google.api.http) = {
+            post: "/api/notification/send"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc SendNotificationWorkflow(SendNotificationWorkflowRequest) returns (SendNotificationResponse){
+        option (google.api.http) = {
+            post: "/api/notification/send/workflow"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc HistoryNotification(HistoryNotificationRequest) returns (HistoryNotificationResponse) {
+        option (google.api.http) = {
+            get: "/api/notification/history"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Get notification history"
+            description: "This API for get notification history"
+        };
+    }
+
+    rpc UpdateLogHistoryNotifiation(UpdateLogHistoryNotifiationRequest) returns (UpdateLogHistoryNotifiationResponse) {
+        option (google.api.http) = {
+            post: "/api/notification/history"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Get update notification history"
+            description: "This API for get update notification history"
+        };
+    }
+
+    rpc ListModuleVariable(ListModuleVariableReq) returns (ListModuleVariableResp) {
+        option (google.api.http) = {
+            get: "/api/notification/module/variables"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Get list of variable of modules"
+            description: "This API to retrieve data of module variables"
+        };
+    }
+
+    rpc TemplateByKey(NotificationKey) returns (NotificationKeyResponse) {
+        option (google.api.http) = {
+            get: "/api/notification/key/{notificationKey}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }; // Disable security key
+            summary: "Template data by key";
+            description: "This API for get template by key"
+        };
+    };
+
+    rpc ProcessDataSFTP(ProcessDataSftpRequest) returns (ProcessDataSftpResponse) {}
+
+    rpc DownloadListNotificationTasksV2(FileListNotificationTaskV2Request) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/notification/v2/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list notification task v2"
+            description: "This API for download list notification task v2"
+        };
+    };
+
+    rpc DeactivateTask(DeactivateRequest) returns (DefaultResponse) {
+        option (google.api.http) = {
+            post: "/api/notification/v2/deactivate/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Update status notification to inactive"
+            description: "This API for update status notification to inactive"
+        };
+    };
+}
+
+message ListModuleResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated NotificationModule data = 4;
+
+}
+
+message ListVariableResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated EventVariable data = 4;
+}
+
+message ListClientResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TempClient data = 4;
+}
+
+message GetModuleEventsByModileIDRequest{
+    uint64 moduleID = 1;
+}

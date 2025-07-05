@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package external_id.service.v1;
+option go_package = "./pb";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "external-id-service/external_id_payload.proto";
+import "google/protobuf/empty.proto";
+
+service ExternalIdService {
+  rpc HealthCheck(google.protobuf.Empty) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      get: "/api/external-id/health"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: {}
+      tags: ["Utility"]
+      summary: "Health Check"
+      description: "This API for check server's health"
+    };
+  };
+
+  rpc Counter(CounterRequest) returns (CounterResponse) {};
+
+  rpc ResetCounter(ResetCounterRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/external-id/reset-counter"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: {}
+      tags: ["Utility"]
+      summary: "Reset Counter"
+      description: "This API for reset counter"
+    };
+  };
+}

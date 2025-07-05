@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "df-pupuk-indonesia-transmitter-service/df_pupuk_indonesia_transmitter_core.proto";
+
+package df_pupuk_indonesia_transmitter.service.v1;
+option go_package = "./pb";
+
+message Result {
+  uint64 result_id = 1;
+  uint64 task_id = 2;
+  uint64 module_id = 3;
+  uint32 http_status_code = 4;
+  string response_code = 5;
+  string response_message = 6;
+  string external_id = 7;
+  string request_data = 8;
+  string response_data = 9;
+  google.protobuf.Timestamp date_hit = 10;
+  google.protobuf.Timestamp date_response = 11;
+  string created_by = 12;
+  google.protobuf.Timestamp created_dt = 13;
+  string updated_by = 14;
+  google.protobuf.Timestamp updated_dt = 15;
+}
+
+message MappingAccountMaster {
+  uint64 mapping_account_id = 1;
+  uint64 task_id = 2;
+  string transaction_id = 3;
+  uint64 company_id = 5;
+  string company_name = 6;
+  uint64 created_by_id = 7;
+  string created_by_name = 8;
+  string customer_number = 9;
+  StatusMappingAccount status = 10;
+  string task_information = 11;
+  uint64 client_id_cms = 12;
+  google.protobuf.Timestamp created_at = 13;
+  uint64 updated_by_id = 14;
+  string updated_by_name = 15;
+  google.protobuf.Timestamp updated_at = 16;
+}
+
+message LoanAccount {
+  uint64 loan_account_id = 1;
+  uint64 mapping_account_id = 2;
+  string company_code_pupuk = 3;
+  string loan_account = 4;
+  string loan_account_name = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message Orders {
+  uint64 order_id = 1;
+  uint64 task_id = 2;
+  string transaction_id = 3;
+  uint64 company_id = 4;
+  string company_name = 5;
+  string debit_account = 6;
+  string debit_account_name = 7;
+  string debit_account_type = 8;
+  string df_invoice_number = 9;
+  google.protobuf.Timestamp due_date = 10;
+  Status status = 11;
+  string data_inquiry = 12;
+  double fee = 13;
+  double amount = 14;
+  double total_amount = 15;
+  string workflow_doc = 16;
+  google.protobuf.Timestamp created_at = 17;
+  uint64 created_by_id = 18;
+  string created_by_name = 19;
+  google.protobuf.Timestamp updated_at = 20;
+  string updated_by_name = 21;
+  uint64 updated_by_id = 22;
+  google.protobuf.Timestamp transaction_date = 23;
+  string company_code = 24;
+  string fee_account = 25;
+  string customer_number = 26;
+}

@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "span-file-processor-service/span_file_processor_payload.proto";
+
+package span_file_processor.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "QCash Span File Processor";
+    version: "1.0";
+  }
+
+  schemes: HTTP;
+  // schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service SpanFileProcessorService {
+  rpc SpanFileProcessor(SpanFileProcessorRequest) returns (StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/span/file-processor"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["SpanFileProcessor"]
+      summary: "Validate Span File"
+      description: "This API for validating Span file"
+    };
+  };
+}

@@ -1,0 +1,270 @@
+syntax = "proto3";
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package auth.service.v1;
+option go_package = "./pb";
+
+message Authentication {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "authentications",
+    };
+    uint64 userID = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true column: "user_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    string username = 2 [(gorm.field).tag = {column: "username"}];
+    string password = 3 [(gorm.field).tag = {column: "password"}];
+    uint64 companyID = 4 [
+        (gorm.field).tag = {
+            column: "company_id"
+        }
+    ];
+    string verification1 = 5 [
+        (gorm.field).tag = {
+            column: "verification_1",
+            type: "text"
+        }
+    ];
+    string verification2 = 6 [
+        (gorm.field).tag = {
+            column: "verification_2"
+            type: "text"
+        }
+    ];
+    string generatePassword = 7 [
+        (gorm.field).tag = {
+            column: "generate_password"
+        }
+    ]; // This is a temporary password that has been generated for the purpose of allowing the user to change their password.
+    string salt = 8 [
+        (gorm.field).tag = {
+            column: "salt"
+            type: "text"
+        }
+    ];
+    //this is encoded pass firt time for regol
+    string initCred = 9 [
+        (gorm.field).tag = {
+            column: "init_cred"
+            type: "text"
+        }
+    ];
+    bool isQlola = 10 [
+        (gorm.field).tag = {
+            column: "is_qlola"
+            type: "boolean"
+        }
+    ];
+    google.protobuf.Timestamp lastChangePassword = 11 [
+        (gorm.field).tag = {
+            column: "last_change_password"
+        }
+    ];
+    string prevSalt = 12 [
+        (gorm.field).tag = {
+            column: "prev_salt"
+            type: "text"
+        }
+    ];
+}
+
+message UserLoginTime {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "user_login_times",
+    };
+    uint64 userID = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true column: "user_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    string username = 2 [(gorm.field).tag = {column: "username"}];
+    google.protobuf.Timestamp lastLoginTime = 3 [
+        (gorm.field).tag = {
+            column: "last_login_time",
+            default: "CURRENT_TIMESTAMP"
+        }
+    ];
+    uint64 attempts = 4 [
+        (gorm.field).tag = {
+            column: "attempts",
+            type: "integer",
+            default: "0"
+        }
+    ];
+}
+
+message Jail {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "token_jail",
+    };
+
+    uint64 jailID = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true column: "JailID"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string token = 2 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {unique: true not_null: true column: "Token" type: "text"}
+    ];
+    
+    string tokenType = 3 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = { column: "TokenType" type: "varchar(255)"}
+    ];
+
+    google.protobuf.Timestamp expiredAt = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message TokenStore {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "token_store",
+    };
+    
+    string token = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {primary_key: true unique: true not_null: true column: "Token" type: "text"}
+    ];
+
+    uint64 userID = 2 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true column: "UserID"}
+    ];
+
+    string username = 3 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true column: "Username"}
+    ];
+
+    string sessionID = 4 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true column: "SessionID" type: "text"}
+    ];
+
+    string dateTime = 5 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "DateTime"}
+    ];
+
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "CreatedAt"}];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "UpdatedAt"}];
+
+}
+
+message SessionIDPair {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "session_id_pair",
+    };
+
+    uint64 pairID = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true column: "PairID"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string sessionID = 2 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {unique: true not_null: true column: "SessionID" type: "text"}
+    ];
+
+    string token = 3 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {unique: true not_null: true column: "Token" type: "text"}
+    ];
+    
+    google.protobuf.Timestamp expiredAt = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message PasswordReset {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "password_reset",
+    };
+    string token = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {
+            column: "token",
+            type: "text",
+            primary_key: true,
+            unique: true,
+            not_null: true
+        }
+    ];
+    string email = 2 [
+        (gorm.field).tag = {
+            column: "email",
+        }
+    ];
+    uint64 userID = 3 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true column: "user_id"}
+    ];
+
+    google.protobuf.Timestamp expiredAt = 100 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {
+            column: "expired_at"
+        }
+    ];
+    google.protobuf.Timestamp createdAt = 101 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {
+            column: "created_at"
+        }
+    ];
+    google.protobuf.Timestamp updatedAt = 102 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {
+            column: "updated_at"
+        }
+    ];
+}
+
+
+message LoginLogs {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "login_logs",
+    };
+
+    string requestId = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true column: "request_id"}
+    ];
+
+    string username = 2 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true column: "username"}
+    ];
+
+    google.protobuf.Timestamp timestamp = 3 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true column: "timestamp"}
+    ];
+
+    string status = 4 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true column: "status"}
+    ];
+
+    string ipAddress = 5 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true column: "ip_address"}
+    ];
+
+    string userAgent = 6 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true column: "user_agent"}
+    ];
+
+    string loginMethod = 7 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true column: "login_method"}
+    ];
+
+    string grpcRequestMetadata = 8 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true column: "grpc_request_metadata" type: "text"}
+    ];
+
+    string errorMessage = 9 [
+        (google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true column: "error_message" type: "text"}
+    ];
+}

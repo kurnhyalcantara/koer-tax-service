@@ -1,0 +1,454 @@
+syntax = "proto3";
+
+import "file-listener-service/fileobject_db.proto";
+
+package file_object.service.v1;
+option go_package = "./pb";
+
+import "google/protobuf/timestamp.proto";
+
+message RunCheckRequest {
+    string requester = 1;
+}
+
+message ErrorBodyResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message RunCheckResponse {
+    uint32 found = 1;
+    uint32 success = 2;
+    uint32 failed = 3;
+    string message = 4;
+}
+
+message DataProcessRequest{
+    uint64 fileID = 1;
+    string type = 2;
+    string fileName = 3;
+}
+
+message DataProcessResponse{
+    uint64 fileID = 1;
+    string type = 2;
+    string fileName = 3;
+    string message = 4;
+}
+
+message FileFilter{
+    string fileName = 1;
+    string fileOriginName = 2;
+
+    FileData.FileStatus status = 3;
+    
+    message DateFilter {
+        string from = 1;
+        string to = 2;
+    }
+    
+    DateFilter createdAt = 4;
+    DateFilter updatedAt = 5;
+
+    string taskID = 6;
+    string taskType = 7;
+}
+
+message GetFileRequest{
+    uint64 fileID = 1;
+    int32 limit = 2;
+    int32 page = 3;
+    string sort = 4;
+    
+    enum Direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    Direction direction = 5;
+
+    FileFilter filter = 6;
+
+    string search = 7;
+
+}
+
+enum ProductType {
+    MASS_TRANSFERS = 0;
+    MULTIPAYMENT = 1;
+}
+
+message GetFileResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated FileData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+}
+
+message SetFileRequest{
+    repeated FileData data = 1;
+}
+
+message SetFileResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated FileData data = 4;
+}
+
+message SendToProcessedRequest{
+    repeated FileData data = 1;
+}
+
+message SendToProcessedResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated FileData data = 4;
+}
+
+message SendFileToFTPRequest{
+    uint32 fileID = 1;
+}
+
+message SendFileToFTPResponse{
+    message Response {
+        string errorCode = 1;
+        string responseCode = 2;
+        string responseMessage = 3;
+    }
+
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Response data = 4;
+}
+
+message CheckFileAtFTPRequest{
+    uint32 fileID = 1;
+}
+
+message CheckFileAtFTPResponse{
+    message Response {
+        bool isExist = 1;
+    }
+
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Response data = 4;
+}
+
+// File_Upload DTO
+
+message FileInfo {
+    string fileName = 1;
+    string fileOriginName = 2;
+    string mimeType = 3;
+    string fileExtension = 4;
+}
+
+message FileUploadHandlerRequest{
+    FileInfo fileInfo = 1;
+    bytes chunk_data = 2;
+}
+
+message FileUploadHandlerResponse{
+    bool error = 1; 
+    uint32 code = 2;
+    string message = 3;
+    string fileID = 4;
+    uint64 fileSize = 5;
+    UploadInfo uploadInfo = 6;
+}
+
+message FileDownloadHandlerRequest{
+    string objectName = 1;
+    string contentDisposition = 2;
+}
+
+message FileDownloadNonTokenHandlerRequest{
+    string app_key = 1;
+    string objectName = 2;
+    string contentDisposition = 3;
+}
+
+message PutObjectRequest {
+    oneof data {
+        PutObjectInfo object = 1;
+        ObjectByteChunk chunkData = 2;
+    }
+}
+
+message PutObjectInfo {
+    FileHeader info = 1;
+    bool isKey = 2;
+}
+
+message FileHeader {
+    string fileName = 1;
+    
+    string serviceName = 2; // service name
+    string serviceCode = 3; // service feature code ex: transaction, non-transaction
+    map<string, string> mimeHeader = 4;
+    int64 size= 5;
+    string urlDownload = 6;
+}
+
+message PutObjectResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    string key = 4;
+    UploadInfo uploadInfo = 5;
+}
+
+message HttpObjectResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    string key = 4;
+    string urlDownload = 5;
+}
+
+message UploadInfo {
+    string fileName = 1;
+    string size = 2;
+    string extension = 3;
+    MinioObjectInfo objectInfo = 10;
+}
+
+message MinioObjectInfo {
+    string bucket = 1;
+	string key = 2;
+	string eTag = 3;
+	int64 size = 4;
+	google.protobuf.Timestamp lastModified = 5;
+	string location = 6;
+	string versionID = 7;
+
+	// Lifecycle expiry-date and ruleID associated with the expiry
+	// not to be confused with `Expires` HTTP header.
+	google.protobuf.Timestamp expiration = 8;
+	string expirationRuleID = 9;
+}
+
+// File_Request DTO
+message ObjectRequest {
+    string bucket = 1; // optional, default value define by service
+    string objectName = 2;
+}
+
+enum KeyType {
+    NULL_KEY = 0;
+    PUT_KEY = 1;
+    GET_KEY = 2;
+}
+
+message RemoveKeyReq {
+    string key = 1;
+    KeyType type = 2;
+}
+
+message RemoveKeyRes {
+    bool isSuccess = 1;
+    string message = 2;
+}
+
+message ObjectRequestWithKey{
+    string key = 1;
+}
+
+message RequestKeyForGetObjectRes {
+    string key = 1;
+    string eTag = 2;
+    string message = 3;
+}
+
+message ObjectDownloadRequest{
+    ObjectRequest object = 1;
+    DownloadOpts opts = 2;
+}
+
+message DownloadOpts{
+    int64 chunkSize = 1; // value in byte
+}
+
+message GetObjectResponse{
+    oneof data {
+        StatObjectResponse stat = 1;
+        ObjectByteChunk chunk_data = 2;
+    }
+}
+
+message StatObjectResponse {
+    google.protobuf.Timestamp lastModified = 1;
+    string eTag = 2;
+    string contentType = 3;
+    int64 size = 4;
+    map<string, string> metaData = 5;
+}
+
+message ObjectTagsResponse {
+    map<string, string> tags = 1;
+}
+
+message ObjectByteChunk {
+    int64 n = 1;
+    bytes bytes = 2;
+}
+
+message PutObjectValidationReq {
+    string key = 1;
+}
+
+message GetObjectDetailInfoReq {
+    string key = 1;
+}
+
+message GenObjectPutKey {
+	string key = 1;
+	string objectName = 2;
+	google.protobuf.Timestamp createdAt = 3;
+	UploadInfo objectInfo = 4;
+}
+
+enum objectValidationType {
+    NULL_FILE_VALIDATION = 0;
+    EXTENSION = 1;
+    MAX_SIZE = 2;
+    MIN_SIZE = 3;
+    MIME_TYPE = 4;
+    MAX_TOTAL_SIZE = 5;
+    MIN_TOTAL_SIZE = 6;
+    MAX_FILES = 7;
+    MIN_FILES = 8;
+}
+
+message FileValidationObject {
+    objectValidationType type = 1;
+    string value = 2;
+}
+
+
+message RecieptStatementRequest {
+    string fileName = 1;
+    bytes data = 2;
+    string contenType = 3;
+}
+
+message RecieptStatementResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    string fileName = 4;
+    string urlDownload = 5;
+}
+
+message ResendRecieptStatementRequest {
+    string file_name = 1;
+    string file_type = 2;
+}
+
+message ResendRecieptStatementResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    string urlDownload = 4;
+}
+
+message FileUploadRequest {
+    string file_name = 1;
+    bytes data = 2;
+    string conten_type = 3;
+    string file_type = 4;
+    string module_id = 5;
+    string company_id = 6;
+    uint32 type = 7;
+}
+
+message FileUploadPublicRequest {
+    string file_name = 1;
+    bytes data = 2;
+    string content_type = 3;
+    string file_type = 4;
+    string module_id = 5;
+    string company_id = 6;
+    uint32 type = 7;
+    string path = 8;
+}
+
+message FileUploadResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    string file_name = 4;
+    string url_download = 5;
+}
+
+message FileUploadInfoResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    string file_name = 4;
+    string url_download = 5;
+}
+
+message GetUrlDownloadRequest {
+    string file_name = 1;
+    string file_type = 2;
+}
+
+message GetUrlDownloadResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    string urlDownload = 4;
+}
+
+message Tag {    
+	uint64 company_id = 1;
+	string fileName = 2;
+	uint64 module_id = 3;
+}
+message FileRemoveRequest {
+    string file_name = 1;
+    uint32 type = 2;
+}
+
+message FileRemoveResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+}
+
+// Obras
+
+message FileUploadObrasRequest {
+    string file_name = 1;
+    bytes data = 2;
+    string content_type = 3;
+    string file_type = 4;
+    string module_name = 5;
+    string company_id = 6;
+    uint32 type = 7;
+    string country = 8;
+    string inquiry_type = 9;
+}
+
+message AccountReceivableRequestV2 {
+    bytes data = 1;
+    string company_id = 2;
+    string user_id = 3;
+    string filename = 4;
+    string file_extension = 5;
+}

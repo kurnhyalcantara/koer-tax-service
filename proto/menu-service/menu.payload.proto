@@ -1,0 +1,1525 @@
+syntax = "proto3";
+
+import "menu-service/menu.gorm_db.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package menu.service.v1;
+option go_package = "./pb";
+
+
+message LoginRequest {
+  string username = 1 [(validator.field) = {msg_exists : true}];
+  string password = 2 [(validator.field) = {msg_exists : true}];
+}
+
+message LoginResponse {
+  string access_token = 1;
+}
+
+message HealthCheckResponse {
+  string message = 1;
+}
+
+message ArrayString {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated string data = 4;
+}
+
+message Empty {}
+
+message InvalidKeyError {
+  string key = 1;
+  string message = 2;
+}
+
+message JWTTokenResponse {
+  string token = 1;
+  int64 expiredAt = 2;
+}
+
+message errorBodyResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  google.protobuf.NullValue data = 4;
+}
+
+message CommonRequest {}
+
+message CommonResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message ListMenuDataRequest {
+  menu.service.v1.Menu menu = 1;
+  bool isActiveOnly = 2;
+  int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "page number to get data. Default value '-1' for disable page",
+  }];
+  string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  direction dir = 6;
+  string filter = 7;
+  string query = 8;
+}
+
+message Sort {
+  string column = 1;
+  string direction = 2;
+}
+
+message CreateMenuRequest {
+  menu.service.v1.Menu data = 1;
+  uint64 taskID = 2;
+}
+
+message CreateMenuResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  menu.service.v1.Menu data = 4;
+}
+
+message CreateMenuTaskRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"isDraft\":true,\"data\":{\"parentID\":\"string\",\"userType\":\"string\",\"label\":\"string\",\"isModule\":true,\"moduleID\":\"string\",\"rootPath\":\"string\"}}"
+  };
+
+  menu.service.v1.Menu data = 1;
+  uint64 taskID = 2;
+  bool isDraft = 3;
+}
+
+message MenuTaskResponse {
+  uint64 taskID = 1;
+  uint64 featureID = 5;
+  string type = 2;
+  string status = 3;
+  string step = 4;
+  uint64 lastApprovedByID = 6;
+  uint64 lastRejectedByID = 7;
+  string lastApprovedByName = 8;
+  string lastRejectedByName = 9;
+  string createdByName = 10;
+  string comment = 11;
+  string updatedByName = 12;
+  google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message MenuWithTask {
+  Menu menu = 1;
+  MenuTaskResponse task = 2;
+}
+
+message ListMenuTaskResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated MenuWithTask data = 4;
+}
+
+message ListMenuTaskRequest {
+  enum statuses{
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+  }
+
+  enum steps{
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+  }
+
+  statuses status = 1;
+  steps step = 2;
+
+  int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "page number to get data. Default value '-1' for disable page",
+  }];
+  string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  direction dir = 6;
+  string filter = 7;
+  string query = 8;
+}
+
+message ListMenuRequest {
+  uint32 page = 1;
+  int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  string keyword = 3;
+  string column = 4;
+  string filter = 5;
+}
+
+message ListMenuResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  PaginationResponse pagination = 4;
+  repeated MenuWithTask data = 5;
+}
+
+message ListMenuActiveResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated menu.service.v1.Menu data = 4;
+  PaginationResponse pagination = 5;
+}
+
+message PaginationResponse {
+  int32 page = 1;
+  int32 limit = 2;
+  int64 totalRows = 3;
+  int32 totalPages = 4;
+}
+
+message UpdateMenuRequest {
+
+}
+
+message GetByTaskID {
+  uint64 taskID = 1;
+}
+
+message ListModuleResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated menu.service.v1.Module data = 4;
+}
+
+message ListMenuDisableResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated menu.service.v1.MenuDisable data = 4;
+}
+
+message ListMenuLicenseResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated menu.service.v1.MenuLicense data = 4;
+}
+
+message MenuAppearance {
+  uint64 menuID = 1;
+  uint64 parentID = 2;
+  string userType = 3;
+  string label = 4;
+  bool isModule = 5;
+  string rootPath = 6;
+  uint64 productID = 7;
+  string productName = 8;
+  string orderNumber = 9;
+  string iconURI = 10;
+  repeated MenuDisable disables = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  uint64 taskID = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string name = 13 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  bool isEnable = 14;
+  bool isTransactional = 16;
+  bool enableScheduled = 15;
+
+  MenuAuthorities authorities = 17;
+}
+
+message FeatureAuthorities {
+  string featureName = 1;
+  repeated string authorities = 2;
+}
+
+message MenuAuthorities {
+  repeated FeatureAuthorities featureAuthorities = 1;
+}
+
+message Task {
+  uint64 taskID = 1;
+  string type = 2;
+  string status = 3;
+  string step = 4;
+  uint64 featureID = 5;
+  uint64 lastApprovedByID = 6;
+  uint64 lastRejectedByID = 7;
+  string lastApprovedByName = 8;
+  string lastRejectedByName = 9;
+  string createdByName = 10;
+  string comment = 11;
+  string updatedByName = 12;
+  string reasons = 13;
+  bool isValidFeatureID = 14;
+  uint64 createdByID = 15;
+  uint64 updatedByID = 16;
+  bool isActiveTask = 17;
+  google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp approvedAt = 103 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp rejectedAt = 104 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message TaskDataMenuAppearance {
+  repeated MenuAppearance menus = 1;
+  Task task = 2;
+  MenuParentAppearance detail = 3;
+}
+
+message GetListTaskMenuAppearanceReq{
+  enum statuses{
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+  }
+
+  enum steps{
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+  }
+
+  statuses status = 1;
+  steps step = 2;
+
+  int32 limit = 3;
+  int32 page = 4;
+  string sort = 5;
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  direction dir = 6;
+  string filter = 7;
+  string query = 8;
+  string in = 9;
+  string filterOr = 10;
+}
+
+message GetListProductAppearanceUKLNRequest{
+
+  uint64 menuID = 1;
+  int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "page number to get data. Default value '-1' for disable page",
+  }];
+  string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  direction dir = 5;
+  string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+
+  string  countryName = 8;
+
+}
+
+
+message GetListTaskMenuAppearanceRes{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated TaskDataMenuAppearance data = 4;
+  PaginationResponse pagination = 5;
+}
+
+message GetTaskMenuAppearanceReq {
+  uint64 taskID = 1;
+}
+
+message GetTaskMenuAppearanceRes{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  TaskDataMenuAppearance data = 4;
+}
+
+message MenuParent {
+  bool isParent = 1;
+  string name = 2;
+  string changelog = 3;
+  uint64 companyID = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string companyName = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string userTypeName = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string countryName = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+  repeated MenuLicenseSave menus = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message MenuParentAppearance {
+  bool isParent = 1;
+  string name = 2;
+  string changelog = 3;
+  // string companyID = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+  // string companyName = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string userTypeName = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message SetTaskMenuAppearanceReq {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // example: "{\"changeLog\":\"string\",\"isDraft\":true,\"data\":[{\"menuID\":\"0\",\"parentID\":\"0\",\"userType\":\"string\",\"label\":\"string\",\"isModule\":true,\"rootPath\":\"string\",\"productID\":\"0\",\"productName\":\"string\",\"orderNumber\":\"string\",\"iconURI\":\"string\",\"disables\":[{\"startDateTime\":\"2022-03-16T10:52:42.246Z\",\"endDateTime\":\"2022-03-16T10:52:42.246Z\",\"customTime\":\"string\",\"menuID\":\"0\"}],\"taskID\":\"0\"}]}"
+  };
+  repeated MenuAppearance data = 1;
+  uint64 taskID = 2;
+  bool isDraft = 3;
+  string changeLog = 4;
+  string name = 5;
+}
+
+message SetTaskMenuAppearanceResData {
+  uint64 taskID = 1;
+}
+
+message SetTaskMenuAppearanceRes {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  SetTaskMenuAppearanceResData data = 4;
+}
+
+message SaveMenuAppearanceReq {
+  repeated MenuAppearance data = 1;
+  uint64 taskID = 2;
+}
+
+message BeforeSaveMenuAppearanceReq {
+  string userType = 1;
+}
+
+message SaveMenuAppearanceRes {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated Menu data = 4;
+}
+
+message GetMenuAppearanceReq{
+  uint64 menuID = 1;
+  int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "page number to get data. Default value '-1' for disable page",
+  }];
+  string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  direction dir = 5;
+  string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+}
+
+message GetMenuLicenseReq{
+  uint64 menuLicenseID = 1;
+  int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "page number to get data. Default value '-1' for disable page",
+  }];
+  string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  direction dir = 5;
+  string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string in = 9;
+}
+
+message GetMenuAppearanceRes {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated Menu data = 4;
+  PaginationResponse pagination = 5;
+}
+
+message GetMyMenuReq {
+  string token = 1;
+}
+
+message GetMyMenuRes {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated Menu data = 4;
+}
+
+
+message MenuLicenseWrite {
+  uint64 menuLicenseID = 1 ;
+  uint64 menuID = 21 ;
+  uint64 parentID = 22 ;
+  string label = 23 ;
+  bool isModule = 24 ;
+  uint64 companyID = 3 ;
+  bool isAllowed = 4 ;
+  uint64 fee = 5;
+  string feeCurrency = 2;
+  string feeType = 6;
+  repeated TempLimit transactionLimit = 7;
+  uint64 productID = 15 ;
+  string productName = 16;
+  string orderNumber = 25;
+  TempCompany Company = 17;
+  repeated google.protobuf.Timestamp chargeDate = 8 ;
+  google.protobuf.Timestamp createdAt = 9 ;
+  uint64 createdByID = 10 ;
+  google.protobuf.Timestamp updatedAt = 11;
+  uint64 updatedByID = 12;
+  string name = 13;
+  bool isEnable = 14;
+  uint64 accountID = 18;
+  string accountNumber = 19;
+  string accountName = 20;
+  string accountAlias = 26;
+  uint64 taskID = 27;
+  // bool isEnabled = 28;
+  bool isTransactional = 29;
+  string iconURI = 30;
+  string createdByName = 31;
+  string updatedByName = 32;
+  string penalty = 33;
+  uint64 feeMultiple = 34;
+  HostToHost hostToHost = 35;
+  bool isBiRtgs = 36;
+  bool isMTEnable = 37;
+  bool isBalanceSummary = 38;
+  bool isReportStatement = 39;
+}
+
+message GetMenuLicenseRes {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated MenuLicenseSave data = 4;
+  PaginationResponse pagination = 5;
+}
+
+message SetTaskMenuLicenseReq {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // example: "{\"data\": [{\"companyID\": \"string\",\"isAllowed\": true,\"fee\": \"string\",\"feeType\": \"string\",\"transactionLimit\": \"string\",\"productID\": \"string\"}],\"isDraft\": true}"
+  };
+  repeated MenuLicenseSave data = 1;
+  uint64 taskID = 2;
+  bool isDraft = 3;
+  string name = 4;
+  string changelog = 5;
+}
+
+message SetTaskMenuLicenseRes {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  SetTaskMenuLicenseResData data = 4;
+}
+
+message SetTaskMenuLicenseResData {
+  uint64 taskID = 1;
+}
+
+message SaveMenuLicenseReq {
+  repeated MenuLicenseSave data = 1;
+  uint64 taskID = 2;
+  bool isRPC = 3;
+}
+
+message MenuLicenseSave {
+  enum EncryptionType {
+    NULL = 0;
+    AES128 = 1;
+    AES256 = 2;
+    GNUPG = 3;
+  }
+
+
+  enum KliringActionType {
+    UNKNOWN = 0;
+    NEXT_BUSINESS_DATE = 1;
+    SAMEDAY = 2;
+    CANCEL = 3;
+  }
+
+  enum RejectionType{
+    NULL_REJECTION_TYPE = 0;
+    REJECTION_RECORD = 1;
+    REJECTION_FILE = 2;
+  }
+
+  uint64 menuLicenseID = 1 ;
+  uint64 menuID = 21 ;
+  uint64 parentID = 22 ;
+  string label = 23 ;
+  bool isModule = 24 ;
+  uint64 companyID = 3 ;
+  bool isAllowed = 4 ;
+  uint64 fee = 5;
+  string feeCurrency = 2;
+  string feeType = 6;
+  repeated TempLimit transactionLimit = 7;
+  uint64 productID = 15 ;
+  string productName = 16;
+  string orderNumber = 25;
+  TempCompany Company = 17;
+  repeated google.protobuf.Timestamp chargeDate = 8 ;
+  google.protobuf.Timestamp createdAt = 9 ;
+  uint64 createdByID = 10 ;
+  google.protobuf.Timestamp updatedAt = 11;
+  uint64 updatedByID = 12;
+  string name = 13;
+  bool isEnable = 14;
+  uint64 accountID = 18;
+  string accountNumber = 19;
+  string accountName = 20;
+  string accountAlias = 26;
+  uint64 taskID = 27;
+  // bool isEnabled = 28;
+  bool isTransactional = 29;
+  uint64 moduleID = 33;
+  string penalty = 34;
+  uint64 feeMultiple = 35;
+  HostToHost hostToHost = 36;
+  bool isBiRtgs = 37;
+  bool isMTEnable = 38;
+  bool isBalanceSummary = 39;
+  bool isReportStatement = 40;
+  bool enableDecryption = 41;
+  EncryptionType encryptionType = 42;
+  string encryptionKey = 43;
+  string kodePerusahaanEfek = 44;
+  FeeMass feemass = 45 [json_name = "fee_mass"];
+  KliringActionType kliringActionType = 46 [json_name = "kliring_action_type"];
+  RejectionType rejectionType = 47 [json_name = "rejection_type"];
+}
+
+
+message TempLimit {
+  uint64 limit = 1;
+  uint64 currencyID = 2;
+  string currency = 3;
+}
+
+message SaveMenuLicenseRes {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  MenuLicense data = 4;
+}
+
+// message filterGetListTaskMenuLicense{
+//    string DateCreated  = 1;
+//     string DateModified  = 2;
+//     string Createdby = 3;
+//     string Modifiedby = 4;
+// }
+
+message GetListTaskMenuLicenseReq{
+  enum statuses{
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+  }
+
+  enum steps{
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+  }
+
+  statuses status = 1;
+  steps step = 2;
+
+  int32 limit = 3;
+  int32 page = 4;
+  string sort = 5;
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  direction dir = 6;
+  string filter = 7;
+  string query = 8;
+  string in = 9;
+  string filterOr = 10;
+  string companyName = 11;
+  string feature = 12;
+}
+
+message GetListTaskMenuLicenseRes{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated TaskDataMenuLicense data = 4;
+  PaginationResponse pagination = 5;
+}
+
+message TaskDataMenuLicense {
+  repeated MenuLicenseSave menus = 1;
+  Task task = 2;
+  MenuParent detail = 3;
+  repeated MenuLicenseSave hidedMenus = 4;
+  CompanyData company = 5;
+}
+
+message CompanyData {
+  uint64 companyID = 1;
+  string companyCode = 2;
+  string companyName = 3;
+  string countryCode = 4;
+  string countryName = 5;
+}
+
+message GetTaskMenuLicenseReq {
+  uint64 taskID = 1;
+}
+
+message GetTaskMenuLicenseRes{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  TaskDataMenuLicense data = 4;
+}
+
+message GetMenuAppearanceDisableReq{
+  uint64 menuID = 1;
+  uint64 menuDisableID = 2;
+  int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "page number to get data. Default value '-1' for disable page",
+  }];
+  string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  };
+  direction dir = 6;
+  string filter = 7;
+  string query = 8;
+}
+
+message GetMenuAppearanceDisableRes {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated MenuDisable data = 4;
+  PaginationResponse pagination = 5;
+}
+
+message FileMenuLicenseTaskRequest {
+
+  enum Formats {
+    null = 0;
+    pdf = 1;
+    xls = 2;
+    csv = 3;
+  }
+
+  Formats fileFormat = 1;
+
+  enum statuses{
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+  }
+
+  enum steps{
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+  }
+
+  statuses status = 2;
+  steps step = 3;
+
+  int32 limit = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  int32 page = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "page number to get data. Default value '-1' for disable page",
+  }];
+  string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  direction dir = 7;
+  string filter = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  // filterGetListTaskMenuLicense filter = 8;
+  string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+}
+
+message FileMenuLicenseTaskV2Request {
+
+  enum Formats {
+    null = 0;
+    pdf = 1;
+    xls = 2;
+    csv = 3;
+  }
+
+  Formats fileFormat = 1;
+
+  //  enum statuses{
+  //    AllStatus = 0;
+  //    Pending = 1;
+  //    Draft = 2;
+  //    Returned = 3;
+  //    Approved = 4;
+  //    Rejected = 5;
+  //  }
+
+  enum steps{
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+  }
+
+  //  statuses status =2;
+  steps step = 3;
+
+  int32 limit = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  int32 page = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "page number to get data. Default value '-1' for disable page",
+  }];
+
+  enum Sort {
+    companyID = 0;
+    companyCode = 1;
+    companyName = 2;
+    countryCode = 3;
+    countryName = 4;
+    status = 5;
+    createdByName = 6;
+    reviewedByName = 7;
+    createdAt = 8;
+    updatedAt = 9;
+  }
+
+  Sort sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  direction dir = 7;
+  ViewTaskLicenses filter = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  // filterGetListTaskMenuLicense filter = 8;
+  string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+}
+
+message FileMenuAppearanceTaskRequest {
+
+  enum Formats {
+    null = 0;
+    pdf = 1;
+    xls = 2;
+    csv = 3;
+  }
+
+  Formats fileFormat = 1;
+
+  enum statuses{
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+  }
+
+  enum steps{
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+  }
+
+  statuses status = 2;
+  steps step = 3;
+
+  int32 limit = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  int32 page = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "page number to get data. Default value '-1' for disable page",
+  }];
+  string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  direction dir = 7;
+  string filter = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+}
+
+
+message TaskActionRequest {
+  uint64 taskID = 1;
+  string action = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Action: 'approve', 'rework', 'reject', 'delete'"
+    }
+  ];
+  string comment = 3;
+  string reasons = 4;
+}
+
+message TaskActionResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  Task data = 4;
+}
+
+message HostToHost {
+    bool stp = 1;
+    string pathIn = 2;
+    string pathOut = 3;
+    string userAlias = 4;
+    string fileProtocol = 5;
+    string sharedFolderLocation = 6;
+    string serverUsername = 7;
+    string serverPassword = 8;
+    string ssKey = 9;
+    string recipientEmail = 10;
+    bool isMakerConfirmation = 11;
+	  string fileFormat = 12;
+    string pathBPNSSP = 13;
+    string pathReceipt = 14;
+    string approverName = 15;
+    string charge_type = 16;
+    string credit_account_number = 17;
+    bool beneficiaryValidation = 18;
+}
+
+message CreateMenuPackageTaskRequest {
+  Package package = 1;
+  bool isDraft = 100;
+  uint64 taskID = 101;
+  string comment = 102;
+  uint64 featureID = 103;
+  string status = 104;
+}
+
+message CreateMenuPackageTaskResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  Task data = 4;
+}
+
+message ActionMenuPackageTaskRequest {
+  uint64 taskID = 1;
+  string action = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Action: 'approve', 'rework', 'reject', 'delete', 'cancel'"
+    }
+  ];
+  string comment = 3;
+  string reasons = 4;
+}
+
+message ActionMenuPackageTaskResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  Task data = 4;
+}
+
+message CreateMenuPackageRequest {
+  CreateMenuPackageTaskRequest data = 1;
+  uint64 taskID = 2;
+}
+
+message CreateMenuPackageResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  Package data = 4;
+}
+
+message GetMenuPackageTaskByIDRequest {
+  string taskID = 1;
+}
+
+message GetMenuPackageTaskByIDResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  PackageTask data = 4;
+}
+
+message DeleteMenuPackageResponse {
+  bool success = 1;
+}
+
+message PackageTask {
+  Package package = 1;
+  Task task = 2;
+}
+
+message ListMenuPackageTaskRequest {
+  //    enum statuses{
+  //        AllStatus = 0;
+  //        Pending = 1;
+  //        Draft = 2;
+  //        Returned = 3;
+  //        Approved = 4;
+  //        Rejected = 5;
+  //    }
+  string status = 9;
+
+  int32 limit = 7;
+  int32 page = 8;
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+
+  direction dir = 4;
+  PackagePayload filter = 5;
+  string query = 6;
+
+  enum Sort {
+    packageID = 0;
+    packageName = 1;
+    countryName = 2;
+    createdBy = 3;
+    dateCreated = 4;
+    approvedBy = 5;
+    dateApproved = 6;
+    statusPackage = 7;
+    statusTask = 8;
+  }
+
+  Sort sort = 10;
+
+}
+
+message ListMenuPackageTaskResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated PackageTask data = 4;
+  PaginationResponse pagination = 5;
+}
+
+
+// request data package
+message ListMenuPackageDataRequest {
+  int32 limit = 1;
+  int32 page = 2;
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  enum Sort {
+    packageID = 0;
+    packageName = 1;
+    countryName = 2;
+    createdBy = 3;
+    dateCreated = 4;
+    approvedBy = 5;
+    dateApproved = 6;
+    statusPackage = 7;
+  }
+  Sort sort = 3;
+  direction dir = 4;
+  PackagePayload filter = 5;
+  string query = 6;
+}
+
+
+message PackagePayload {
+  uint64 packageID = 1;
+  string packageName = 2;
+  string packageDescription = 3;
+  string packageStatus = 4;
+  string createdByName = 96;
+  string approvedByName = 97 ;
+  uint64 createdByID = 98 ;
+  uint64 updatedByID = 99 ;
+  uint64 deletedByID = 100;
+  string createdAt = 101 ;
+  string updatedAt = 102;
+  string deletedAt = 103 ;
+  string countryName = 111 ;
+}
+
+message ListMenuPackageDataResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated Package data = 4;
+  PaginationResponse pagination = 5;
+}
+
+message GetMyMenuLicenseByCompanyProductReq {
+  uint32 companyId = 1;
+  uint32 productId = 2;
+}
+
+enum StatusPackage {
+  NULL_STATUS_PACKAGE = 0;
+  Active = 1;
+  RequestInactive = 2;
+  Inactive = 3;
+}
+
+message SetStatusPackageRequest {
+  uint64 packageID = 1;
+  StatusPackage status = 2;
+}
+
+message SetStatusPackageResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message GetMenuPackageNameAvailabilityRequest {
+  string packageName = 1;
+  uint64 packageID = 2;
+  uint64 taskID = 3;
+  string countryName = 4;
+}
+
+message  FileMenuPackageTaskRequest {
+
+  enum Formats {
+    null = 0;
+    pdf = 1;
+    xls = 2;
+    csv = 3;
+  }
+
+  Formats fileFormat = 1;
+  //  enum statuses{
+  //    AllStatus = 0;
+  //    Pending = 1;
+  //    Draft = 2;
+  //    Returned = 3;
+  //    Approved = 4;
+  //    Rejected = 5;
+  //  }
+  string status = 9;
+
+  int32 limit = 7;
+  int32 page = 8;
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+
+  direction dir = 4;
+  PackagePayload filter = 5;
+  string query = 6;
+
+  enum Sort {
+    packageID = 0;
+    packageName = 1;
+    countryName = 2;
+    createdBy = 3;
+    dateCreated = 4;
+    approvedBy = 5;
+    dateApproved = 6;
+    statusPackage = 7;
+    statusTask = 8;
+  }
+
+  Sort sort = 10;
+}
+
+message GetListRequest {
+  string sourceTable = 1;
+  string displayColumn = 2;
+  string filterColumn = 3;
+  string filterValue = 4;
+  bool isDistinct = 5;
+}
+
+message ListTaskPluckResponse {
+  repeated string data = 1;
+}
+
+
+message GetListTaskMenuLicenseV2Req{
+  int32 limit = 1;
+  int32 page = 2;
+
+  enum Sort {
+    companyID = 0;
+    companyCode = 1;
+    companyName = 2;
+    countryCode = 3;
+    countryName = 4;
+    status = 5;
+    createdByName = 6;
+    reviewedByName = 7;
+    createdAt = 8;
+    updatedAt = 9;
+  }
+
+  Sort sort = 3;
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+  direction dir = 4;
+  ViewTaskLicenses filter = 5;
+  string query = 6;
+
+}
+// request FileMenuPackageHistory
+message FileMenuPackageHistoryRequest {
+
+  int32 limit = 7;
+  int32 page = 8;
+
+  enum Formats {
+    null = 0;
+    pdf = 1;
+    xls = 2;
+    csv = 3;
+  }
+
+  Formats fileFormat = 1;
+
+
+  enum direction {
+    DESC = 0;
+    ASC = 1;
+  }
+
+
+  direction dir = 4;
+  PackagePayload filter = 5;
+  string query = 6;
+
+  enum Sort {
+    packageID = 0;
+    packageName = 1;
+    countryName = 2;
+    createdBy = 3;
+    dateCreated = 4;
+    approvedBy = 5;
+    dateApproved = 6;
+    statusPackage = 7;
+  }
+
+  Sort sort = 9;
+
+}
+
+message GetListTaskMenuLicenseV2Resp{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated TaskDataMenuLicenseV2 data = 4;
+  PaginationResponse pagination = 5;
+}
+
+message TaskDataMenuLicenseV2 {
+  ViewTaskLicenses menu = 1;
+  Task task = 2;
+}
+
+enum actionTask {
+  NULL_ACTION = 0;
+  approve = 1;
+  rework = 2;
+  reject = 3;
+  delete = 4;
+}
+
+
+message TaskActionV2Request {
+  uint64 taskID = 1;
+  actionTask action = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Action: 'approve', 'rework', 'reject', 'delete'"
+    }
+  ];
+  string comment = 3;
+  string reasons = 4;
+}
+
+message TaskActionV2Response {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  Task data = 4;
+}
+
+message GetCreatedAndApprovedResponse{
+  bool error = 1;
+  uint64 code = 2;
+  string message = 3;
+  DataGetCreatedAndApprovedResponse data = 4;
+}
+
+message DataGetCreatedAndApprovedResponse{
+  repeated string created = 1;
+  repeated string approved = 2;
+}
+
+message SetTaskMenuAppearanceReqV2 {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    // example: "{\"changeLog\":\"string\",\"isDraft\":true,\"data\":[{\"menuID\":\"0\",\"parentID\":\"0\",\"userType\":\"string\",\"label\":\"string\",\"isModule\":true,\"rootPath\":\"string\",\"productID\":\"0\",\"productName\":\"string\",\"orderNumber\":\"string\",\"iconURI\":\"string\",\"disables\":[{\"startDateTime\":\"2022-03-16T10:52:42.246Z\",\"endDateTime\":\"2022-03-16T10:52:42.246Z\",\"customTime\":\"string\",\"menuID\":\"0\"}],\"taskID\":\"0\"}]}"
+  };
+  repeated MenuAppearance menu = 1;
+  string changeLog = 2;
+  string name = 3;
+  string userType = 4;
+}
+
+message GetDistinctNonEmptyKodePerusahaanEfekResponse{
+  bool error = 1;
+  uint64 code = 2;
+  string message = 3;
+  repeated DataGetDistinctNonEmptyKodePerusahaanEfekResponse data = 4;
+}
+
+message DataGetDistinctNonEmptyKodePerusahaanEfekResponse{
+  uint64 companyID = 1;
+  uint64 productID = 2;
+  string kodePerusahaanEfek = 3;
+}
+
+message FeeMass {
+  ProductDetail bifast = 1 [json_name = "bifast"];
+  ProductDetail kliring = 2 [json_name = "kliring"];
+  ProductDetail rtgs = 3 [json_name = "rtgs"];
+  ProductDetail ift = 4 [json_name = "ift"];
+  ProductDetail swift = 5 [json_name = "swift"];
+}
+
+message ProductDetail {
+  uint64 productID = 1 [json_name = "productID"];
+  string currency = 2 [json_name = "currency"];
+  repeated uint64 amount = 3 [json_name = "amount"];
+}
+
+message GetListTaskMenuLicenseV3Req {
+  int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Limit data per page. Default value '-1' for disable limit",
+  }];
+  int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Page number to get data. Default value '-1' for disable page",
+  }];
+  string sort = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+  string dir = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Sort DirectionEnum should be ASC or DESC",
+  }];
+  string filter = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string filterOr = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+}
+
+message GetListTaskMenuLicenseV3Resp{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated TaskDataMenuLicenseV2 data = 4;
+  SummaryItems summary = 5;
+  PaginationResponse pagination = 6;
+
+}
+
+message SummaryItems {
+  uint64 all = 1 [json_name = "all"];
+  uint64 draft = 2 [json_name = "draft"];
+  uint64 returned = 3 [json_name = "returned"];
+  uint64 on_checker = 4 [json_name = "onChecker"];
+  uint64 on_signer = 5 [json_name = "onSigner"];
+  uint64 on_releaser = 6 [json_name = "onReleaser"];
+  uint64 approved = 7 [json_name = "approved"];
+  uint64 rejected = 8 [json_name = "rejected"];
+  uint64 deleted = 9 [json_name = "deleted"];
+  uint64 delete_request = 10 [json_name = "deleteRequest"];
+  uint64 active = 11 [json_name = "active"];
+  uint64 own_task_checker = 12 [json_name = "ownTaskChecker"];
+  uint64 own_task_signer = 13 [json_name = "ownTaskSigner"];
+  uint64 own_task_releaser = 14 [json_name = "ownTaskReleaser"];
+}
+
+message FilterDistinctRequest {
+  int32 limit = 1;
+  int32 page = 2;
+  string sort = 3;
+  string dir = 4;
+  string filter = 5;
+  string category = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Category: company_id, company_code, company_name, country_code, country_name, task_id, status" ,
+  }];
+  string query = 7;
+}
+
+message FilterDistinctResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated string data = 4;
+  PaginationResponse pagination = 5;
+}
+
+message GlobalRequest {
+  string request = 1;
+}
+
+message GlobalResponse {
+  string response = 1;
+}
+
+message SetTaskMenuLicenseRPCRequest {
+  repeated MenuLicenseSave data = 1;
+  uint64 task_id = 2;
+  bool is_draft = 3;
+  string name = 4;
+  string change_log = 5;
+  bool is_skip_to_approved = 6;
+  UserNonSession user = 7;
+}
+
+message UserNonSession {
+  uint64 user_id = 1;
+  uint64 company_id = 2;
+  string company_name = 3;
+  string user_name = 4;
+  repeated uint64 role_ids = 5;
+  string user_type = 6;
+}

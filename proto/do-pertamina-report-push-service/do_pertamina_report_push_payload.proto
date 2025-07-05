@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+import "do-pertamina-report-push-service/do_pertamina_report_push_core.proto";
+
+package do_pertamina_report_push.service.v1;
+option go_package = "./pb";
+
+message ErrorBodyResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message ReportPushRequest {
+  string app_key = 1;
+  string process_id = 2;
+  ModuleTypes module_type = 3;
+  string esb_request = 4;
+  string esb_response = 5;
+  uint64 order_id = 6;
+  Status status = 7;
+  string http_status_code = 8;
+  string external_id = 9;
+  InsertResultRequestAdd result = 10;
+  uint64 task_id = 11;
+}
+
+message ReportPushResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message HealthCheckRequest {
+
+}
+
+message HealthCheckResponse {
+  string message = 1;
+}
+
+message InsertResultRequestAdd {
+	string response_code = 1;    
+	string response_message = 2; 
+	string date_hit = 3;
+	string date_response = 4;
+}
+
+message UpdateTaskRequest {
+  string so_number = 1;
+  Status status = 2;
+  uint64 task_id = 3;
+  string error_message_payment = 4;
+}
+
+message TaskDataDOPertamina {
+  string transaction_id = 1;
+  string application_id = 2;
+  ModuleTypes module_type = 3;
+  string module_type_name = 4;
+  string order_date = 5;
+  string quotation_number = 6;
+  string scheduling_agreement_number = 7;
+  string debit_account = 8;
+  string debit_account_name = 9;
+  string product_group_id = 10;
+  string product_group_name = 11;
+  string ship_to = 12;
+  uint32 total_quantity = 13;
+  string uom = 14;
+  double total_amount = 15;
+  Status status = 16;
+  string sales_organization_id = 17;
+  string sales_organization_name = 18;
+  string distribution_channel_id = 19;
+  string distribution_channel_name = 20;
+  string sold_to = 21;
+  string depo_id = 22;
+  string depo_name = 23;
+  double pph_tax = 24;
+  double gross_value = 25;
+  string debit_or_credit_note = 26;
+  double net_value = 27;
+  double ppn_tax = 28;
+  double pbbkb_tax = 29;
+  string ship_to_name = 30;
+  string sold_to_name = 31;
+  string so_number = 32;
+}

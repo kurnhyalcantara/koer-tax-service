@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package issued.lc.service.v1;
+option go_package = "./pb";
+
+message NotificationData {
+  string APPLICANT_NAME = 1 [json_name='APPLICANT_NAME'];
+  string BANK_NAME = 4 [json_name='BANK_NAME'];
+  string BENEFICIARY_NAME = 5 [json_name='BENEFICIARY_NAME'];
+  string COMMENT = 9 [json_name='COMMENT'];
+  string COMPANY_NAME = 10 [json_name='COMPANY_NAME'];
+  string CREATED_DATE = 11 [json_name='CREATED_DATE'];
+  string CREATED_DATETIME = 12 [json_name='CREATED_DATETIME'];
+  string CREATED_TIME = 13 [json_name='CREATED_TIME'];
+  string CURRENCY_NAME = 14 [json_name='CURRENCY_NAME'];
+  string EVENT_DATE = 15 [json_name='EVENT_DATE'];
+  string EVENT_DATETIME = 16 [json_name='EVENT_DATETIME'];
+  string EVENT_TIME = 17 [json_name='EVENT_TIME'];
+  string EXCHANGE_RATE = 18 [json_name='EXCHANGE_RATE'];
+  string EXCHANGE_RATE_CURRENCY = 19 [json_name='EXCHANGE_RATE_CURRENCY'];
+  string MODULE = 20 [json_name='MODULE'];
+  string REASON = 21 [json_name='REASON'];
+  string RECEIVED_AMOUNT = 22 [json_name='RECEIVED_AMOUNT'];
+  string REMARK = 23 [json_name='REMARK'];
+  string SEND_AMOUNT = 24 [json_name='SEND_AMOUNT'];
+  string STATUS_ACTION = 25 [json_name='STATUS_ACTION'];
+  string TASK_ID = 26 [json_name='TASK_ID'];
+  string TRANSACTION_ID = 27 [json_name='TRANSACTION_ID'];
+  string USERNAME_APPROVER = 28 [json_name='USERNAME_APPROVER'];
+  string USERNAME_CHECKER = 29 [json_name='USERNAME_CHECKER'];
+  string USERNAME_MAKER = 30 [json_name='USERNAME_MAKER'];
+  string USERNAME_REJECTOR = 31 [json_name='USERNAME_REJECTOR'];
+  string USERNAME_RELEASER = 32 [json_name='USERNAME_RELEASER'];
+  string RECEIVER_NAME = 33 [json_name='RECEIVER_NAME'];
+  string REFERENCE_NO = 34 [json_name='REFERENCE_NO'];
+  string ROLE = 35 [json_name='ROLE'];
+  string USERNAME_REWORKER = 36 [json_name='USERNAME_REWORKER'];
+}

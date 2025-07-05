@@ -1,0 +1,460 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "system-service/system_payload.proto";
+
+package system.service.v1;
+option go_package = "./pb";
+
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+
+service ApiService {
+
+    rpc HealthCheck(Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/system/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Health Check"
+            tags: ["HealthCheck"];
+            description: "This API for check health server"
+        };
+    };
+
+    rpc CreateSystem(CreateRequest) returns (CreateResponse){};
+
+    rpc CreateSystemParam(CreateSystemRequest) returns (CreateTaskSystemResponse) {
+        option (google.api.http) = {
+            post: "/api/system/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    post: "/api/system/task/edit/{taskID}"
+                    body: "*"
+                }
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "create new / update add (id) to update system task"
+            tags: ["System"];
+            description: "This API for get list task system"
+        };
+    };
+    rpc GetMyTasksID(GetMyTasksIDRequest) returns (GetMyTasksIDResponse) {
+        option (google.api.http) = {
+            get: "/api/system/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get system task by task id"
+            tags: ["System"];
+            description: "This API for get system task by task id"
+        };
+    };
+
+    rpc GetMyTasks(SystemFilterRequest) returns (ListSystemResponse) {
+        option (google.api.http) = {
+            get: "/api/system/task/me"
+            additional_bindings: [
+                {
+                    get: "/api/system/task"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my system tasks"
+            tags: ["System"];
+            description: "This API for get list systems task"
+        };
+    };
+
+    // rpc GetListSystem(ListSystemRequest) returns (ListSystemResponse) {
+    //     option (google.api.http) = {
+    //         get: "/api/system"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         summary: "Get list data system"
+    //         description: "This API is used for get list data system"
+    //     };
+    // }
+
+    rpc ListSystemData(ListSystemDataRequest) returns (ListSystemDataResponse) ;
+
+    rpc HTTPListSystemData(ListSystemDataRequest) returns (ListSystemDataResponse) {
+        option (google.api.http) = {
+            get: "/api/system/data";
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }; // Disable security key
+            summary: "List system data";
+            tags: ["System"];
+            description: "This API for get list system"
+        };
+    };
+
+    rpc SystemDetail(SystemDetailRequest) returns (SystemDetailResponse) {
+        option (google.api.http) = {
+            get: "/api/system/data/{systemID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }; // Disable security key
+            summary: "System data by id";
+            tags: ["System"];
+            description: "This API for get system by id"
+        };
+    }
+    ;
+
+    rpc SystemDetailByKey(SystemDetailByKeyRequest) returns (SystemDetailByKeyResponse);
+    rpc HTTPSystemDetailByKey(SystemDetailByKeyRequest) returns (SystemDetailByKeyResponse) {
+        option (google.api.http) = {
+            get: "/api/system/key/{systemKey}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }; // Disable security key
+            summary: "System data by key";
+            tags: ["System"];
+            description: "This API for get system by key"
+        };
+    };
+
+    rpc SystemDetailByKeySecure(SystemDetailByKeyRequest) returns (SystemDetailByKeyResponse);
+    rpc HTTPSystemDetailByKeySecure(SystemDetailByKeyRequest) returns (SystemDetailByKeyResponse) {
+        option (google.api.http) = {
+            get: "/api/system/key-secure/{systemKey}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }; // Disable security key
+            summary: "System data by key secure";
+            tags: ["System"];
+            description: "This API for get system by key secure"
+        };
+    };
+
+    // MdBiccc
+    // MdBenefType
+    // MdCountry
+    // MdEmploymentIndustry
+    // MdEmploymentPosition
+    // MdEmploymentStatus
+    // MdGender
+    // MdIdType
+    // MdKota
+    // MdProvince
+    // MdPurpose
+    // MdPurposeIntended
+    // MdRelationToSender
+
+    rpc ListMdBiccc(ListMdBicccRequest) returns (ListMdBicccResponse) {}
+    rpc ListMdBicccHttp(ListMdBicccRequest) returns (ListMdBicccResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdBiccc"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "List MdBiccc"
+            tags: ["MasterData"];
+            description: "This API for get list MdBiccc"
+        };
+    };
+    
+    rpc ListMdBicccWithCache(ListMdBicccRequest) returns (ListMdBicccResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdBiccc/cache"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "List MdBiccc"
+            tags: ["MasterData"];
+            description: "This API for get list MdBiccc"
+        };
+    };
+    rpc ListMdBenefType(ListMdBenefTypeRequest) returns (ListMdBenefTypeResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdBenefType"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {}; // Disable security key
+            summary: "List MdBenefType";
+            tags: ["MasterData"];
+            description: "This API for get list MdBenefType"
+        };
+    }
+    rpc ListMdCountryHTTP(ListMdCountryRequest) returns (ListMdCountryResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdCountry"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "List MdCountry";
+            tags: ["MasterData"];
+            description: "This API for get list MdCountry"
+        };
+    }
+    rpc ListMdCountry(ListMdCountryRequest) returns (ListMdCountryResponse) {}
+    rpc ListMdEmploymentIndustry(ListMdEmploymentIndustryRequest) returns (ListMdEmploymentIndustryResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdEmploymentIndustry"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdEmploymentIndustry";
+            tags: ["MasterData"];
+            description: "This API for get list MdEmploymentIndustry"
+        };
+    }
+    rpc ListMdEmploymentPosition(ListMdEmploymentPositionRequest) returns (ListMdEmploymentPositionResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdEmploymentPosition"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdEmploymentPosition";
+            tags: ["MasterData"];
+            description: "This API for get list MdEmploymentPosition"
+        };
+    }
+    rpc ListMdEmploymentStatus(ListMdEmploymentStatusRequest) returns (ListMdEmploymentStatusResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdEmploymentStatus"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdEmploymentStatus";
+            tags: ["MasterData"];
+            description: "This API for get list MdEmploymentStatus"
+        };
+    }
+    rpc ListMdGender(ListMdGenderRequest) returns (ListMdGenderResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdGender"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdGender";
+            tags: ["MasterData"];
+            description: "This API for get list MdGender"
+        };
+    }
+    rpc ListMdIdType(ListMdIdTypeRequest) returns (ListMdIdTypeResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdIdType"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdIdType";
+            tags: ["MasterData"];
+            description: "This API for get list MdIdType"
+        };
+    }
+    rpc ListMdKota(ListMdKotaRequest) returns (ListMdKotaResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdKota"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdKota";
+            tags: ["MasterData"];
+            description: "This API for get list MdKota"
+        };
+    }
+    rpc ListMdProvince(ListMdProvinceRequest) returns (ListMdProvinceResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdProvince"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdProvince";
+            tags: ["MasterData"];
+            description: "This API for get list MdProvince"
+        };
+        
+    }
+    rpc ListMdPurpose(ListMdPurposeRequest) returns (ListMdPurposeResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdPurpose"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdPurpose";
+            tags: ["MasterData"];
+            description: "This API for get list MdPurpose"
+        };
+    }
+    rpc ListMdPurposeIntended(ListMdPurposeIntendedRequest) returns (ListMdPurposeIntendedResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdPurposeIntended"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdPurposeIntended";
+            tags: ["MasterData"];
+            description: "This API for get list MdPurposeIntended"
+        };
+    }
+    rpc ListMdRelationToSender(ListMdRelationToSenderRequest) returns (ListMdRelationToSenderResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdRelationToSender"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdRelationToSender";
+            tags: ["MasterData"];
+            description: "This API for get list MdRelationToSender"
+        };   
+    }
+    rpc ListMdBankKliring(ListMdBankKliringRequest) returns (ListMdBankKliringResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdBankKliring"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdBankKliring";
+            tags: ["MasterData"];
+            description: "This API for get list MdBankKliring"
+        };
+    }
+    rpc ListMdBankKliringWithCache(ListMdBankKliringRequest) returns (ListMdBankKliringResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdBankKliring/cache"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdBankKliring";
+            tags: ["MasterData"];
+            description: "This API for get list MdBankKliring with cache"
+        };
+    }
+    rpc ListMdBranch(ListMdBranchRequest) returns (ListMdBranchResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdBranch"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdBranch";
+            tags: ["MasterData"];
+            description: "This API for get list MdBranch"
+        };
+    }
+    rpc GetResponseMapping(ResponseMappingRequest) returns (ResponseMappingRes) {
+        option (google.api.http) = {
+            get: "/api/system/response-mapping/{productId}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get response mapping by product id"
+            description: "This API handling get response mapping by product id"
+        };
+    }
+
+
+    rpc CheckMdBankLiringSuspend(CheckMdBankliringSuspendReq) returns (CheckMdBankliringSuspendRes) {
+       
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdBankKliring/suspend"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "check status ready MdBankKliring"
+            description: "This API handling checking status suspend MdBankKliring"
+        };
+
+    }
+
+    rpc ListMdJhrate(ListMdJhrateRequest) returns (ListMdJhrateResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdJhrate"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "List MdJhrate"
+            tags: ["MasterData"];
+            description: "This API for get list MdJhrate"
+        };
+    }
+
+    rpc UpdateRTGSBank(UpdateRTGSBankRequest) returns (UpdateRTGSBankResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/update-rtgs-bank/{key}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "Update RTGS Bank";
+            tags: ["MasterData"];
+            description: "This API for get update RTGS Bank data"
+        };
+    }
+
+	rpc ListMdBankKliringAR(ListMdBankKliringARRequest) returns (ListMdBankKliringResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/MdBankKliring/AR"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdBankKliring Account Receivable";
+            tags: ["MasterData"];
+            description: "This API for get list MdBankKliring Receivable"
+        };
+    }
+    
+    rpc GetBenCategoryByCode(GetBenCategoryRequest) returns (GetBenCategoryResponse) {
+        option (google.api.http) = {
+            get: "/api/system/BenCategory"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List BenCategory";
+            tags: ["BenCategory"];
+            description: "This API for get BenCategory By Code"
+        };
+    }
+
+    rpc GetBITRXCodeByCode(GetBITRXCodeRequest) returns (GetBITRXCodeResponse) {
+        option (google.api.http) = {
+            get: "/api/system/BRITRXCode"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List BITRXCode";
+            tags: ["BITRXCode"];
+            description: "This API for get BI Transaction Code by Code"
+        };
+    }
+
+
+    //  serive mdremarktobenef
+    rpc ListMdRemarkToBankBenef(ListMdRemarkToBankBenefRequest) returns (ListMdRemarkToBankBenefResponse) {
+        option (google.api.http) = {
+            get: "/api/system/master-data/mdRemarkToBankBenef"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "List MdRemarkToBankBenef";
+            tags: ["MasterData"];
+            description: "This API for get list MdRemarkToBankBenef"
+        };
+    }
+
+    rpc GetMappingCurrencyForCrossBorderTransfer(GetMappingCurrencyForCrossBorderTransferRequest) returns (GetMappingCurrencyForCrossBorderTransferResponse) {}
+}

@@ -1,0 +1,814 @@
+syntax = "proto3";
+
+package span.service.v1;
+
+import "mwitkow/go-proto-validators/validator.proto";
+import "span-service/span_core.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pb";
+
+/* #region basic Payload */
+message ErrorBodyResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message StandardResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message HealthCheckResponse{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message Sort {
+  string column = 1;
+  string direction = 2;
+}
+
+message PaginationRequest {
+  int32 limit = 1;
+  int32 page = 2;
+  string search = 3;
+}
+
+message PaginationResponse {
+  int32 limit = 1;
+  int32 page = 2;
+  int32 total_rows = 3;
+  int32 total_pages = 4;
+  double total_amount = 5;
+  string currency = 6;
+}
+
+message StandardWithTransactionIdResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  TransactionIdData data = 4;
+}
+
+message TransactionIdData {
+  string transaction_id = 1;
+}
+/* #end region basic Payload */
+
+/* #region task payload */
+message TaskDataSpan {
+  string transaction_id = 1;
+  Status status = 2;
+  uint64 company_id = 3;
+  string company_name = 4;
+  string file_description = 5;
+  string file_format = 6;
+  uint64 file_total_record = 7;
+  string file_name = 8;
+  uint64 valid_data = 11;
+  uint64 invalid_data = 12;
+  double total_amount = 13;
+  double total_valid_amount = 14;
+  double total_invalid_amount = 15;
+  uint64 transaction_completed = 16;
+  uint64 transaction_successful = 17;
+  uint64 transaction_failed = 18;
+  double transaction_total_amount = 19;
+  double transaction_valid_amount = 20;
+  double transaction_invalid_amount = 21;
+  string id_file = 22;
+  double transaction_completed_amount = 23;
+  double transaction_successful_amount = 24;
+  double transaction_failed_amount = 25;
+  string description_message = 49;
+  string transaction_type = 50;
+  uint64 total_batch_count = 51;
+  string currency = 52;
+}
+
+message SaveSpanTask {
+  uint64 task_id = 1;
+  TaskDataSpan task_data = 2;
+  bool is_draft = 3;
+}
+
+message SaveTaskSpanResponse {
+  uint64 task_id = 1;
+  string transaction_id = 2;
+  Status status = 3;
+}
+/* #end region task payload */
+message SubmitSpanRequest {
+  string file_description = 1 [(validator.field) = {string_not_empty: true, length_lt: 36}];
+  string file_key = 2 [(validator.field) = {string_not_empty: true}];
+}
+
+message SendApprovalSpanRequest {
+  uint64 task_id = 1;
+}
+
+message ListSpanDetailRequest {
+  int32 page = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Page number to get data. Default value '-1' for disable page",
+  }];
+  int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Limit data per page. Default value '-1' for disable limit",
+  }];
+  string query = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=agentBankAccountName,file.filename:<search>",
+  }];
+  string filter = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string id_file = 5;
+}
+
+message ListSpanDetailResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  ListSpanDetailResponses data = 4;
+}
+
+message ListSpanDetailResponses {
+  ListSpanDetailItemsResponses span_items = 1;
+  TaskDetailResponse task = 2;
+  string workflow_doc = 3;
+}
+
+
+message ListSpanDetailItemsResponses {
+  repeated ListSpanDetailItemsResponsesData data = 1;
+  PaginationResponse pagination = 2;
+}
+
+message ListSpanDetailItemsResponsesData {
+  string document_date = 1 [json_name = "documentDate"];
+  string document_number = 2 [json_name = "documentNumber"];
+  string beneficiary_name = 3 [json_name = "beneficiaryName"];
+  string beneficiary_bank_code = 4 [json_name = "beneficiaryBankCode"];
+  string beneficiary_bank = 5 [json_name = "beneficiaryBank"];
+  string beneficiary_account = 6 [json_name = "beneficiaryAccount"];
+  string amount = 7 [json_name = "amount"];
+  string currency_target = 8 [json_name = "currencyTarget"];
+  string description = 9 [json_name = "description"];
+  string agent_bank_code = 10 [json_name = "agentBankCode"];
+  string agent_bank_account_number = 11 [json_name = "agentBankAccountNumber"];
+  string agent_bank_account_name = 12 [json_name = "agentBankAccountName"];
+  string email_address = 13 [json_name = "emailAddress"];
+  string swift_code = 14 [json_name = "swiftCode"];
+  string iban_code = 15 [json_name = "ibanCode"];
+  string payment_method = 16 [json_name = "paymentMethod"];
+  string status_code = 17 [json_name = "statusCode"];
+  string status_desc = 18 [json_name = "statusDesc"];
+  string state_transaction = 19 [json_name = "stateTransaction"];
+  string desc_transaction = 20 [json_name = "descTransaction"];
+  string transaction_type = 21 [json_name = "transactionType"];
+  string supplier_name = 22 [json_name = "supplierName"];
+  string satker_code = 23 [json_name = "satkerCode"];
+  string address = 24 [json_name = "address"];
+}
+
+message ListBrigateDocumentResponseData {
+  string document_date = 1 [json_name = "documentDate"];
+  string document_number = 2 [json_name = "documentNumber"];
+  string beneficiary_name = 3 [json_name = "beneficiaryName"];
+  string beneficiary_bank_code = 4 [json_name = "beneficiaryBankCode"];
+  string beneficiary_bank = 5 [json_name = "beneficiaryBank"];
+  string beneficiary_account = 6 [json_name = "beneficiaryAccount"];
+  string amount = 7 [json_name = "amount"];
+  string currency_target = 8 [json_name = "currencyTarget"];
+  string description = 9 [json_name = "description"];
+  string agent_bank_code = 10 [json_name = "agentBankCode"];
+  string agent_bank_account_number = 11 [json_name = "agentBankAccountNumber"];
+  string agent_bank_account_name = 12 [json_name = "agentBankAccountName"];
+  string email_address = 13 [json_name = "emailAddress"];
+  string swift_code = 14 [json_name = "swiftCode"];
+  string iban_code = 15 [json_name = "ibanCode"];
+  string payment_method = 16 [json_name = "paymentMethod"];
+  string status_code = 17 [json_name = "statusCode"];
+  string status_desc = 18 [json_name = "statusDesc"];
+  string state_transaction = 19 [json_name = "stateTransaction"];
+  string desc_transaction = 20 [json_name = "descTransaction"];
+  int32 total_data = 21;
+}
+
+message SpanDetailRequest {
+  int32 page = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Page number to get data. Default value '-1' for disable page",
+  }];
+  int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Limit data per page. Default value '-1' for disable limit",
+  }];
+  string sort = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+  Direction dir = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Sort DirectionEnum should be ASC or DESC",
+  }];
+  string filter = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string filter_or = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=task_id:1|type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=reference_number,file.filename:<search>",
+  }];
+  string transaction_id = 8;
+}
+
+message SpanDetailResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  SpanDataDetail data = 4;
+}
+
+message SpanDataDetail {
+  SpanTransactionInformation transaction_information = 1;
+  ListSpanItems span_items = 2;
+  TaskDetailResponse task = 3;
+  string workflow_doc = 4;
+}
+
+message DownloadAckResponse {
+  string document_number = 1;
+  string url_ack = 2;
+  string total_record = 3;
+  string file_name = 4;
+}
+
+message TaskDetailResponse {
+  uint64 task_id = 1;
+  string status = 2;
+  string reasons = 3;
+  string last_approved_by_name = 4;
+  string last_rejected_by_name = 5;
+  string updated_by_name = 6;
+  string created_by_name = 7;
+  string type = 8;
+  string comment = 9;
+  string created_at = 101;
+  string updated_at = 102;
+  string approved_at = 104;
+  string rejected_at = 105;
+}
+
+message ListSpanItems {
+  repeated SpanItemData data = 1;
+  PaginationResponse pagination = 2;
+}
+
+message SpanTransactionInformation {
+  string transaction_id = 1;
+  string file_name = 2;
+  string file_description = 3;
+  string transaction_type = 4;
+  string file_format = 5;
+  uint64 total_record = 6;
+  uint64 total_valid_data = 7;
+  uint64 total_invalid_data = 8;
+  uint64 total_pending_data = 9;
+  Status status = 10;
+  uint64 transaction_completed = 11;
+  uint64 transaction_successful = 12;
+  uint64 transaction_failed = 13;
+  double transaction_completed_amount = 14;
+  double transaction_successful_amount = 15;
+  double transaction_failed_amount = 16;
+  string reason_message = 17;
+  string uploaded_date = 18;
+  double total_valid_amount = 19;
+  double total_invalid_amount = 20;
+  double total_amount = 21;
+  string id_file = 22;
+}
+
+message SpanItemData {
+  uint64 span_item_id = 1;
+  string document_date = 2;
+  string document_number = 3;
+  string beneficiary_name = 4;
+  string beneficiary_bank_code = 5;
+  string beneficiary_bank = 6;
+  string beneficiary_account = 7;
+  double amount = 8;
+  string currency_target = 9;
+  string description = 10;
+  string agent_bank_code = 11;
+  string agent_bank_account_number = 12;
+  string agent_bank_account_name = 13;
+  string email_address = 14;
+  string swift_code = 15;
+  string iban_code = 16;
+  string payment_method = 17;
+  string transaction_type = 18;
+  string supplier_name = 19;
+  string satker_code = 20;
+  string address = 21;
+  string sp2d_count = 22;
+  string validation_status = 23;
+  string Transaction_status = 24;
+  string reason = 25;
+  string status_code = 26;
+  string status_desc = 27;
+}
+
+message GetPaymentMethodRequest {
+  string query = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=status:3,status:4 => Where status = 3 OR status = 4 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+}
+
+message GetPaymentMethodResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated GetPaymentMethodResponseData data = 4;
+}
+
+message GetPaymentMethodResponseData {
+  string payment_method_key = 1;
+  string payment_method_name = 2;
+}
+
+message ListRequest {
+  string status = 1;
+  string filter = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "the type_module is required",
+  }];
+  string search = 3;
+  int32 page = 4;
+  int32 limit = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Order data by column name",
+    }];
+  Direction dir = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Sort Direction enum should be ASC or DESC",
+    }];
+  string filter_or = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=created_at:>=2023-10-17,created_at:<=2023-10-18  => Where created_at >= 2023-10-17 AND created_at <= 2023-10-17 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=status:3,status:4 => Where status = 3 OR status = 4 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string type_tab = 10 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Action: 'span-upload', 'span-system', 'span-verify-reject', 'span-download-ack', 'span-void'"
+      }
+  ];
+  string custom_key_status = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Summary custom request \n format: [data.key] or [key]"
+  }
+  ];
+}
+
+message ListResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated string data = 4;
+  PaginationResponse pagination = 5;
+  string summary = 6;
+}
+
+message DeleteTaskSpanRequest {
+  repeated uint64 task_ids = 1 [(validator.field) = {repeated_count_min: 1}];
+}
+
+message DeleteTaskSpanResponse {
+  bool error = 1;
+  uint32 code = 2;    
+  string message = 3;
+  int32 total_successful = 4;
+  int32 total_failed = 5;
+  repeated DeleteTaskSpanData data = 6;
+}
+
+message DeleteTaskSpanData {
+  bool error = 1;
+  string message = 2;
+  TaskActionData task = 3;
+}
+
+message TaskActionData {
+  uint64 task_id = 1;
+}
+
+message SetStatusesTaskSpanRequest {
+  repeated uint64 task_ids = 1 [(validator.field) = {repeated_count_min: 1}];
+  string action = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Action: 'approve', 'reject'"
+    },
+    (validator.field) = {string_not_empty: true}
+  ];
+  string comment = 3 [(validator.field) = {length_lt:101}];
+  string reasons = 4 [(validator.field) = {length_lt:101}];
+  string pass_code = 5;
+  bool is_from_dashboard = 6;
+}
+
+message SetStatusesTaskSpanResponse {
+  bool error = 1;
+  int32 code = 2;
+  string message = 3;
+  int32 total_successful = 4;
+  int32 total_failed = 5;
+  repeated TaskStatusData data = 6;
+}
+
+message TaskStatusData {
+  bool error = 1;
+  string message = 2;
+  TaskActionData task = 3;
+}
+
+message ListFileRequest {
+  string status = 1;
+  string filter = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "the type_module is required",
+  }];
+  string search = 3;
+  int32 page = 4;
+  int32 limit = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Order data by column name",
+    }];
+  Direction dir = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Sort Direction enum should be ASC or DESC",
+    }];
+  string filter_or = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=created_at:>=2023-10-17,created_at:<=2023-10-18  => Where created_at >= 2023-10-17 AND created_at <= 2023-10-17 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=status:3,status:4 => Where status = 3 OR status = 4 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string type_tab = 10 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Action: 'span-upload', 'span-system', 'span-verify-reject', 'span-download-ack', 'span-void'"
+      }
+  ];
+  string type_data = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Action: 'transaction', 'history'"
+    }
+  ];
+  string file_format = 12;
+}
+
+message DownloadListSpanItemsRequest {
+  int32 page = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Page number to get data. Default value '-1' for disable page",
+  }];
+  int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Limit data per page. Default value '-1' for disable limit",
+  }];
+  string sort = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Order data by column name",
+  }];
+  Direction dir = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Sort DirectionEnum should be ASC or DESC",
+  }];
+  string filter = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string filter_or = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=task_id:1|type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+  }];
+  string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=reference_number,file.filename:<search>",
+  }];
+  string transaction_id = 8;
+  string file_format = 9;
+  string type_tab = 10 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Action: 'transaction', 'history'"
+  }];
+}
+
+message TaskService {
+  uint64 task_id = 1 [json_name = "taskID"];
+  string type = 2;
+  string status = 3;
+  string step = 4;
+  uint64 created_by_id = 5 [json_name = "createdByID"];
+  uint64 last_approved_by_id = 6 [json_name = "lastApprovedByID"];
+  uint64 last_rejected_by_id = 7 [json_name = "lastRejectedByID"];
+  string data = 8;
+  string comment = 9;
+  uint64 feature_id = 10 [json_name = "featureID"];
+  repeated TaskService childs = 11;
+  bool is_parent_active = 12 [json_name = "isParentActive"];
+  string reasons = 13;
+  string last_approved_by_name = 14 [json_name = "lastApprovedByName"];
+  string last_rejected_by_name = 15 [json_name = "lastRejectedByName"];
+  uint64 updated_by_id = 16 [json_name = "updatedByID"];
+  string updated_by_name = 17 [json_name = "updatedByName"];
+  string created_by_name = 18 [json_name = "createdByName"];
+  string data_bak = 19 [json_name = "dataBak"];
+  string child_bak = 20 [json_name = "childBak"];
+  string workflow_doc = 21 [json_name = "workflowDoc"];
+  uint64 company_id = 22 [json_name = "companyID"];
+  uint64 holding_id = 23 [json_name = "holdingID"];
+  google.protobuf.Timestamp created_at = 101 [json_name = "createdAt"];
+  google.protobuf.Timestamp updated_at = 102 [json_name = "updatedAt"];
+  google.protobuf.Timestamp deleted_at = 103 [json_name = "deletedAt"];
+  google.protobuf.Timestamp approved_at = 104 [json_name = "approvedAt"];
+  google.protobuf.Timestamp rejected_at = 105 [json_name = "rejectedAt"];
+}
+
+message ListAgentBankAccountNumberResponse {
+  bool error = 1;
+  int32 code = 2;
+  string message = 3;
+  repeated AgentBankAccountNumber data = 4;
+}
+
+message AgentBankAccountNumber {
+  string agent_bank_account_number = 1;
+  string agent_bank_account_name = 2;
+}
+
+message VoidActionRequest {
+  repeated VoidActionRequestData data = 1  [(validator.field) = {repeated_count_min: 1}];
+  string pass_code = 2;
+}
+
+message VoidActionRequestData {
+  string document_date = 1 [(validator.field) = {string_not_empty: true}];
+  string document_number = 2 [(validator.field) = {string_not_empty: true}];
+  string amount = 3 [(validator.field) = {string_not_empty: true}];
+  string reason = 4 [(validator.field) = {string_not_empty: true, length_lt:101}];
+  string beneficiary_account = 5;
+  string beneficiary_bank = 6;
+  string beneficiary_bank_code = 7;
+  string beneficiary_name = 8;
+  string agent_bank_account_number = 9;
+  string agent_bank_account_name = 10;
+  string agent_bank_code = 11;
+  string currency = 12;
+  string description = 13;
+  string email_address = 14;
+  string swift_code = 15;
+  string iban_code = 16;
+  string payment_method = 17;
+}
+
+message SpanActionResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  SpanActionResponseData data = 4;
+} 
+
+message SpanActionResponseData {
+  uint32 total_successful = 1;
+  uint32 total_failed = 2;
+}
+
+message SpanActionListResponse {
+  uint64 span_action_id = 1;
+  string status = 4;
+  string beneficiary_account = 5;
+  string beneficiary_name = 6;
+  string beneficiary_bank = 7;
+  string beneficiary_bank_code = 8;
+  string agent_bank_account_number = 9;
+  string agent_bank_account_name = 10;
+  string agent_bank_code = 11;
+  string currency = 12;
+  string type = 13;
+  string amount = 14;
+  uint64 company_id = 15;
+  string company_name = 16;
+  string document_date = 17;
+  string document_number = 18;
+  string description = 19;
+  string email_address = 20;
+  string swift_code = 21;
+  string iban_code = 22;
+  string payment_method = 23;
+  string reason_message = 24;
+  string created_by_name = 51;
+  uint64 created_by_id = 52;
+  google.protobuf.Timestamp created_at = 53;
+  string updated_by_name = 54;
+  uint64 updated_by_id = 55;
+  google.protobuf.Timestamp updated_at = 56;
+}
+
+message RejectActionRequest {
+  repeated RejectActionRequestData data = 1  [(validator.field) = {repeated_count_min: 1}];
+  string pass_code = 2;
+}
+
+message RejectActionRequestData {
+  string document_number = 1 [(validator.field) = {string_not_empty: true}];
+  string amount = 2 [(validator.field) = {string_not_empty: true}];
+  string beneficiary_account = 3;
+  string beneficiary_bank = 4;
+  string beneficiary_bank_code = 5;
+  string beneficiary_name = 6;
+  string agent_bank_account_number = 7;
+  string agent_bank_account_name = 8;
+  string agent_bank_code = 9;
+  string currency = 10;
+  string document_date = 11;
+  string description = 12;
+  string email_address = 13;
+  string swift_code = 14;
+  string iban_code = 15;
+  string payment_method = 16;
+}
+
+message UpdateCurrencyRequest {
+  string document_date = 1 [(validator.field) = {string_not_empty: true}];
+  string document_number = 2 [(validator.field) = {string_not_empty: true}];
+  string flag_completed = 3 [(validator.field) = {string_not_empty: true}];
+  string currency_target = 4 [(validator.field) = {string_not_empty: true}];
+  string swift_code = 5;
+  string pass_code = 6;
+}
+
+message DataListSpanUploadKemenkeu {
+  string id_file = 1;
+  string created_date_file = 2;
+  string document_date = 3;
+  string file_name = 4;
+  string record = 5;
+  string total_amount = 6;
+  string status = 7;
+  string status_desc = 8;
+  string source_upload = 9;
+}
+
+message DownloadFileACKRequest {
+  string url = 1 [(validator.field) = {string_not_empty: true}];
+}
+
+message ValidateDebitAccountByRole {
+  string account_number = 1;
+  repeated uint64 role_ids = 2;
+  uint64 company_id = 3;
+}
+
+/* #region email */
+message NotificationData {
+  string creation_date = 1 [json_name='CREATION_DATE'];
+  string transaction_id = 2 [json_name='TRANSACTION_ID'];
+  string total_record = 3 [json_name='TOTAL_RECORD'];
+  string total_amount = 4 [json_name='TOTAL_AMOUNT'];
+  string transaction_status = 9 [json_name='TRANSACTION_STATUS'];
+  string user_maker = 10 [json_name='USER_MAKER'];
+  string reason = 11 [json_name='REASON'];
+  string reject_description = 12 [json_name='REJECT_DESCRIPTION'];
+  string reject_from = 13 [json_name='REJECT_FROM'];
+  string file_description = 14 [json_name='FILE_DESCRIPTION'];
+}
+/* #end region email*/
+
+/* #region brigate to cip */
+message BrigateGetListSpanUtamaRequest {
+  string creation_date = 1 [json_name = "creationDate"];
+  string file_name = 2 [json_name = "fileName"];
+}
+
+message BrigateGetListSpanUtamaResponse {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  repeated BrigateGetListSpanUtama response_data = 3 [json_name = "responseData"];
+}
+
+message BrigateGetListSpanUtama {
+  string id_file = 1 [json_name = "idFile"];
+  string created_date_file = 2 [json_name = "createdDateFile"];
+  string document_date = 3 [json_name = "documentDate"];
+  string nama_file = 4 [json_name = "namaFile"];
+  string record = 5 [json_name = "record"];
+  string total_nominal = 6 [json_name = "totalNominal"];
+  string status = 7 [json_name = "status"];
+  string status_desc = 8 [json_name = "statusDesc"];
+  string source_upload = 9 [json_name = "sourceUpload"];
+}
+
+message BrigateDownloadAckResponse {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  repeated BrigateDownloadAckResponseData url = 3 [json_name = "url"];
+}
+
+message BrigateDownloadAckResponseData {
+  string document_number = 1 [json_name = "documentNumber"];
+  string url_ack = 2 [json_name = "urlAck"];
+  string total_record = 3 [json_name = "totalRecord"];
+}
+
+
+message BrigateGetListAgentBankAccountNumberResponse {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  repeated BrigateGetListAgentBankAccountNumber response_data = 3 [json_name = "responseData"];
+}
+
+message BrigateGetListAgentBankAccountNumber {
+  string nomor_rekening = 1 [json_name = "nomorRekening"];
+  string nama_rekening = 2 [json_name = "namaRekening"];
+}
+
+message BrigateDocumentDateRequest {
+  string document_date = 1 [json_name = "documentDate"];
+}
+
+message BrigateGetListDocumentResponse {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  repeated BrigateDataListDocument response_data = 3 [json_name = "responseData"];
+}
+
+message BrigateDataListDocument {
+  string document_date = 1 [json_name = "documentDate"];
+  string document_number = 2 [json_name = "documentNumber"];
+  string beneficiary_name = 3 [json_name = "beneficiaryName"];
+  string beneficiary_bank_code = 4 [json_name = "beneficiaryBankCode"];
+  string beneficiary_bank = 5 [json_name = "beneficiaryBank"];
+  string beneficiary_account = 6 [json_name = "beneficiaryAccount"];
+  string amount = 7 [json_name = "amount"];
+  string currency_target = 8 [json_name = "currencyTarget"];
+  string description = 9 [json_name = "description"];
+  string agent_bank_code = 10 [json_name = "agentBankCode"];
+  string agent_bank_account_number = 11 [json_name = "agentBankAccountNumber"];
+  string agent_bank_account_name = 12 [json_name = "agentBankAccountName"];
+  string email_address = 13 [json_name = "emailAddress"];
+  string swift_code = 14 [json_name = "swiftCode"];
+  string iban_code = 15 [json_name = "iBanCode"];
+  string payment_method = 16 [json_name = "paymentMethod"];
+  string status_code = 17 [json_name = "statusCode"];
+  string status_desc = 18 [json_name = "statusDesc"];
+  string state_transaction = 19 [json_name = "stateTransaction"];
+  string desc_transaction = 20 [json_name = "descTransaction"];
+  int32 total_data = 21;
+}
+
+message BrigateGetListSpanDetailRequest {
+  string id_file = 1 [json_name = "idFile"];
+}
+
+message BrigateGetListSpanDetailResponse {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  repeated BrigateGetListSpanDetailResponseData response_data = 3 [json_name = "responseData"];
+}
+
+message BrigateGetListSpanDetailResponseData {
+  string document_date = 1 [json_name = "documentDate"];
+  string document_number = 2 [json_name = "documentNumber"];
+  string beneficiary_name = 3 [json_name = "beneficiaryName"];
+  string beneficiary_bank_code = 4 [json_name = "beneficiaryBankCode"];
+  string beneficiary_bank = 5 [json_name = "beneficiaryBank"];
+  string beneficiary_account = 6 [json_name = "beneficiaryAccount"];
+  string amount = 7 [json_name = "amount"];
+  string currency_target = 8 [json_name = "currencyTarget"];
+  string description = 9 [json_name = "description"];
+  string agent_bank_code = 10 [json_name = "agentBankCode"];
+  string agent_bank_account_number = 11 [json_name = "agentBankAccountNumber"];
+  string agent_bank_account_name = 12 [json_name = "agentBankAccountName"];
+  string payment_method = 13 [json_name = "paymentMethod"];
+  string email_address = 14 [json_name = "emailAddress"];
+  string swift_code = 15 [ json_name = "swiftCode"];
+  string iban_code = 16 [json_name = "iBanCode"];
+  string status_code = 17 [json_name = "statusCode"];
+  string status_desc = 18 [json_name = "statusDesc"];
+  string state_transaction = 19 [json_name = "stateTransaction"];
+  string desc_transaction = 20 [json_name = "descTransaction"];
+  string jenis_transaksi = 21 [json_name = "jenisTransaksi"];
+  string nama_supplier = 22 [json_name = "namaSupplier"];
+  string kode_satker = 23 [json_name = "kodeSatker"];
+  string address = 24 [json_name = "address"];
+}
+
+message BrigateUpdateCurrencyRequest {
+  string document_date = 1 [json_name='documentDate'];
+  string document_number = 2 [json_name='documentNumber'];
+  string flag_completed = 3 [json_name="flagCompleted"];
+  string currency_target = 4 [json_name='currencyTarget'];
+  string swift_code = 5 [json_name='swiftCode'];
+}
+
+message BrigateUpdateCurrencyResponse {
+  string response_code = 1 [json_name='responseCode'];
+  string response_message = 2 [json_name='responseMessage'];
+}
+
+/* #end brigate*/

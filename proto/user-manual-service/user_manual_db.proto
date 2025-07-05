@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+
+package user_manual.service.v1;
+option go_package = "./pb";
+
+message UserManuals {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "qcash_user_manual.user_manuals",
+    };  
+    uint64 id = 1;
+    string module_name = 2;
+    string description = 3;
+    string order_number = 4 [(gorm.field).tag = {type: "varchar(10)"}];
+    int32 parent_id = 5;
+    google.protobuf.Timestamp created_at = 6;
+    string created_by = 7;
+    google.protobuf.Timestamp updated_at = 8;
+    string updated_by = 9;
+    string user_type = 10 [(gorm.field).tag = {type: "varchar(100)"}];
+    string file_name = 11;
+    string url_preview = 12;
+    int32 product_id = 13;
+    string status = 14 [(gorm.field).tag = {type: "varchar(10)"}];
+    bool isukln = 15;
+    bool is_default_manual = 16;
+};

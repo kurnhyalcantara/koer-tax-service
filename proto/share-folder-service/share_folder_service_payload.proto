@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package share_folder_service.service.v1;
+option go_package = "./pb";
+
+message StartWatchRequest {
+  string app_key = 1;
+};
+
+message StartWatchResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+};
+
+message ErrorBodyResponse{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+};
+
+message ProcessFileData {
+  string file_path = 1;
+  string original_file_name = 2;
+  uint64 company_id = 3;
+  bool stp_status = 4;
+  string user_alias = 5;
+  uint64 product_id = 6;
+  string ftp_host = 7;
+  string ftp_port = 8;
+  string ftp_username = 9;
+  string ftp_password = 10;
+  string message_queue_name = 11;
+  uint64 processed_file_id = 12;
+  string file_extension = 13;
+  string message_queue_payload = 14;
+  bool insecure_skip_verify = 15;
+  string certificate = 16;
+  string protocol = 17;
+  bool encrypt_status = 18;
+  bool is_maker_confirmation = 19;
+  string file_format = 20;
+  string pathIn = 21;
+  string email = 22;
+  string approver_name = 23;
+};
+
+message TransferFileData {
+  uint64 company_id = 1;
+  string path = 2;
+  string original_file_name = 3;
+  string uploaded_file_name = 4;
+  bool encrypt_status = 5;
+  bool stp_status = 6;
+  string user_alias = 7;
+  bool is_maker_confirmation = 8;
+  string file_format = 9;
+  string approver_name = 10;
+};
+
+message NotificationDataSharefolder {
+  string transaction_status_ind = 1 [json_name="TRANSACTION_STATUS_IND"];
+  string filename = 2 [json_name="FILENAME"];
+  string transaction_count = 3 [json_name="TRANSACTION_COUNT"];
+  string transaction_count_total = 4 [json_name="TRANSACTION_COUNT_TOTAL"];
+  string data_table = 5 [json_name="DATA_TABLE"];
+  string transaction_status_eng = 6 [json_name="TRANSACTION_STATUS_ENG"];
+}

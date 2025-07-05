@@ -1,0 +1,642 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "menu-service/menu.payload.proto";
+// import "menu_appearance.payload.proto";
+import "google/api/httpbody.proto";
+
+package menu.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+
+    rpc HealthCheck(Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/menu/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Health Check"
+            description: "This API for check health server"
+        };
+    };
+
+    // rpc UpdateMenuAdmin(CommonResponse) returns (CommonResponse) {
+    //     option (google.api.http) = {
+    //         put: "/api/menu/admin"
+    //         body: "*"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { } // Disable security key
+    //         summary: "Update menu admin"
+    //         description: "This API for update menu admin"
+    //     };
+    // };
+    
+    // rpc ListMenuTask(ListMenuTaskRequest) returns (ListMenuResponse) {
+    //     option (google.api.http) = {
+    //         get: "/api/menu/task"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { } // Disable security key
+    //         summary: "Get list menu task"
+    //         description: "This API for get list task menu"
+    //     };
+    // };
+
+    // rpc CreateMenu(CreateMenuRequest) returns (CreateMenuResponse);
+
+    // rpc CreateMenuTask(CreateMenuTaskRequest) returns (CreateMenuResponse) {
+    //     option (google.api.http) = {
+    //         post: "/api/menu/task"
+    //         body: "*"
+    //         additional_bindings: [
+    //             {
+    //                 put: "/api/menu/task/{taskID}"
+    //                 body: "*"
+    //             }
+    //         ]
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { }
+    //         summary: "Create Task menu"
+    //         description: "This API for create task menu"
+    //     };
+    // };
+
+
+    // rpc GetMenuTaskByID(GetByTaskID) returns (ListMenuResponse) {
+    //     option (google.api.http) = {
+    //         get: "/api/menu/task/{taskID}"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { }
+    //         summary: "Get Task menu by id"
+    //         description: "This API for Get task menu by id"
+    //     };
+    // };
+
+    // rpc ListMenu(ListMenuDataRequest) returns (ListMenuActiveResponse) {
+    //     option (google.api.http) = {
+    //         get: "/api/menu/data"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { }
+    //         summary: "Get list menu"
+    //         description: "This API for get list menu"
+    //     };
+    // };
+
+    // rpc ListModule(Empty) returns (ListModuleResponse) {
+    //     option (google.api.http) = {
+    //         get: "/api/menu/modules"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { }
+    //         summary: "Get list module"
+    //         description: "This API for get list module"
+    //     };
+    // };
+
+    // rpc ListMenuDisable(Empty) returns (ListMenuDisableResponse) {
+    //     option (google.api.http) = {
+    //         get: "/api/menu/disables"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { }
+    //         summary: "Get list menu disable"
+    //         description: "This API for get list menu disable"
+    //     };
+    // };
+
+    // rpc ListMenuLicense(Empty) returns (ListMenuLicenseResponse) {
+    //     option (google.api.http) = {
+    //         get: "/api/menu/licenses"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { }
+    //         summary: "Get list menu license"
+    //         description: "This API for get list menu license"
+    //     };
+    // };
+
+    rpc SetTaskMenuAppearance(SetTaskMenuAppearanceReq) returns (SetTaskMenuAppearanceRes) {
+        option (google.api.http) = {
+            post: "/api/menu/appearance/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    post: "/api/menu/appearance/task/edit/{taskID}"
+                    body: "*"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc GetListTaskMenuAppearance(GetListTaskMenuAppearanceReq) returns (GetListTaskMenuAppearanceRes) {
+        // option (google.api.http) = {
+        //     get: "/api/menu/appearance/task"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     security: { } // Disable security key
+        // };
+    }
+
+    rpc GetTaskMenuAppearance(GetTaskMenuAppearanceReq) returns (GetTaskMenuAppearanceRes) {
+        option (google.api.http) = {
+            get: "/api/menu/appearance/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc SaveMenuAppearance(SaveMenuAppearanceReq) returns (SaveMenuAppearanceRes) {}
+    rpc BeforeSaveMenuAppearance(BeforeSaveMenuAppearanceReq) returns (SaveMenuAppearanceRes) {}
+
+    // Move to
+    rpc GetMenuAppearance(GetMenuAppearanceReq) returns (GetMenuAppearanceRes) {
+//        option (google.api.http) = {
+//            get: "/api/menu/appearance/data"
+//        };
+//        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+//            security: { } // Disable security key
+//        };
+    }
+
+    rpc GetMenuLicense(GetMenuLicenseReq) returns (GetMenuLicenseRes) {
+        option (google.api.http) = {
+            get: "/api/menu/license/data"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+        };
+    }
+    
+    rpc GetMenuLicenseWithoutWorkflow(GetMenuLicenseReq) returns (GetMenuLicenseRes) {
+    }
+
+    rpc GetMenuLicenseWithoutWorkflowV2(GetMenuLicenseReq) returns (GetMenuLicenseRes) {
+        option (google.api.http) = {
+            post: "/api/menu/license/data2"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+        };
+    }
+
+    rpc SetTaskMenuLicense(SetTaskMenuLicenseReq) returns (SetTaskMenuLicenseRes) {}
+
+    rpc SetTaskMenuLicenseHttp(SetTaskMenuLicenseReq) returns (SetTaskMenuLicenseRes) {
+        option (google.api.http) = {
+            post: "/api/menu/license/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    post: "/api/menu/license/task/edit/{taskID}"
+                    body: "*"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc SaveMenuLicense(SaveMenuLicenseReq) returns (SaveMenuLicenseRes) {}
+    rpc DeleteMenuLicense(SaveMenuLicenseReq) returns (SaveMenuLicenseRes) {}
+    rpc DeleteMenuLicenseCompany(SaveMenuLicenseReq) returns (SaveMenuLicenseRes) {}
+
+
+    rpc GetListTaskMenuLicense(GetListTaskMenuLicenseReq) returns (GetListTaskMenuLicenseRes) {
+        // option (google.api.http) = {
+        //     get: "/api/menu/license/task"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     security: { } // Disable security key
+        // };
+    }
+
+    rpc DeleteTaskMenuLicense(GetTaskMenuLicenseReq) returns (GetTaskMenuLicenseRes) {
+        option (google.api.http) = {
+            post: "/api/menu/license/task/delete/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc GetTaskMenuLicense(GetTaskMenuLicenseReq) returns (GetTaskMenuLicenseRes) {
+        option (google.api.http) = {
+            get: "/api/menu/license/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc ListMenuTask(ListMenuTaskRequest) returns (ListMenuResponse) {
+        option (google.api.http) = {
+            get: "/api/menu/task"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list menu task"
+            description: "This API for get list task menu"
+        };
+    };
+
+    rpc ListModule(Empty) returns (ListModuleResponse) {
+        option (google.api.http) = {
+            get: "/api/menu/modules"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Get list module"
+            description: "This API for get list module"
+        };
+    };
+
+    rpc ListMenuDisable(Empty) returns (ListMenuDisableResponse) {
+        option (google.api.http) = {
+            get: "/api/menu/disables"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Get list menu disable"
+            description: "This API for get list menu disable"
+        };
+    };
+
+    rpc GetMenuAppearanceDisable(GetMenuAppearanceDisableReq) returns (GetMenuAppearanceDisableRes) {
+        option (google.api.http) = {
+            get: "/api/menu/appearance/data/disable"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc FileMenuLicenseTask(FileMenuLicenseTaskRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/menu/license/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list menu license task"
+            description: "This API for download list menu license task"
+        };
+    };
+
+    rpc FileMenuLicenseTaskV2(FileMenuLicenseTaskV2Request) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/menu/v2/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list menu license task V2"
+            description: "This API for download list menu license task V2"
+        };
+    };
+
+    rpc FileMenuAppearanceTask(FileMenuAppearanceTaskRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/menu/appearance/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list menu appearance task"
+            description: "This API for download list menu appearance task"
+        };
+    };
+
+    rpc GetMyTasksMenuLicense(GetListTaskMenuLicenseReq) returns (GetListTaskMenuLicenseRes) {
+        option (google.api.http) = {
+            get: "/api/menu/license/task/me"
+            additional_bindings: [
+                {
+                    get: "/api/menu/license/task"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my menu license tasks"
+            description: "This API for get list menu licenses task"
+        };
+    };
+
+    rpc GetMyTasksMenuLicenseCreatedBy(Empty) returns (ArrayString) {
+        option (google.api.http) = {
+            get: "/api/menu/license/task/me/created-by"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my user tasks"
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc GetMyTasksMenuLicenseApprovedBy(Empty) returns (ArrayString) {
+        option (google.api.http) = {
+            get: "/api/menu/license/task/me/approved-by"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my user tasks"
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc GetMyTasksMenuAppearance(GetListTaskMenuAppearanceReq) returns (GetListTaskMenuAppearanceRes) {
+        option (google.api.http) = {
+            get: "/api/menu/appearance/task/me"
+            additional_bindings: [
+                {
+                    get: "/api/menu/appearance/task"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my menu Appearance tasks"
+            description: "This API for get list menu Appearances task"
+        };
+    }
+
+    rpc GetMyMenu(GetMyMenuReq) returns (GetMyMenuRes) {
+        option (google.api.http) = {
+            post: "/api/menu/me"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get my menu"
+            description: "This API for get my menu"
+        };
+    }
+
+    rpc TaskActionLicense(TaskActionRequest) returns (TaskActionResponse) {
+        option (google.api.http) = {
+            post: "/api/menu/license/task/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Menu Approval"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+    rpc GetMyMenuPackageTasks(ListMenuPackageTaskRequest) returns (ListMenuPackageTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/menu/package/task/me"
+            additional_bindings: [
+                {
+                    get: "/api/menu/package/task"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my menu package tasks"
+            description: "This API for get list menu package task"
+        };
+    };
+
+    rpc CreateMenuPackageTask(CreateMenuPackageTaskRequest) returns (CreateMenuPackageTaskResponse) {
+        option (google.api.http) = {
+            post: "/api/menu/package/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    post: "/api/menu/package/task/edit/{taskID}"
+                    body: "*"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Create menu package task"
+            description: "This API for create menu package task"
+        };
+    }
+
+    rpc GetMenuPackageTaskByID(GetMenuPackageTaskByIDRequest) returns (GetMenuPackageTaskByIDResponse) {
+        option (google.api.http) = {
+            get: "/api/menu/package/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get menu package task by ID"
+            description: "This API for get menu package task by ID"
+        };
+    };
+
+    rpc ActionMenuPackageTask(ActionMenuPackageTaskRequest) returns (ActionMenuPackageTaskResponse) {
+        option (google.api.http) = {
+            post: "/api/menu/package/task/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject \n - delete \n - cancel"
+        };
+    }
+
+    rpc ListMenuPackageData(ListMenuPackageDataRequest) returns (ListMenuPackageDataResponse){
+        option (google.api.http) = {
+            get: "/api/menu/package/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get list menu package data"
+            description: "This API for get list menu package data"
+        };
+    }
+
+    rpc ListMenuPackageHistory(ListMenuPackageDataRequest) returns (ListMenuPackageTaskResponse){
+        option (google.api.http) = {
+            get: "/api/menu/package/history"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get list menu package history"
+            description: "This API for get list menu package history"
+        };
+    }
+    
+    rpc ChangeStatusPackage(SetStatusPackageRequest) returns (SetStatusPackageResponse){
+        option (google.api.http) = {
+            post: "/api/menu/package/status/{packageID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Request change status menu package"
+            description: "This API for send request change status menu package"
+        };
+    }
+
+    rpc FileMenuPackageTask(FileMenuPackageTaskRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/menu/package/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list menu package task"
+            description: "This API for download list menu package task"
+        };
+    }
+
+//  download list package
+    rpc FileMenuPackageHistory(FileMenuPackageHistoryRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/menu/package/history/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list menu package history"
+            description: "This API for download list menu package history"
+        };
+    }
+
+    rpc GetListByColumn(GetListRequest) returns (ListTaskPluckResponse) {
+        option (google.api.http) = {
+            post: "/api/menu/list"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list task by column"
+            description: "This API for get data by column",
+        };
+    };
+
+    rpc GetMenuLicenseWithoutContext(GetMyMenuLicenseByCompanyProductReq) returns (MenuLicenseSave) {}
+
+
+
+    rpc GetMyTasksMenuLicenseV2(GetListTaskMenuLicenseV2Req) returns (GetListTaskMenuLicenseV2Resp) {
+        option (google.api.http) = {
+            get: "/api/menu/v2/license/task/me"
+            additional_bindings: [
+                {
+                    get: "/api/menu/v2/license/task"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my menu license tasks v2"
+            description: "This API for get list menu licenses task v2"
+        };
+    };
+
+    rpc GetListProductAppearanceUKLN(GetListProductAppearanceUKLNRequest) returns (GetMenuAppearanceRes) {
+        option (google.api.http) = {
+            get: "/api/menu/appearance/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+        };
+    }
+
+    rpc TaskActionMenuAppearanceV2(TaskActionV2Request) returns (TaskActionV2Response) {
+        option (google.api.http) = {
+            post: "/api/menu/apperance/v2/task/action/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            tags: ["V2","New"];
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject \n - delete \n - cancel"
+        };
+    }
+
+
+    rpc GetMenuLicenseCreatedAndApproved(Empty) returns (GetCreatedAndApprovedResponse) {
+        option (google.api.http) = {
+            get: "/api/menu/v2/created-approved"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get username by created and approved"
+            description: "This API for get menu licenses by username"
+        };
+    }
+
+    rpc GetDistinctNonEmptyKodePerusahaanEfek(google.protobuf.Empty) returns (GetDistinctNonEmptyKodePerusahaanEfekResponse) {
+        option (google.api.http) = {
+            get: "/api/menu/v2/distinct-kode-perusahaan-efek"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get distinct non empty kode perusahaan efek"
+            description: "This API for get distinct non empty kode perusahaan efek"
+        };
+    }
+
+    rpc ListMenuPackageDataRPC(ListMenuPackageDataRequest) returns (ListMenuPackageDataResponse){};
+    rpc SetTaskMenuLicenseRPC(SetTaskMenuLicenseRPCRequest) returns (SetTaskMenuLicenseRes) {}
+    rpc GetMenuPackageByIdRPC(ListMenuPackageDataRequest) returns (ListMenuPackageDataResponse){};
+
+    rpc SaveMenuLicenseBatches(SaveMenuLicenseReq) returns (SaveMenuLicenseRes){};
+
+    rpc GetMyTasksMenuLicenseV3(GlobalRequest) returns (GlobalResponse) {
+        option (google.api.http) = {
+            post: "/api/menu/v3/license/task/me"
+            body : "*"
+            additional_bindings: [
+                {
+                    post: "/api/menu/v3/license/task"
+                    body : "*"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my menu license tasks v3"
+            description: "This API for get list menu licenses task v3"
+        };
+    };
+
+    rpc GetDistinctFilterMenuLicense(GlobalRequest) returns (GlobalResponse) {
+        option (google.api.http) = {
+            post: "/api/menu/v3/license/distinct"
+            body : "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get distinct for filter on list menu license"
+            description: "This API for get distinct for filter on list menu license"
+        };
+    }
+
+}
+
+message TempGenToken {
+    enum Role {
+        bankadmin = 0;
+        notificationadmin = 1;
+        notificationuser = 2;
+    }
+    Role role = 1;
+}

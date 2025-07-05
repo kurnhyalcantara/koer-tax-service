@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package do_pupuk_indonesia_transmitter.service.v1;
+option go_package = "./pb";
+
+message ErrorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+  };
+  
+  message PaymentRequest {
+    string app_key = 1;
+    string process_id = 2;
+    uint64 order_id = 3;
+    string external_id = 4;
+    uint64 retry_count = 5;
+    uint64 task_id = 6;
+    PaymentData data = 7;
+    PaymentRequest last_request = 8;
+    bool is_debit_account_unsupported = 9;
+  };
+  
+  message PaymentData {
+    string inquiry_id = 1;
+    string account_number = 2;
+    string cust_number = 3;
+    string amount = 4;
+    string product_code = 5;
+    string batas_ambil = 6;
+    string booking_time_limit = 7;
+    string comm_code = 8;
+    string company_name = 9;
+    string cust_name = 10;
+    string gudang = 11;
+    string produk = 12;
+    string so_number = 13;
+    string tujuan = 14;
+    string credit_account = 15;
+    string fee = 16;
+  }
+  
+  message PaymentResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+  };
+  
+  message EsbPaymentRequest {
+    EsbPaymentRequestData request = 1; 
+  }
+  
+  message EsbPaymentRequestData {
+    string external_id = 1 [json_name = "externalId"];
+    string cust_number = 2 [json_name = "custNumber"];
+    string product_code = 3 [json_name = "productCode"];
+    string account_number = 4 [json_name = "accountNumber"];
+    string channel_id = 5 [json_name = "channelId"];
+    string card_number = 6 [json_name = "cardNumber"];
+    string terminal_id = 7 [json_name = "terminalId"];
+    string terminal_info = 8 [json_name = "terminalInfo"];
+    string amount = 9;
+    string credit_account = 10 [json_name = "creditAccount"];
+    string inquiry_id = 11 [json_name = "inquiryId"];
+    EsbPaymentRequestBillData bill_data = 12 [json_name = "billData"];
+  }
+  
+  message EsbPaymentRequestBillData {
+    string batas_ambil = 1 [json_name = "batasAmbil"];
+    string booking_time_limit = 2 [json_name = "bookingTimeLimit"];
+    string comm_code = 3 [json_name = "commCode"];
+    string company_name = 4 [json_name = "companyName"];
+    string cust_name = 5 [json_name = "custName"];
+    string gudang = 6;
+    string produk = 7;
+    string sales_order_number = 8 [json_name = "salesOrderNumber"];
+    string tujuan = 9;
+  }
+  
+  
+  message EsbPaymentResponse {
+    EsbPaymentResponseData response = 1;
+  }
+  
+  message EsbPaymentResponseData {
+    string response_code = 1 [json_name = "responseCode"];
+    string response_message = 2 [json_name = "responseMessage"];
+    string error_code = 3 [json_name = "errorCode"];
+    EsbPaymentResponseDataData data = 4 [json_name = "data"];
+  }
+  
+  message EsbPaymentResponseDataData {
+    string journal_sequence = 1 [json_name = "journalSequence"];
+    string tran_code = 2 [json_name = "tranCode"];
+    string need_approval = 3 [json_name = "needApproval"];
+    string biller_code = 4 [json_name = "billerCode"];
+    string fee = 5;
+    string cust_number = 6 [json_name = "custNumber"];
+    string cust_name = 7 [json_name = "custName"];
+    string product_code = 8 [json_name = "productCode"];
+    string amount = 9;
+    repeated Pair receipt_info = 10 [json_name = "receiptInfo"];
+    repeated Pair customer_details = 11 [json_name = "customerDetails"];
+    repeated Pair product_details = 12 [json_name = "productDetails"];
+    EsbPaymentResponseDataDataBillData bill_data = 13 [json_name = "billData"];
+  }
+  
+  message EsbPaymentResponseDataDataReceiptInfo {
+    string key = 1;
+    string value = 2;
+  }
+  
+  message EsbPaymentResponseDataDataCustomerDetails {
+    string key = 1;
+    string value = 2;
+  }
+  
+  message EsbPaymentResponseDataDataProductDetails {
+    string key = 1;
+    string value = 2;
+  }
+  
+  message EsbPaymentResponseDataDataBillData {
+    string trx_id = 1 [json_name = "trxId"];
+    string rq_uuid = 2 [json_name = "rqUuid"];
+    string bill_info1 = 3 [json_name = "billInfo1"];
+    string error_code = 4 [json_name = "errorCode"];
+    string status_description = 5 [json_name = "statusDescription"];
+    string batas_ambil = 6 [json_name = "batasAmbil"];
+  }
+  
+  message Pair {
+    string key = 1;
+    string value = 2;
+  }

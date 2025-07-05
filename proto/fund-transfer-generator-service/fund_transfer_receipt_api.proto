@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "fund-transfer-generator-service/fund_transfer_receipt_payload.proto";
+
+package fund_transfer_generator.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Fund Transfer Receipt GRPC Service";
+        version: "1.0";
+    };
+    security_definitions: {
+        security: {
+            key: "bearer"
+            value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service FundTransferReceiptGeneratorService {
+
+
+    
+    rpc HealthCheck(google.protobuf.Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/template/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            tags: ["Utility"]
+            summary: "Health Check"
+            description: "This API for check server's health"
+        };
+    };
+
+    rpc GenerateReceipt(ReceiptFileGeneratorRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/receipt-generator/generate-receipt"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Templates"]
+            summary: "Generate receipt"
+            description: "This API for generate receipt"
+        };
+    };
+
+    rpc GenerateReport(ReportFileGeneratorRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/receipt-generator/generate-report"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Templates"]
+            summary: "Generate receipt"
+            description: "This API for generate receipt"
+        };
+    };
+
+    rpc GenerateReportAndReceiptMultiple(GenerateReportBulkRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/receipt-generator/generate-report-bulk"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Templates"]
+            summary: "Generate receipt"
+            description: "This API for generate receipt"
+        };
+    };
+    rpc GenerateIFTReceipts(RequestIFTReceipts) returns (google.api.HttpBody);
+    rpc GenerateIFTReports(RequestIFTReports) returns (google.api.HttpBody);
+    rpc GenerateIFTReceiptsAndReports(RequestIFTMultiple) returns (google.api.HttpBody);
+
+
+    // #endregion
+}

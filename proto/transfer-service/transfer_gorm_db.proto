@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+
+package transfer.service.v1;
+option go_package = "./pb";
+
+enum CurrencyType {
+    NullCurrencyType = 0;
+    DebitCurrencyType = 1;
+    CreditCurrencyType = 2;
+}
+
+enum Fee {
+    OUR = 0;
+    BEN = 1;
+}
+
+enum TransactionSchedule {
+    NullTransactionSchedule = 0;
+    Immediate = 1;
+    Scheduled = 2;
+    Recurring = 3;
+}
+
+enum RecurringFrequency {
+    NullRecurringFrequency = 0;
+    Daily = 1;
+    Weekly = 2;
+    Monthly = 3;
+}
+
+message InternalTransferTransaction {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "internal_transfer_transactions",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 taskID = 2;
+    string transactionID = 3;
+    uint64 transactionServiceID = 4;
+    string data = 5 [(gorm.field).tag = { type: "jsonb" }];
+
+    string transactionRequestJson = 6 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+    string transactionResponseJson = 7 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+    string feeRequestJson = 8 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+    string feeResponseJson = 9 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+    string workflowDoc = 10 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+    string task = 11 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+
+    google.protobuf.Timestamp createdAt = 51 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true}
+    ];
+    google.protobuf.Timestamp updatedAt = 52 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {not_null: true}
+    ];
+}
+
+message InternalTransferSingleTemplate {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "internal_single_templates",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string data = 2 [(gorm.field).tag = { type: "jsonb" }];
+    string templateName = 3;
+    uint64 createdByID = 4;
+    google.protobuf.Timestamp createdAt = 51 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true}
+    ];
+    google.protobuf.Timestamp updatedAt = 52 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {not_null: true}
+    ];
+}

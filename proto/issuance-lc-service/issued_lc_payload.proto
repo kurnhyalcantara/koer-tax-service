@@ -1,0 +1,886 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "issuance-lc-service/issued_lc_gorm_db.proto";
+import "google/protobuf/any.proto";
+
+package issued.lc.service.v1;
+option go_package = "./pb";
+
+message GlobalRequest {
+    string request = 1;
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;
+    int32 totalPages = 4;
+}
+
+enum TaskStatus {
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+    RequestForDelete = 6;
+    Deleted = 7;
+}
+
+enum TaskStep {
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+}
+
+enum ApplicantType {
+    CompanyApplicant = 0;
+    IndividualApplicant = 1;
+}
+
+enum PublishingType {
+    SingleBranch = 0;
+    InterBranch = 1;
+}
+
+enum Gender {
+    Male = 0;
+    Female = 1;
+}
+
+enum CompanyType {
+    PT = 0;
+    CV = 1;
+}
+
+enum ContractGuaranteeType {
+    Insurance = 0;
+    Cash = 1;
+    NonCashLoan = 2;
+    Combination = 3;
+    CounterGuarantee = 4;
+}
+
+message Company {
+    uint64 companyID = 1;
+    uint64 holdingID = 2;
+    string groupName = 3;
+    string companyName = 4;
+    string holdingCompanyName = 5;
+    google.protobuf.Timestamp createdAt = 101;
+    google.protobuf.Timestamp updatedAt = 102;
+}
+
+enum SortDirection {
+    DESC = 0;
+    ASC = 1;
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+// REGION CREATE
+message SaveTemplateRequest{
+    string transactionEventId = 1;
+    string taskId = 2;
+    string saveAs = 3;
+    string agreementStatement = 4;
+    string amountInWords = 5;
+    string accountName = 6;
+    IssuedLc data = 7;
+    repeated TemplateCoverageLc dataAccount = 8;
+    string SummaryCoverageLcObj = 9;
+    FileUpload fileUpload = 10;
+}
+message UploadFIleDocument {
+    string fileName = 1;
+    string descriptionFile = 3;
+    bool allowBriAccess = 4;
+    string originalFileName = 5;
+}
+message FileUpload{
+    repeated UploadFIleDocument uploadFile = 1;
+}
+message SaveIssuanceLC{
+    string transactionEventId = 1;
+    string taskId = 2;
+    string saveAs = 3;
+    string agreementStatement = 4;
+    string amountInWords = 5;
+    string accountName = 6;
+    IssuedLc data = 7;
+    repeated CoverageLc dataAccount = 8;
+    string SummaryCoverageLcObj = 9;
+    string exchangeRate = 10;
+    string fileName = 11;
+    string urlDownload = 12;
+    FileUpload fileUpload = 13;
+}
+message CoverageLc {
+    uint64 id = 1;
+    uint64 templateId = 2;
+    string currency = 3;
+    string account = 4;
+    string accountName = 5;
+    double amount = 6;
+}
+
+// REGION READ
+message IssuedLcRequest{
+    int64 id = 1;
+}
+message TemplateData {
+    IssuedLc dataIssue = 1;
+    repeated TemplateCoverageLc dataCoverage = 2;
+    repeated Comment comment = 3;
+    string statusChannel = 4;
+    string statusInternal = 5;
+    string statusTracking = 6;
+    string registrationNo = 7;
+    FileUpload fileUpload = 8;
+}
+
+message IssuedLcId {
+    uint64 id = 1;
+}
+
+message GetListTemplateRequest{
+    string companyID = 1;
+    string dir = 2;
+    string filter = 3;
+    string filterOr = 4;
+    int32 limit = 5;
+    int32 page = 6;
+    string query = 7;
+    string sort = 8;
+    string in = 9;
+
+}
+message ListTemplate {
+    uint64 id = 1;
+    string templateName = 2;
+    string modifiedDate = 3;
+    string createdDate = 4;
+    string createdBy = 5;
+}
+message GetListTemplateResponse{
+    string responseCode = 1;
+    string responseMessage = 2;
+    repeated ListTemplate data = 3;
+    PaginationResponse pagination = 4;
+    string totalData = 5;
+}
+
+message GetAmountToWordRequest{
+    uint64 amount = 1;
+    string locale = 2;
+    string currency = 3;
+}
+message GetAmountToWordResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    string data = 4;
+}
+
+message MasterDataRequest {
+    string typeId = 1;
+}
+
+message MasterDataResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    repeated MasterData data = 3;
+}
+
+// REGION UPDATE
+message UpdateTemplateNameRequest {
+    int32 id = 1;
+    string templateName = 2;
+}
+
+// REGION GENERAL
+message GeneralResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+}
+
+message SaveIssuanceResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    string transactionEventId = 3;
+    string taskId = 4;
+}
+
+message Account{
+    uint64 accountID = 1;
+    uint64 companyID = 2;
+    string accountNumber = 3;
+    string accountAlias = 4;
+    string accountName = 5;
+    string accountType = 6;
+    string accountStatus = 7;
+    string accountCurrency = 8;
+    string accessLevel = 9;
+    string isOwnedByCompany = 10;
+    uint64 createdByID = 11;
+    uint64 updatedByID = 12;
+    uint64 deletedByID = 13;
+    bool disabled = 15;
+    string cif = 16;
+    string productCode = 17;
+    string statusCode = 18;
+    google.protobuf.Timestamp createdAt = 51;
+    google.protobuf.Timestamp updatedAt = 52;
+    google.protobuf.Timestamp deletedAt = 53;
+}
+
+message GetListAccountWithImportLineRequest{
+    Account account = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string filterOr = 8;
+    string in = 9;
+    uint64 productID = 10;
+}
+
+message GetListAccountWithImportLineResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Account data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message MasterFacility{
+    string alias = 1;
+    string name = 2;
+    string account = 4;
+}
+
+message GetMasterFacilityRequest{
+    repeated string name = 1;
+}
+
+message GetMasterFacilityResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MasterFacility data = 4;
+}
+
+//LIST ISSUED LC
+message ListIssuedLCRequest {
+    string page = 1;
+    string limit = 2;
+    string channelId = 3;
+    string channelCompanyId = 4;
+    string channelUserId = 5;
+    string registrationNo = 6;
+    string currency = 7;
+    string applicantName = 8;
+    string beneficiaryName = 9;
+    string beneficiaryCountry = 10;
+    string subProduct = 11;
+    string statusChannel = 12;
+    string approvalPosition = 13;
+    string statusInternal = 14;
+    string teamPosition = 15;
+    string issueDate = 16;
+    string expiryDate = 17;
+    string startIncomingDate = 18;
+    string endIncomingDate = 19;
+}
+
+message ListIssuedLCBEResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    repeated ListIssuedLCData responseData = 3;
+    Pagination pagination = 4;
+}
+
+message ListIssuedLCResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    repeated ListIssuedLCData data = 3;
+    PaginationListResponse pagination = 4;
+}
+
+message PaginationListResponse {
+    string page = 1;
+    string limit = 2;
+    string totalRows = 3;
+    int64 totalPages = 4;
+}
+
+
+message Pagination {
+    string page = 1;
+    string limit = 2;
+    string totalRecord = 3;
+    int64 totalPage = 4;
+}
+
+message ListIssuedLCData {
+    string transactionEventId = 1;
+    string channelId = 2;
+    string channelCompanyId = 3;
+    string channelUserId = 4;
+    string referenceNo = 5;
+    string registrationNo = 6;
+    string productName = 7;
+    string subProductName = 8;
+    string eventName = 9;
+    string eventCode = 10;
+    string applicantName = 11;
+    string beneficiaryName = 12;
+    string applicationDate = 13;
+    string issuedDate = 14;
+    string expiryDate = 15;
+    string currency = 16;
+    string amount = 17;
+    string teamPosition = 18;
+    string statusChannel = 19;
+    string statusInternal = 20;
+    string pnMakerBranch = 21;
+    string pnMakerTpc = 22;
+    string createDate = 23;
+    string modifiedDate = 24;
+    string approvalPosition = 25;
+    string beneficiaryCountry = 26;
+    string statusTracking = 27;
+}
+
+// GET DETAILS ISSUED
+message DetailsIssuedLcESBRequest {
+    string transactionEventId = 1;
+    string requestBase64Doc = 2;
+}
+
+message DownloadDocLcRequest {
+    string transactionEventId = 1;
+    string requestBase64Doc = 2;
+    string downloadZipFile = 3;
+}
+
+message DownloadDocLcResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    string fileName = 4;
+    string fileMime = 5;
+    string base64 = 6;
+}
+
+message responseData {
+    string fileName = 1;
+    string fileMime = 2;
+    string base64 = 3;
+}
+
+message responseBody {
+    string responseCode = 1;
+    string responseMessage = 2;
+    responseData    responseData = 3;
+}
+
+// SAVE ISSUED LC
+message CreateIssuedLcBERequest{
+    string transactionEventId = 71;
+    string isDraft = 72;
+    string channelId = 1;
+    string channelCompanyId = 2;
+    string channelUserId = 3;
+    string channelTaskId = 73;
+    string channelRoleId = 74;
+    string channelCoverageObj = 75;
+    string branchId = 4;
+    string statusChannel = 5;
+    string approvalPosition = 76;
+    string statusInternal = 6;
+    string teamPosition = 7;
+    AccountCoverageObj accountCoverageObj = 8;
+    AccountInterestChargesObj accountInterestChargesObj = 9;
+    string agreementStatement = 10;
+    string applicationDate = 11;
+    string issuedDate = 12;
+    string expiryDate = 13;
+    string expiryPlace = 14;
+    string currency = 15;
+    string amount = 16;
+    string amountInWords = 17;
+    string applicantName = 18;
+    string applicantAddress = 19;
+    string applicantCp = 20;
+    string applicantPhone = 21;
+    string beneficiaryName = 22;
+    string beneficiaryAddress = 23;
+    string beneficiaryCountry = 24;
+    string availableWith = 25;
+    string availableBy = 26;
+    string referenceToPreAdvice = 27;
+    string mixedPaymentDetails = 28;
+    string negotiationDeferredPaymentDetails = 29;
+    string receiverBankBic = 30;
+    string receiverBankName = 31;
+    string receiverBankAddress = 32;
+    string receiverBankCountry = 33;
+    string formDocumentaryCredit = 35;
+    string applicableRules = 36;
+    string applicableRulesOther = 37;
+    string isCreditAmountToleranceExceeding = 38;
+    string creditMinAmountTolerance = 40;
+    string creditMaxAmountTolerance = 41;
+    string additionalAmountsCovered = 42;
+    string draftsAt = 43;
+    string draftsAtUsance = 44;
+    string isDrawingIssuingBank = 45;
+    string draweeBankBic = 46;
+    string partialShipments = 47;
+    string transhipment = 48;
+    string placeOfTakingInCharge = 49;
+    string portLoadingOrAirportDeparture = 50;
+    string portDischargeOrAirportDestination = 51;
+    string placeOfFinalDestination = 52;
+    string latestShipmentDate = 53;
+    string descriptionGoodsService = 54;
+    string documentsRequired = 55;
+    string additionalConditions = 56;
+    string bankingCharges = 57;
+    string bankingChargesOthers = 58;
+    string periodForPresentation = 60;
+    string periodForPresentationDescription = 61;
+    string confirmationInstructions = 62;
+    string requestedConfirmationParty = 63;
+    string specialPaymentConditionsForBeneficiary = 64;
+    string specialPaymentConditionsForReceiving = 65;
+    string reimbursingBank = 66;
+    string adviseThroughBank = 67;
+    string otherInformation = 68;
+    string shipmentPeriod = 69;
+    string senderToReceiverInformation = 70;
+    string exchangeRate = 77;
+}
+
+message AccountCoverageObj{
+    repeated Acc account = 1;
+    repeated Facility facility = 2;
+}
+message Acc {
+    string account_number = 1 [json_name="account_number"];
+    string amount_coverage = 2 [json_name="amount_coverage"];
+}
+message Facility {
+    string account_number = 1[json_name="account_number"];
+    string currency = 2 [json_name = "currency"];
+    string amount_coverage = 3[json_name="amount_coverage"];
+    string created_date = 4 [json_name="created_date"];
+}
+message AccountInterestChargesObj{
+    string account_number = 1[json_name="account_number"];
+    string created_date = 2 [json_name="created_date"];
+}
+
+message CreateIssuedLcBEResponse{
+    string responseCode = 1;
+    string responseMessage = 2;
+    CreateIssuedLcDataResponse responseData = 3;
+
+}
+message CreateIssuedLcDataResponse{
+    string channelId = 1;
+    string registrationNo = 2;
+    string branchId = 3;
+    string channelCompanyId = 4;
+    string channelUserId = 5;
+    int64 transactionEventId = 6;
+}
+
+// UPDATE ISSUED LC
+message EditIssuedLcBERequest{
+    string transactionEventId = 1;
+    string branchId = 2;
+    AccountCoverageObj accountCoverageObj = 3;
+    AccountInterestChargesObj accountInterestChargesObj = 4;
+    string agreementStatement = 10;
+    string applicationDate = 11;
+    string issuedDate = 12;
+    string expiryDate = 13;
+    string expiryPlace = 14;
+    string currency = 15;
+    string amount = 16;
+    string amountInWords = 17;
+    string applicantName = 18;
+    string applicantAddress = 19;
+    string applicantCp = 20;
+    string applicantPhone = 21;
+    string beneficiaryName = 22;
+    string beneficiaryAddress = 23;
+    string beneficiaryCountry = 24;
+    string availableWith = 25;
+    string availableBy = 26;
+    string referenceToPreAdvice = 27;
+    string mixedPaymentDetails = 28;
+    string negotiationDeferredPaymentDetails = 29;
+    string receiverBankBic = 30;
+    string receiverBankName = 31;
+    string receiverBankAddress = 32;
+    string receiverBankCountry = 33;
+    string receiverBankDescription = 34;
+    string formDocumentaryCredit = 35;
+    string applicableRules = 36;
+    string applicableRulesOther = 37;
+    string isCreditAmountToleranceExceeding = 38;
+    string creditMinAmountTolerance = 40;
+    string creditMaxAmountTolerance = 41;
+    string additionalAmountsCovered = 42;
+    string draftsAt = 43;
+    string draftsAtUsance = 44;
+    string isDrawingIssuingBank = 45;
+    string draweeBankBic = 46;
+    string partialShipments = 47;
+    string transhipment = 48;
+    string placeOfTakingInCharge = 49;
+    string portLoadingOrAirportDeparture = 50;
+    string portDischargeOrAirportDestination = 51;
+    string placeOfFinalDestination = 52;
+    string latestShipmentDate = 53;
+    string descriptionGoodsService = 54;
+    string documentsRequired = 55;
+    string additionalConditions = 56;
+    string bankingCharges = 57;
+    string bankingChargesOthers = 58;
+    string periodForPresentation = 60;
+    string periodForPresentationDescription = 61;
+    string confirmationInstructions = 62;
+    string requestedConfirmationParty = 63;
+    string specialPaymentConditionsForBeneficiary = 64;
+    string specialPaymentConditionsForReceiving = 65;
+    string reimbursingBank = 66;
+    string adviseThroughBank = 67;
+    string otherInformation = 68;
+    string shipmentPeriod = 69;
+    string senderToReceiverInformation = 70;
+    string exchangeRate = 71;
+}
+
+message EditIssuedLcBEResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+}
+
+// APPROVAL ISSUED LC
+message ApprovalRequest {
+    string transactionEventId = 1;
+    string statusChannel = 2;
+    string approvalPosition = 3;
+    string teamPosition = 4;
+    string statusInternal = 5;
+    string personalNumber = 6;
+    string reason = 7;
+    string remark = 8;
+}
+message ApprovalBERequest {
+    string transactionEventId = 1;
+    string statusChannel = 2;
+    string approvalPosition = 3;
+    string teamPosition = 4;
+    string statusInternal = 5;
+}
+
+message SaveTransactionLog {
+    TransactionLcIssue data = 1;
+}
+
+message ErrorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message AccountCoverage{
+    string accountNumber = 1;
+    string currency = 2;
+    double amount = 3;
+    double balance = 4;
+    double percentage = 5;
+}
+
+message ExchangeRate{
+    string exchange = 1;
+    string rate = 2;
+}
+
+message CoverageDetails{
+    string accountNumber = 1;
+    double amount = 2;
+    double amountToHold = 3;
+    string amountCurr = 4;
+    string currency = 5;
+    double balance = 6;
+    double percentageAmount = 7;
+}
+
+message SummaryLCAndCoverageAccountRequest{
+    string currency = 1;
+    double amount = 2;
+    string accountCharge = 3;
+    bool amountTolerance = 4;
+    double minTolerance = 5;
+    string minToleranceString = 8;
+    double maxTolerance = 6;
+    string maxToleranceString = 9;
+    repeated AccountCoverage accountCoverage = 7;
+}
+
+message SummaryLCAndCoverageAccountResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    double amountLC = 4;
+    string amountLCString = 15;
+    bool isAmountTolerance = 5;
+    double minTolerance = 6;
+    double maxTolerance = 7;
+    string minToleranceString = 18;
+    string maxToleranceString = 19;
+    double minCoverageLC = 8;
+    string minCoverageLCString = 20;
+    uint64 exchangeRisk = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    repeated ExchangeRate exchangeRate = 10;
+    repeated ExchangeRate exchangeRateReal = 21;
+    repeated CoverageDetails coverageDetails = 11;
+    double totalCoverage = 12;
+    string totalCoverageString = 16;
+    double totalPercentageCoverage = 13;
+    string totalPercentageCoverageString = 17;
+    string differenceCoverage = 14;
+    string accountCharge = 22;
+}
+
+message ConvertKursRequest {
+    string dealt = 1;
+    uint32 dealtIndex = 2;
+    string counter = 3;
+    uint32 counterIndex = 4;
+    repeated string data = 5;
+}
+
+message ConvertKursResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    double rateBuy = 4;
+    double rateSell = 5;
+    string dealt = 6;
+    uint32 dealtIndex = 7;
+    string counter = 8;
+    uint32 counterIndex = 9;
+    KursBRIEFX data = 10;
+}
+
+message KursBRIEFX {
+    string CURRENCY_PAIR = 1; // "CURRENCY_PAIR": "USD-IDR",
+    string CURRENCY_1 = 2; // "CURRENCY_1": "USD",
+    string CURRENCY_2 = 3; // "CURRENCY_2": "IDR",
+    double BUY = 4; // "BUY": 14574,
+    double SELL = 5; // "SELL": 14664,
+    int32 STATUS = 6; // "STATUS": 1,
+    string LASTEST_UPDATE = 7; // "LASTEST_UPDATE": "2022-05-13T22:59:06.953",
+    string ERROR_CODE = 8; // "ERROR_CODE": "FX-001",
+    string RESPONSE_CODE = 9; // "RESPONSE_CODE": "00",
+    string RESPONSE_MESSAGE = 10; // "RESPONSE_MESSAGE": "Sukses"
+}
+
+message NostroPriorityRequest{}
+
+message NostroPriorityResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated string data = 4;
+}
+
+message GetTransactionLcIssueRequest {
+    int64  transactionEventId = 1;
+//    string registrationNo = 2;
+}
+
+message GetTransactionLcIssueResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    TransactionLcIssue Data = 3;
+}
+
+message Comment {
+    string commentId = 1;
+    string eventId = 2;
+    string commentType = 3;
+    string commentDescription = 4;
+    string pnComenter = 5;
+    string commentDate = 6;
+}
+
+message ValidateAccountRequest{
+    string accountNo = 1;
+    string remark = 2;
+    uint64 productId = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    string accountType = 4;
+}
+
+message ValidateAccountResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        string acctNo = 1;
+        string errorCode = 2;
+        string responseCode = 3;
+        string responseMessage = 4;
+        string shortName = 5;
+        string acctCurr = 6;
+        string availableBal = 7;
+        string status = 8 ;
+        string productCode = 9 ;
+        string statusCode = 10 ;
+    }
+
+    Response data = 4;
+}
+
+message ListHSCodeRequest {
+    HSCode data = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+
+message GetListHSCodeResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated HSCode data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message GetNotificationIssuanceRequest {
+    string transactionEventId = 1;
+    string referenceNumber = 2;
+    uint64 companyId = 3;
+    string attachment = 4;
+    string event = 5;
+}
+
+message GetNotificationIssuanceResponse {
+    uint64 moduleID = 1;
+    uint64 eventID = 2;
+    string moduleName = 3;
+    string eventName = 4;
+    string data = 5;
+    repeated uint64 roleIDs = 6;
+    string step = 7;
+    uint64 companyID = 8;
+    repeated uint64 userID = 9;
+    repeated string customEmail = 10;
+    string attachment = 11;
+    string emailCC = 12;
+    string accountNo = 13;
+}
+
+message NotificationIssuanceTradeData {
+    string USERNAME_MAKER = 1 [json_name='USERNAME_MAKER'];
+    string COMPANY_NAME = 2 [json_name='COMPANY_NAME'];
+    string TRANSACTION_ID = 3 [json_name='TRANSACTION_ID'];
+    string APPLICANT_NAME =4 [json_name='APPLICANT_NAME'];
+    string BENEFICIARY_NAME = 5 [json_name='BENEFICIARY_NAME'];
+    string CURRENCY_NAME = 6 [json_name='CURRENCY_NAME'];
+    string SEND_AMOUNT = 7 [json_name='SEND_AMOUNT'];
+    string CREATED_DATETIME = 8 [json_name='CREATED_DATETIME'];
+    string ATTACHMENT_FILE = 9 [json_name='ATTACHMENT_FILE'];
+    string EVENT_DATETIME =10 [json_name='EVENT_DATETIME'];
+}
+
+message SaveBenefApplicantRequest {
+    string type = 1;
+    string name = 2;
+    string address = 3;
+    string country = 4;
+}
+
+message GetListBenefApplicantRequest {
+    int32 limit = 1;
+    int32 page = 2;
+    string sort = 3;
+    string dir = 4;
+    string filter = 5;
+    string query = 6;
+    string in = 7;
+    string filterOr = 8;
+}
+
+message GetListBenefApplicantResponse {
+    string code = 1;
+    string message = 2;
+    repeated BenefApplicant data = 3;
+    PaginationResponse pagination = 4;
+}
+
+message DeleteBenefApplicantRequest {
+    int32 id = 1;
+}
+
+message GetDocumentationFromMinio {
+    string url =1;
+}

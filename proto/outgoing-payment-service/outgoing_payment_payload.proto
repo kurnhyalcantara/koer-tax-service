@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+package outgoing_payment.service.v1;
+option go_package = "./pb";
+
+message GeneralBodyResponse {
+  string process_id = 1;
+  bool error = 2;
+  uint32 code = 3;
+  string message = 4;
+};
+
+// Insert Payment Payload
+
+message InsertTrxOutgoingPaymentRequest {
+  TrxOutgoingPaymentData data = 3;
+}
+
+message TrxOutgoingPaymentData {
+  string client_id = 1;
+  string transaction_reference_header = 2;
+  string transaction_reference = 3;
+  string debit_account = 4;
+  string credit_account = 5;
+  string value_date = 6;
+  string value_currency = 7;
+  double amount = 8;
+  string destination_bank_code = 9;
+  string beneficiary_name = 10;
+  string charging_model_id = 11;
+  string remark = 12;
+  string extended_payment_detail = 13;
+  string beneficiary_email_address = 14;
+  string payment_method = 15;
+  string beneficiary_address = 16;
+  string payment_remark = 17;
+  string beneficiary_bank_name = 18;
+  string beneficiary_country_code = 19;
+  string beneficiary_bank_address = 20;
+  string bank_reference_number = 21;
+}
+
+message InsertTrxOutgoingPaymentResponse {
+  string response_code = 1;
+  string response_message = 2;
+  string response_timestamp = 3;
+}
+
+message GlobalInsertTransactionRequest {
+  TrxOutgoingPaymentData data = 1;
+  string user_non_session = 2;
+  bool is_stp = 3;
+}
+
+// Inquiry Payment Payload
+
+message InquiryTrxOutgoingPaymentRequest {
+  string bank_reference_number = 1;
+  string transaction_reference_header = 2;
+  string transaction_reference = 3;
+}
+
+message InquiryTrxOutgoingPaymentResponse {
+  string response_code = 1;
+  string response_message = 2;
+  InquiryResultOutgoingPayment data = 3;
+}
+
+message InquiryResultOutgoingPayment {
+  string run_date = 1;
+  string transactionRef = 2;
+  string bank_reference_number = 3;
+  string transaction_amount = 4;
+  string trans_curr = 5;
+  string debit_account = 6;
+  string credit_account = 7;
+  string status_code = 8;
+  string status_desc = 9;
+  string remmitance_no = 10;
+  string uetr = 11;
+}
+
+message InsertRTGSingleTransactionRequest {
+  TrxOutgoingPaymentData data = 1;
+  string user_non_session = 2;
+  bool is_stp = 3;
+}
+// Helper Payload
+
+message UpdateTrxOutgoingPaymentRequest {
+  uint64 task_id = 5;
+  string transaction_id = 6;
+  uint64 company_id = 7;
+  string payment_method = 8;
+  string bank_reference_number = 9;
+  string transaction_reference_header = 10;
+  string transaction_reference = 11;
+  string sender = 12;
+  string receiver = 13;
+  string value_date = 14;
+  string payment_remark = 15;
+  string transactions_outgoing_request = 16;
+  string transactions_outgoing_response = 17;
+  double amount = 18;
+  string charging_model_id = 19; 
+  string status_outgoing = 20;
+  string status_transaction = 21;
+  string esb_request = 22;
+  string esb_response = 23;
+  string status_message = 24;
+  string fee_request = 25;
+  string fee_response = 26;
+}
+
+message UpdateTrxOutgoingPaymentResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message InquriyUetrSwiftRequest {
+  string customer_reference_number = 1;
+}
+
+message InquriyUetrSwiftResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  InquiryUetrSwiftResponseData data = 4;
+}
+
+message InquiryUetrSwiftResponseData {
+  string cust_ref_no = 1;
+  string instruction_code = 2;
+  string status = 3;
+  string valueDate = 4;
+  string no_remittance = 5;
+  string client_id = 6;
+  double amount = 7;
+  string currency = 8;
+  string remark = 9;
+  string debit_act = 10;
+  string debit_act_name = 11;
+  string uetr = 12;
+}

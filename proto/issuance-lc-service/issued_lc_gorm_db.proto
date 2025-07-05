@@ -1,0 +1,498 @@
+syntax = "proto3";
+
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+
+package issued.lc.service.v1;
+option go_package = "./pb";
+
+message IssuedLc{
+    option (gorm.opts) = {
+        ormable:true,
+        table: "template_import_issued_lc",
+    };
+
+    uint64 id = 1 [
+        (gorm.field).tag = {column: "id" primary_key: true not_null: true auto_increment: true, type:'int'},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string companyId = 2 [
+        (gorm.field).tag = {column: "company_id" not_null: false, type:'varchar(50)'}
+    ];
+
+    string userId = 3 [
+        (gorm.field).tag = {column:"user_id", not_null: false, type:'varchar(50)'}
+    ];
+
+    string importLCIssueId = 4 [
+        (gorm.field).tag = {column:"import_lc_issue_id", not_null: false, type:'varchar(20)'}
+    ];
+
+    string importLCEventId = 5 [
+        (gorm.field).tag = {column:"import_lc_event_id", not_null: false, type:'varchar(20)'}
+    ];
+
+    string branchId = 6 [
+        (gorm.field).tag = {column:"branch_id", not_null: true, type:'varchar(10)'}
+    ];
+
+    string customerProfileId = 7 [
+        (gorm.field).tag = {column:"customer_profile_id", not_null: false, type:'varchar(20)'}
+    ];
+
+    string fbtiReferenceNo = 8 [
+        (gorm.field).tag = {column:"fbti_reference_no", not_null: false, type:'varchar(20)'}
+    ];
+
+    string productId = 9 [
+        (gorm.field).tag = {column:"product_id", not_null: false, type:'varchar(20)'}
+    ];
+
+    string subProductId = 10 [
+        (gorm.field).tag = {column:"subproduct_id", not_null: false, type:'varchar(20)'}
+    ];
+
+    string applicationDate = 11 [
+        (gorm.field).tag = {column:"application_date", not_null: false, type:'date'}
+    ];
+
+    string issuedDate = 12 [
+        (gorm.field).tag = {column:"issued_date", not_null: false, type:'date'}
+    ];
+
+    string expiryDate = 13 [
+        (gorm.field).tag = {column:"expiry_date", not_null: false, type:'date'}
+    ];
+
+    string expiryPlace = 14 [
+        (gorm.field).tag = {column:"expiry_place", not_null: false, type:'varchar(30)'}
+    ];
+
+    string currency = 15 [
+        (gorm.field).tag = {column:"currency", not_null: false, type:'varchar(10)'}
+    ];
+
+    double amount = 16 [
+        (gorm.field).tag = {column:"amount", not_null: false, type:'numeric'}
+    ];
+
+    string applicantName = 17 [
+        (gorm.field).tag = {column:"applicant_name", not_null: false, type:'varchar(100)'}
+    ];
+
+    string applicantAddress = 18 [
+        (gorm.field).tag = {column:"applicant_address", type:'text'}
+    ];
+
+    string applicantContactPerson = 19 [
+        (gorm.field).tag = {column:"applicant_contact_person", not_null: false, type:'varchar(100)'}
+    ];
+
+    string applicantPhoneNumber = 20 [
+        (gorm.field).tag = {column:"applicant_phone_number", not_null: false, type:'varchar(20)'}
+    ];
+
+    string beneficiaryName = 21 [
+        (gorm.field).tag = {column:"beneficiary_name", not_null:false, type:'varchar(100)'}
+    ];
+
+    string beneficiaryAddress = 22 [
+        (gorm.field).tag = {column:"beneficiary_address", type:'text'}
+    ];
+
+    string beneficiaryCountry = 23 [
+        (gorm.field).tag = {column:"beneficiary_country", type:'text'}
+    ];
+
+    string availableWith = 24 [
+        (gorm.field).tag = {column:"available_with", not_null:false, type:'varchar(150)'}
+    ];
+
+    string availableBy = 25 [
+        (gorm.field).tag = {column:"available_by", not_null:false, type:'varchar(50)'}
+    ];
+
+    string paymentDetails = 26 [
+        (gorm.field).tag = {column:"payment_details", not_null:false, type:'text'}
+    ];
+
+    string ptkNumber = 27 [
+        (gorm.field).tag = {column:"ptk_number", not_null:false, type:'text'}
+    ];
+
+    string receiverBankBIC = 28 [
+        (gorm.field).tag = {column:"receiver_bank_bic", not_null:false, type:'varchar(11)'}
+    ];
+
+    string receiverBankName = 29 [
+        (gorm.field).tag = {column:"receiver_bank_name", not_null:false, type:'varchar(50)'}
+    ];
+
+    string receiverBankAddress = 30 [
+        (gorm.field).tag = {column: "receiver_bank_address", not_null:false, type:'varchar(100)'}
+    ];
+
+    string receiverBankCountry = 31 [
+        (gorm.field).tag = {column: "receiver_bank_country", not_null:false, type:'varchar(200)'}
+    ];
+
+    string formDocumentaryCredit = 32 [
+        (gorm.field).tag = {column: "form_documentary_credit", not_null:false, type:'varchar(100)'}
+    ];
+
+    string applicableRules = 33 [
+        (gorm.field).tag = {column:"applicable_rules", not_null:true, type:'varchar(200)'}
+    ];
+
+    string applicableRulesOther = 34 [
+        (gorm.field).tag = {column:"applicable_rules_other", not_null:false, type:'varchar(200)'}
+    ];
+
+    string isCreditAmountToleranceExceeding = 35 [
+        (gorm.field).tag = {column:"is_credit_amount_tolerance_exceeding", not_null:true, type:'varchar(5)'}
+    ];
+
+    string creditMinAmountTolerance = 36 [
+        (gorm.field).tag = {column:"credit_min_amount_tolerance", not_null:false, type:'varchar(5)'}
+    ];
+
+    string creditMaxAmountTolerance = 37 [
+        (gorm.field).tag = {column:"credit_max_amount_tolerance", not_null:false, type:'varchar(5)'}
+    ];
+
+    string draftsAt = 38 [
+        (gorm.field).tag = {column:"drafts_at", not_null:false, type:'varchar(10)'}
+    ];
+
+    string draftsAtUsance = 39 [
+        (gorm.field).tag = {column:"drafts_at_usance", not_null:false, type:'varchar(50)'}
+    ];
+
+    string isDrawingIssuingBank = 40 [
+        (gorm.field).tag = {column:"is_drawing_issuing_bank", not_null:true, type:'varchar(50)'}
+    ];
+
+    string draweeBankBIC = 41 [
+        (gorm.field).tag = {column:"drawee_bank_bic", not_null:false, type:'varchar(50)'}
+    ];
+
+    string partialShipments = 42 [
+        (gorm.field).tag = {column:"partial_shipments", not_null:false, type:'varchar(50)'}
+    ];
+
+    string transhipment = 43 [
+        (gorm.field).tag = {column:"transhipment", not_null:false, type:'varchar(50)'}
+    ];
+
+    string placeOfTakingInCharge = 44 [
+        (gorm.field).tag = {column:"place_of_taking_in_charge", not_null:false, type:'varchar(70)'}
+    ];
+
+    string portLoadingOrAirportDeparture = 45 [
+        (gorm.field).tag = {column:"port_loading_or_airport_departure", not_null:false, type:'varchar(70)'}
+    ];
+
+    string portDischargeOrAirportDestination = 46 [
+        (gorm.field).tag = {column:"port_discharge_or_airport_destination", not_null:false, type:'varchar(70)'}
+    ];
+
+    string placeOfFinalDestination = 47 [
+        (gorm.field).tag = {column:"place_of_final_destination", not_null:false, type:'varchar(70)'}
+    ];
+
+    string latestShipmentDate = 48 [
+        (gorm.field).tag = {column:"latest_shipment_date", not_null: false, type:'date'}
+    ];
+
+    string descriptionGoodsService = 49 [
+        (gorm.field).tag = {column:"description_goods_service", type:'text'}
+    ];
+
+    string documentsRequired = 50 [
+        (gorm.field).tag = {column:"documents_required", type:'text'}
+    ];
+
+    string AdditionalConditions = 51 [
+        (gorm.field).tag = {column:"additional_conditions", type:'text'}
+    ];
+
+    string isBankingChargesBenefOrApplicant = 52 [
+        (gorm.field).tag = {column:"is_banking_charges_benef_or_applicant", not_null:true, type:'varchar(5)'}
+    ];
+
+    string bankingCharges = 53 [
+        (gorm.field).tag = {column:"banking_charges", not_null:false, type:'varchar(50)'}
+    ];
+
+    string bankingChargesOthers = 54 [
+        (gorm.field).tag = {column:"banking_charges_others", not_null:false, type:'varchar(50)'}
+    ];
+
+    string periodForPresentation = 55 [
+        (gorm.field).tag = {column:"period_for_presentation", not_null:false, type:'varchar(5)'}
+    ];
+
+    string periodForPresentationDescription = 56 [
+        (gorm.field).tag = {column:"period_for_presentation_description", not_null:false, type:'varchar(50)'}
+    ];
+
+    string confirmationType = 57 [
+        (gorm.field).tag = {column:"confirmation_type", not_null:false, type:'varchar(10)'}
+    ];
+
+    string requestedConfirmationParty = 58 [
+        (gorm.field).tag = {column:"requested_confirmation_party", not_null:false, type:'varchar(40)'}
+    ];
+
+    string specialPaymentConditionsforBeneficiary = 59 [
+        (gorm.field).tag = {column:"special_payment_conditions_for_beneficiary", type:'text'}
+    ];
+
+    string specialPaymentConditionsforReceiving = 60 [
+        (gorm.field).tag = {column:"special_payment_conditions_for_receiving", type:'text'}
+    ];
+
+    string reimbursingBank = 61 [
+        (gorm.field).tag = {column:"reimbursing_bank", not_null:false, type:'varchar(100)'}
+    ];
+
+    string adviseThroughBank = 62 [
+        (gorm.field).tag = {column:"advise_through_bank", not_null:false, type:'varchar(100)'}
+    ];
+
+    string otherInformation = 63 [
+        (gorm.field).tag = {column:"other_information", type:'text'}
+    ];
+
+    google.protobuf.Timestamp createdDate = 64 [
+        (gorm.field).tag = {column:"created_date", not_null: true, type:'timestamp'}
+    ];
+
+    google.protobuf.Timestamp modifiedDate = 65 [
+        (gorm.field).tag = {column:"modified_date", not_null: false, type:'timestamp'}
+    ];
+
+    string referenceToPreAdvice = 66 [
+        (gorm.field).tag = {column:"reference_to_pre_advice", not_null:false, type:'varchar(200)'}
+    ];
+
+    string shipmentPeriod = 67 [
+        (gorm.field).tag = {column:"shipment_period", not_null:false, type:'text'}
+    ];
+
+    string senderReceiverInformation = 68 [
+        (gorm.field).tag = {column:"sender_receiver_information", not_null:false, type:'text'}
+    ];
+
+    string templateName = 69 [
+        (gorm.field).tag = {column:"template_name", not_null: false, type:'varchar(50)'}
+    ];
+
+    string NegotiationDeferredPaymentDetails = 70 [
+        (gorm.field).tag = {column:"negotiation_deffered_payment_details", not_null: false, type:'text'}
+    ];
+
+    string AdditionalAmountsCovered = 71 [
+        (gorm.field).tag = {column:"additional_amounts_covered", not_null: false, type:'text'}
+    ];
+
+    string account = 72 [
+        (gorm.field).tag = {column:"account", not_null: false, type:'varchar(20)'}
+    ];
+
+    string exchangeRate = 73 [
+        (gorm.field).tag = {column:"exchange_rate", not_null: false, type:'text'}
+    ];
+
+    string fileName = 74 [
+        (gorm.field).tag = {column:"file_name", not_null: false, type:'text'}
+    ];
+
+    string urlDownload = 75 [
+        (gorm.field).tag = {column:"url_download", not_null: false, type:'text'}
+    ];
+    
+    string uploadFile = 76 [
+        (gorm.field).tag = {column:"upload_file", not_null: false, type:'jsonb'}
+    ];
+
+    string createdBy = 77 [
+        (gorm.field).tag = {column:"created_by", not_null: false, type:'varchar(50)'}
+    ];
+}
+
+message TemplateCoverageLc {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "template_coverage_lc",
+    };
+
+    uint64 id = 1 [
+        (gorm.field).tag = {column: "id" primary_key: true not_null: true auto_increment: true, type:'int'},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 templateId = 2 [
+        (gorm.field).tag = {column: "template_id" primary_key: true not_null: true auto_increment: true, type:'int'},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string account = 3 [
+        (gorm.field).tag = {column:"account", not_null: false, type:'varchar(20)'}
+    ];
+
+    double amount = 4 [
+        (gorm.field).tag = {column:"amount", not_null:false, type:'numeric'}
+    ];
+}
+
+message MasterData {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "master_data",
+    };
+    uint64 id = 1 [
+        (gorm.field).tag = {column: "id" primary_key: true not_null: true auto_increment: true, type:'int'},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    string type = 2 [
+        (gorm.field).tag = {column: "type" not_null: true, index: "type", type: 'varchar(255)'}
+    ];
+
+    string data = 3 [
+        (gorm.field).tag = {column: "data" not_null: true, type:'text'}
+    ];
+
+    string description = 4 [
+        (gorm.field).tag = {column:"description", not_null: false, type:'text'}
+    ];
+}
+
+message TransactionLcIssue {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "transaction_lc_issue",
+    };
+
+    uint64 id = 1 [
+        (gorm.field).tag = {column: "id" primary_key: true not_null: true auto_increment: true, type:'int'},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    int64 transactionEventId = 2 [
+        (gorm.field).tag = {column: "transaction_event_id" not_null: true, type:'int'},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string registrationNo = 3 [
+        (gorm.field).tag = {column:"registration_no", not_null: true, type:'varchar(225)'}
+    ];
+    string currency = 4 [
+        (gorm.field).tag = {column:"currency", not_null: false, type:'varchar(225)'}
+    ];
+    string amount = 5 [
+        (gorm.field).tag = {column:"amount", not_null: false, type:'varchar(50)'}
+    ];
+    string maxTolerant = 6 [
+        (gorm.field).tag = {column:"max_tolerant", not_null: false, type:'varchar(50)'}
+    ];
+    string statusChannel = 7 [
+        (gorm.field).tag = {column:"status_channel", not_null: false, type:'varchar(100)'}
+    ];
+    string agreementStatement = 8 [
+        (gorm.field).tag = {column:"agreement_statement", not_null: false, type:'text'}
+    ];
+    string agreementStatementObj = 9 [
+        (gorm.field).tag = {column:"agreement_statement_obj", not_null: false, type:'jsonb'}
+    ];
+    string summaryCoverageLcObj = 10 [
+        (gorm.field).tag = {column:"summary_coverage_lc_obj", not_null: false, type:'jsonb'}
+    ];
+    int64 taskId = 11 [
+        (gorm.field).tag = {column: "task_id" not_null: true, type:'int'},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string exchangeRate = 14 [
+        (gorm.field).tag = {column:"exchange_rate", not_null: false, type:'text'}
+    ];
+
+    string fileName = 15 [
+        (gorm.field).tag = {column:"file_name", not_null: false, type:'text'}
+    ];
+
+    string urlDownload = 16 [
+        (gorm.field).tag = {column:"url_download", not_null: false, type:'text'}
+    ];
+
+    string uploadFile = 17 [
+        (gorm.field).tag = {column:"upload_file", not_null: false, type:'jsonb'}
+    ];
+
+    google.protobuf.Timestamp createdDate = 12 [
+        (gorm.field).tag = {column:"created_date", not_null: true, type:'timestamp'}
+    ];
+
+    google.protobuf.Timestamp lastUpdate = 13 [
+        (gorm.field).tag = {column:"last_update", not_null: false, type:'timestamp'}
+    ];
+}
+
+message NostroPriority {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "nostro_priorities",
+    };
+
+    string currencyCode = 1 [(gorm.field).tag = {primary_key: true not_null: true type: 'varchar(5)'}];
+    uint32 orderNumber = 2 [(gorm.field).tag = {not_null: true type: 'integer'}];
+}
+
+message HSCode {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "master_hs_codes",
+    };
+    
+    string hs_code = 1 [(gorm.field).tag = { column: "hs_code" }];
+    string uraian_barang = 2 [(gorm.field).tag = { column: "uraian_barang" }];
+    string description_of_goods = 3 [(gorm.field).tag = { column: "description_of_goods" }];
+}
+
+message BenefApplicant {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "benef_applicant",
+    };
+
+    uint64 id = 1 [
+        (gorm.field).tag = {column: "id", primary_key: true, not_null: true, auto_increment: true, type:'int'},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string type = 2 [
+        (gorm.field).tag = {column:"type", not_null: true, type:'varchar(20)'}
+    ];
+    
+    string name = 3 [
+        (gorm.field).tag = {column:"name", not_null: true, type:'varchar(40)'}
+    ];
+    
+    string address = 4 [
+        (gorm.field).tag = {column:"address", not_null: false, type:'text'}
+    ];
+
+    uint64 companyID = 5 [
+        (gorm.field).tag = {column: "company_id", not_null: true, type:'int'},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string country = 6 [
+        (gorm.field).tag = {column:"country", not_null: false, type:'varchar(100)'}
+    ];
+}

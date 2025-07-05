@@ -1,0 +1,221 @@
+syntax = "proto3";
+
+package do_pertamina.service.v1;
+
+import "do-pertamina-service/do_pertamina_core.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+
+option go_package = "./pb";
+
+message TaskDataDOPertamina {
+  string transaction_id = 1;
+  string application_id = 2;
+  ModuleTypes module_type = 3;
+  string module_type_name = 4;
+  string order_date = 5;
+  string quotation_number = 6;
+  string scheduling_agreement_number = 7;
+  string debit_account = 8;
+  string debit_account_name = 9;
+  string product_group_id = 10;
+  string product_group_name = 11;
+  string ship_to = 12;
+  uint32 total_quantity = 13;
+  string uom = 14;
+  double total_amount = 15;
+  Status status = 16;
+  string sales_organization_id = 17;
+  string sales_organization_name = 18;
+  string distribution_channel_id = 19;
+  string distribution_channel_name = 20;
+  string sold_to = 21;
+  string depo_id = 22;
+  string depo_name = 23;
+  double pph_tax = 24;
+  double gross_value = 25;
+  string debit_or_credit_note = 26;
+  double net_value = 27;
+  double ppn_tax = 28;
+  double pbbkb_tax = 29;
+  string ship_to_name = 30;
+  string sold_to_name = 31;
+  string so_number = 32;
+  uint32 total_trip = 33;
+  string error_message_payment = 34;
+  string payer_id = 35;
+  string payer_name = 36;
+  uint64 order_id = 37;
+  double fee = 38;
+  double total_payment = 39;
+  uint32 retry_count_payment = 40;
+}
+
+message SaveTaskDOPertaminaResponse {
+  uint64 task_id = 1;
+  string transaction_id = 2;
+  repeated uint64 current_role_ids = 3;
+  Status status = 4;
+}
+
+message SetStatusesTaskDOPertaminaRequest {
+  repeated uint64 task_ids = 1;
+  string action = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Action: 'approve', 'reject', 'rework"
+    }
+  ];
+  string comment = 3 [(validator.field) = {length_lt:101}];
+ string reasons = 4 [(validator.field) = {length_lt:101}];
+  string pass_code = 5;
+  bool is_from_dashboard = 6;
+}
+
+message SetStatusesTaskDOPertaminaResponse {
+  bool error = 1;
+  int32 code = 2;
+  string message = 3;
+  int32 total_successful = 4;
+  int32 total_failed = 5;
+  repeated TaskStatusResponse data = 6;
+}
+
+message TaskStatusResponse {
+  bool error = 1;
+  string message = 2;
+  TaskActionResponse task = 3;
+}
+
+message TaskActionResponse {
+  uint64 task_id = 1;
+}
+
+message DeleteTaskRequest {
+  repeated uint64 task_ids = 1;
+}
+
+message DeleteTaskResponse {
+  bool error = 1;
+  uint32 code = 2;    
+  string message = 3;
+  int32 total_successful = 4;
+  int32 total_failed = 5;
+  repeated DeleteTaskResponses data = 6;
+}
+
+message DeleteTaskResponses {
+  bool error = 1;
+  string message = 2;
+  DeletedTask task = 3;
+}
+
+message DeletedTask {
+  uint64 task_id = 1;
+}
+
+message ListTaskRequest {
+  string status = 1;
+  string filter = 2;
+  string search = 3;
+  int32 page = 4;
+  int32 limit = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Order data by column name",
+    }];
+  Direction dir = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Sort Direction enum should be ASC or DESC",
+    }];
+  string filter_or = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=created_at:>=2023-10-17,created_at:<=2023-10-18  => Where created_at >= 2023-10-17 AND created_at <= 2023-10-17 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=status:3,status:4 => Where status = 3 OR status = 4 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string typeTab = 10 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Action: 'transaction', 'history'"
+      }
+  ];
+}
+
+message ListTaskResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated DataListTaskResponse data = 4;
+  repeated SummaryTask summary = 5;
+  PaginationResponse pagination = 6;
+}
+
+message SummaryTask{
+  string status = 1;
+  int32 count = 2;
+}
+
+message DataListTaskResponse {
+  TaskDataDOPertamina data = 1;
+  Task task = 2;
+}
+
+message ListTaskFileRequest {
+  string status = 1;
+  string filter = 2;
+  string search = 3;
+  int32 page = 4;
+  int32 limit = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Order data by column name",
+    }];
+  Direction dir = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Sort Direction enum should be ASC or DESC",
+    }];
+  string filter_or = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=created_at:>=2023-10-17,created_at:<=2023-10-18  => Where created_at >= 2023-10-17 AND created_at <= 2023-10-17 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=status:3,status:4 => Where status = 3 OR status = 4 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string typeTab = 10 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Action: 'transaction', 'history'"
+      }
+  ];
+  string file_format = 11;
+}
+
+
+message Task {
+  uint64 task_id = 1;
+  string type = 2;
+  string status = 3;
+  string step = 4;
+  uint64 created_by_id = 5;
+  uint64 last_approved_by_id = 6;
+  uint64 last_rejected_by_id = 7;
+  string data = 8;
+  string comment = 9;
+  uint64 feature_id = 10;
+  repeated Task childs = 11;
+  bool is_parent_active = 12;
+  string reasons = 13;
+  string last_approved_by_name = 14;
+  string last_rejected_by_name = 15;
+  uint64 updated_by_id = 16;
+  string updated_by_name = 17;
+  string created_by_name = 18;
+  string data_bak = 19;
+  string child_bak = 20;
+  string workflow_doc = 21;
+  uint64 company_id = 22;
+  uint64 holding_id = 23;
+  google.protobuf.Timestamp created_at = 101;
+  google.protobuf.Timestamp updated_at = 102;
+  google.protobuf.Timestamp deleted_at = 103;
+  google.protobuf.Timestamp approved_at = 104;
+  google.protobuf.Timestamp rejected_at = 105;
+}

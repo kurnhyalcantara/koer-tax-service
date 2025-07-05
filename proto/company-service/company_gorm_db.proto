@@ -1,0 +1,438 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+package company.service.v1;
+option go_package = "./pb";
+
+// Example User
+message User {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "users",
+    };
+    uint64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    string username = 2 [(google.api.field_behavior) = REQUIRED, (validator.field) = {msg_exists : true}, (gorm.field).tag = {unique: true not_null: true}];
+    string password = 3 [(google.api.field_behavior) = REQUIRED, (validator.field) = {msg_exists : true}, (gorm.field).tag = {not_null: true}];
+    string role = 4 [(validator.field) = {msg_exists : true}, (gorm.field).tag = {default: "user" not_null: true}];
+    google.protobuf.Timestamp created_at = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updated_at = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deleted_at = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message Company {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "companies",
+    };
+
+    uint64 companyID = 1 [
+        (gorm.field).tag = {column: "company_id" primary_key: true not_null: true auto_increment: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 holdingID = 2 [
+        (gorm.field).tag = {column: "holding_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string groupName = 3 [
+        (gorm.field).tag = {column: "group_name", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string companyName = 4 [
+        (gorm.field).tag = {column: "name", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string holdingCompanyName = 5 [
+        (gorm.field).tag = {column: "holding_company", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string companyType = 6 [
+        (gorm.field).tag = {column: "type", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string registrationID = 7 [
+        (gorm.field).tag = {column: "registration_id", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string branchID = 8 [
+        (gorm.field).tag = {column: "branch_id", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string taxID = 9 [
+        (gorm.field).tag = {column: "tax_id", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string address = 10 [
+        (gorm.field).tag = {column: "address", type: "text"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string zipCode = 11 [
+        (gorm.field).tag = {column: "zip_code", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string phoneNumber = 12 [
+        (gorm.field).tag = {column: "phone_number", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string faxNumber = 13 [
+        (gorm.field).tag = {column: "fax_number", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string companyLoginCode = 14 [
+        (gorm.field).tag = {column: "login_code" type: "varchar(150)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string cifCompany = 15 [
+        (gorm.field).tag = {column: "cif_number" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string companyStatus = 16 [
+        (gorm.field).tag = {column: "status" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string businessEntity = 17 [
+        (gorm.field).tag = {column: "business_entity" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string districtCompany = 18 [
+        (gorm.field).tag = {column: "district" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string province = 19 [
+        (gorm.field).tag = {column: "province" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string city = 20 [
+        (gorm.field).tag = {column: "city" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string relationshipManager = 21 [
+        (gorm.field).tag = {column: "relationship_manager" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+    uint32 userLimit = 22 [
+        (gorm.field).tag = {column: "user_limit"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    string channel = 23 [
+        (gorm.field).tag = {column: "channel" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+    string accountNumber = 24 [
+        (gorm.field).tag = {column: "account_number" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+    uint64 taskID = 25 [
+        (gorm.field).tag = {column: "task_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    string countryCode = 26 [
+        (gorm.field).tag = {column: "country_code" type: "varchar(10)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+    string countryName = 27 [
+        (gorm.field).tag = {column: "country_name" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+    uint64 intervalChangePassword = 28 [
+        (gorm.field).tag = {column: "interval_change_password" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    google.protobuf.Timestamp createdAt = 50 [
+        (gorm.field).tag = {column: "created_at"},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 createdByID = 51 [
+        (gorm.field).tag = {column: "created_by_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    google.protobuf.Timestamp updatedAt = 52 [
+        (gorm.field).tag = {column: "updated_at"},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 updatedByID = 53 [
+        (gorm.field).tag = {column: "updated_by_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+    string createdByName = 54 [
+        (gorm.field).tag = {column: "created_by_name" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+    string updatedByName = 55 [
+        (gorm.field).tag = {column: "updated_by_name" type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    uint64 packageID = 56 [
+        (gorm.field).tag = {column: "package_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+
+    // Company holdingCompany = 101 [
+    //     (gorm.field).belongs_to = {
+    //         foreignkey: "holding_id"
+    //         foreignkey_tag: {column: "holding_id"}
+    //         preload: true
+    //     },
+    //     (google.api.field_behavior) = OUTPUT_ONLY
+    // ];
+
+    repeated CompanyLimit companyLimits = 102 [
+        (gorm.field).has_many = {
+            foreignkey: "company_id"
+            foreignkey_tag: {column: "company_id"}
+            preload: false
+        }
+    ];
+
+    repeated CompanyGroupLimit companyGroupLimits = 103 [
+        (gorm.field).has_many = {
+            foreignkey: "holding_company_id"
+            foreignkey_tag: {column: "holding_company_id"}
+            preload: false
+        }
+    ];
+
+    repeated Company subsidiaryCompanies = 104 [
+        (gorm.field).has_many = {
+            foreignkey: "holding_id"
+            foreignkey_tag: {column: "holding_id"}
+            preload: false
+        }
+    ];
+
+    bool isNotifCustomize = 105 [
+        (gorm.field).tag = {column: "is_notif_customize"}
+    ];
+}
+
+message CompanyGroupLimit {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "company_group_limits",
+    };
+
+    uint64 holdingCompanyID = 1 [
+        (gorm.field).tag = { column: "holding_company_id"  primary_key: true  not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 currencyID = 2 [
+        (gorm.field).tag = { column: "currency_id"  primary_key: true  not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    Currency currency = 101 [
+        (gorm.field).belongs_to = {
+            association_foreignkey: "currencyID"
+            foreignkey: "currencyID"
+            foreignkey_tag: {column: "currency_id" not_null: true}
+            preload: true
+        },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 limit = 3 [
+        (gorm.field).tag = { column: "limit" type: "bigint" not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    google.protobuf.Timestamp createdAt = 50 [
+        (gorm.field).tag = {column: "created_at" not_null: true },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 createdByID = 51 [
+        (gorm.field).tag = {column: "created_by_id" not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    google.protobuf.Timestamp updatedAt = 52 [
+        (gorm.field).tag = {column: "updated_at" not_null: true },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 updatedByID = 53 [
+        (gorm.field).tag = {column: "updated_by_id" not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+}
+
+message CompanyLimit {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "company_limits",
+    };
+
+    uint64 companyID = 1 [
+        (gorm.field).tag = { column: "company_id"  primary_key: true  not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 currencyID = 2 [
+        (gorm.field).tag = { column: "currency_id"  primary_key: true  not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    Currency currency = 101 [
+        (gorm.field).belongs_to = {
+            association_foreignkey: "currencyID"
+            foreignkey: "currencyID"
+            foreignkey_tag: {column: "currency_id" not_null: true}
+            preload: true
+        },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 limit = 3 [
+        (gorm.field).tag = { column: "limit" type: "bigint" not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    google.protobuf.Timestamp createdAt = 50 [
+        (gorm.field).tag = { column: "created_at" not_null: true },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 createdByID = 51 [
+        (gorm.field).tag = {column: "created_by_id" not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    google.protobuf.Timestamp updatedAt = 52 [
+        (gorm.field).tag = {column: "updated_at" not_null: true },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 updatedByID = 53 [
+        (gorm.field).tag = {column: "updated_by_id" not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+}
+
+message Currency {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "currencies",
+    };
+
+    uint64 currencyID = 1 [
+        (gorm.field).tag = {column: "currency_id" primary_key: true not_null: true auto_increment: true},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    string name = 2 [
+        (validator.field) = {msg_exists : true},
+        (gorm.field).tag = {column: "name" type: "varchar(255)" not_null: true}
+    ];
+
+    string code = 3 [
+        (validator.field) = {msg_exists : true},
+        (gorm.field).tag = {column: "code" type: "varchar(255)" not_null: true}
+    ];
+
+    google.protobuf.Timestamp createdAt = 50 [
+        (gorm.field).tag = {column: "created_at" not_null: true },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 createdByID = 51 [
+        (gorm.field).tag = {column: "created_by_id" not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    google.protobuf.Timestamp updatedAt = 52 [
+        (gorm.field).tag = {column: "updated_at" not_null: true },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 updatedByID = 53 [
+        (gorm.field).tag = {column: "updated_by_id" not_null: true },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+}
+
+message GroupIDStore {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "group_id_store",
+    };
+
+    uint64 companyID = 1 [
+        (gorm.field).tag = {column: "CompanyID" primary_key: true not_null: true auto_increment: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string ids = 8 [(gorm.field).tag = {column: "IDS" type: "jsonb" }];
+}
+
+message GetCompanyDataByCompanyIDs {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "companies",
+    };
+
+    uint64 companyID = 1 [
+        (gorm.field).tag = {column: "company_id"}
+    ];
+
+    string name = 2 [
+        (gorm.field).tag = {column: "name"}
+    ];
+
+    string loginCode = 3 [
+        (gorm.field).tag = {column: "login_code"}
+    ];
+
+    string countryName = 4 [
+        (gorm.field).tag = {column: "country_name"}
+    ];
+
+    string countryCode = 5 [
+        (gorm.field).tag = {column: "country_code"}
+    ];
+    
+    string address = 6 [
+        (gorm.field).tag = {column: "address"}
+    ];
+}

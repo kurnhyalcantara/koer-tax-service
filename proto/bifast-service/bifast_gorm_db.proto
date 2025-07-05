@@ -1,0 +1,163 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+// import "protoc-gen-openapiv2/options/annotations.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+
+package bifast.service.v1;
+option go_package = "./pb";
+
+enum CurrencyType {
+    NullCurrencyType = 0;
+    DebitCurrencyType = 1;
+    CreditCurrencyType = 2;
+}
+
+enum Fee {
+    OUR = 0;
+    BEN = 1;
+}
+
+enum TransactionSchedule {
+    NullTransactionSchedule = 0;
+    Immediate = 1;
+    Scheduled = 2;
+    Recurring = 3;
+}
+
+enum RecurringFrequency {
+    NullRecurringFrequency = 0;
+    Daily = 1;
+    Weekly = 2;
+    Monthly = 3;
+}
+
+enum AccountType {
+    NullAccountType = 0;
+    AccountNumberAccountType = 1;
+    EmailAccountType = 2;
+    PhoneNumberAccountType = 3;
+}
+
+message ExternalTransferTransaction {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "external_transfer_transactions",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 taskID = 2;
+    string transactionID = 3;
+    uint64 transactionServiceID = 4;
+    string data = 5 [(gorm.field).tag = { type: "jsonb" }];
+    string senderAccountNumber = 6;
+    string beneficiaryAccountNumber = 7;
+    string referenceNumber = 8;
+    double amount = 9;
+    double feeAmount = 10;
+    string exchangeRate = 11;
+    uint32 taskStatus = 12;
+    string dataStatus = 13;
+    uint32 transactionStatus = 14;
+    string workflowStatus = 15;
+    string workflowDoc = 17 [(gorm.field).tag = { type: "jsonb" }];
+    string esbPayload = 18 [(gorm.field).tag = { type: "jsonb" }];
+    string esbRootID = 19;
+    string esbResponseCode = 20;
+    uint64 companyID = 21;
+    string companyName = 22;
+    uint64 userID = 23;
+    string userName = 24;
+    string task = 25 [(gorm.field).tag = { type: "jsonb" }];;
+    google.protobuf.Timestamp createdAt = 26 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true}
+    ];
+    google.protobuf.Timestamp updatedAt = 27 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {not_null: true}
+    ];
+}
+
+message ExternalTransferSingleTemplate {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "external_single_templates",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string senderAccountNumber = 2;
+    string senderAccountCurrency = 3;
+    string senderAccountName = 4;
+    string senderAccountAlias = 5;
+    string senderAccountBalance = 6;
+    string receiverAccountNumber = 7;
+    string receiverAccountCurrency = 8;
+    string receiverAccountName = 9;
+    string receiverAccountAlias = 10;
+    string receiverAccountBalance = 11;
+    string receiverAccountEmail = 35;
+    string dealCode = 12;
+    CurrencyType currency = 13;
+    Fee fee = 14;
+    double amount = 15 [(validator.field) = {float_gte: 0}];
+    TransactionSchedule transactionSchedule = 16;
+    string scheduledDate = 17;
+    string scheduledTime = 18;
+    double exchangeRate = 19 [(validator.field) = {float_gte: 0}];
+    double receivedAmount = 20 [(validator.field) = {float_gte: 0}];
+    string exchangeRateCurrency = 21;
+    RecurringFrequency recurringFrequency = 22;
+    google.protobuf.Timestamp recurringPeriodStart = 23;
+    google.protobuf.Timestamp recurringPeriodEnd = 24;
+    string recurringDay = 25;
+    string recurringDate = 26;
+    string recurringTime = 27;
+    string remark = 28;
+    string journalSquence = 29 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string status = 30 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string statusMessage = 31 [(google.api.field_behavior) = OUTPUT_ONLY];
+    double feeAmount = 32;
+    google.protobuf.Timestamp scheduledAt = 33;
+    string templateName = 34;
+    uint64 createdByID = 36;
+    google.protobuf.Timestamp createdAt = 51 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true}
+    ];
+    google.protobuf.Timestamp updatedAt = 52 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {not_null: true}
+    ];
+    AccountType accountType = 53;
+    string phoneNumber = 54;
+    string email = 55;
+    string bankCode = 56;
+    string bankName = 57;
+    string remark2 = 58;
+    string remark3 = 59;
+}
+
+message RequestCallback {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "history.request_callback",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string esbPayload = 2 [(gorm.field).tag = { type: "jsonb" }];
+    string reffNumber = 3;
+    string transactionType = 4;
+    uint64 taskID = 5;
+    uint64 bifastID = 6;
+    string respondCallback = 7 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+    bool isNotificationSent = 8;
+    google.protobuf.Timestamp createdAt = 20 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true}
+    ]; 
+    google.protobuf.Timestamp modifiedAt = 21 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {not_null: true}
+    ];
+
+}

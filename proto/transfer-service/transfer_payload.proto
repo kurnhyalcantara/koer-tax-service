@@ -1,0 +1,654 @@
+syntax = "proto3";
+
+import "transfer-service/transfer_gorm_db.proto";
+import "transfer-service/transfer_core.proto";
+import "transfer-service/transfer_core_payload.proto";
+import "google/protobuf/timestamp.proto";
+
+package transfer.service.v1;
+option go_package = "./pb";
+
+import "mwitkow/go-proto-validators/validator.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+message GetRequestResponseByTransactionIDRequest {
+    string transactionId = 1;
+}
+
+message GetRequestResponseByTransactionIdData {
+    string transactionId = 1;
+    string request = 2;
+    string response = 3;
+ }
+message GetRequestResponseByTransactionIdResponse {
+    string code = 1;
+    string status = 2;
+    string message = 3;
+    GetRequestResponseByTransactionIdData data = 4;
+
+}
+
+message GlobalRequest {
+    string request = 1;
+}
+
+message CreateWithSignatureRequest {
+    string request = 1;
+    uint64 taskID = 2 [(validator.field) = {msg_exists : false}];
+}
+
+message GlobalRequestWithResCache {
+    string request = 1;
+    string rcode = 2;
+}
+
+message ResCacheReq {
+    string rcode = 1;
+}
+
+message ResCacheRes {
+    string response = 1;
+    string error = 2;
+    string responseCode = 3;
+    string status = 4;
+}
+
+message InternalTransferData {
+    string senderAccountNumber = 1;
+    string senderAccountCurrency = 2;
+    string senderAccountName = 3;
+    string senderAccountAlias = 4;
+    string senderAccountBalance = 5;
+    string receiverAccountNumber = 6;
+    string receiverAccountCurrency = 7;
+    string receiverAccountName = 8;
+    string receiverAccountAlias = 9;
+    string receiverAccountBalance = 10;
+    string dealCode = 11;
+    string bookingID = 35;
+    CurrencyType currency = 12;
+    Fee fee = 13;
+    double amount = 14 [(validator.field) = {float_gte: 0}];
+    TransactionSchedule transactionSchedule = 15;
+    string scheduledDate = 16;
+    string scheduledTime = 17;
+    double exchangeRate = 18 [(validator.field) = {float_gte: 0}];
+    double receivedAmount = 19 [(validator.field) = {float_gte: 0}];
+    string exchangeRateCurrency = 20;
+    RecurringFrequency recurringFrequency = 21;
+    string recurringPeriodStart = 22;
+    string recurringPeriodEnd = 23;
+    string recurringDay = 24;
+    string recurringDate = 25;
+    string recurringTime = 26;
+    string remark = 27;
+    string remark2 = 201;
+    string remark3 = 202;
+    string journalSquence = 28 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string status = 29;
+    string statusMessage = 30 [(google.api.field_behavior) = OUTPUT_ONLY];
+    double feeAmount = 31;
+    double feeAmountSender = 310;
+    string scheduledAt = 32;
+    string OriginDate = 302;
+    repeated string notificationEmails = 33;
+    uint64 uaID = 34;
+    string transactionID = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string parentID = 102;
+    uint64 parentTaskID = 103;
+    uint64 transactionServiceID = 104 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string transactionType = 105 [(google.api.field_behavior) = OUTPUT_ONLY];
+    bool saveAsFavourite = 106 ;
+    bool isBeneficiaryFav = 107 ;
+
+    string senderAccountCIF = 120 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string senderBankCode = 121 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string senderBankName = 122 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string senderAccountType = 123 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+
+    string receiverAccountCIF = 130 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string receiverBankCode = 131 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string receiverBankName = 132 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string receiverAccountType = 133 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string receiverLoanType = 134 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string IsNotPoll = 135 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+
+    string transactionSource = 136;
+    string isRDN = 137;
+    string bankReferenceNumber = 138;
+    bool isOutgoingPayment = 139;
+    UnderlyingData underlying = 150;
+    
+}
+
+message UnderlyingData {
+    string name = 1;
+    string extension = 2;
+    uint32 size = 3;
+}
+
+message TaskInternalTransferData {
+    Task task = 1;
+    InternalTransferData data = 2;
+    ValidateWorkflowData workflow = 3;
+}
+
+// ** Payload **
+
+message GetTaskInternalTransferFileRequest {
+    TaskStatus status = 1;
+    TaskStep step = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    Direction dir = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Sort DirectionEnum should be ASC or DESC",
+	}];
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    FormatTemplate fileFormat = 101;
+}
+
+message GetTaskInternalTransferFileResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message GetTaskInternalTransferRequest {
+    TaskStatus status = 1;
+    TaskStep step = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    Direction dir = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Sort DirectionEnum should be ASC or DESC",
+	}];
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string in = 10 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description : "Create 'in' query \n format: [key: value, value]"
+    }];
+}
+
+message GetTaskInternalTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TaskInternalTransferData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message GetTaskInternalTransferDetailRequest {
+    uint64 taskID = 1;
+    bool myTaskOnly = 2;
+}
+
+message GetTaskInternalTransferDetailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskInternalTransferData data = 4;
+}
+
+message SetTaskInternalTransferRequest {
+    uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject', 'delete'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+}
+
+message SetTaskInternalTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+}
+
+message CreateTaskInternalTransferSingleRequest {
+    uint64 taskID = 1 [(validator.field) = {msg_exists : false}];
+    InternalTransferData data = 2;
+    bool isDraft = 3;
+    string passCode = 5;
+}
+
+message CreateTaskInternalTransferSingleWithoutSessionRequest {
+    uint64 taskID = 1 [(validator.field) = {msg_exists : false}];
+    InternalTransferData data = 2;
+    bool isDraft = 3;
+    string passCode = 5;
+    string userNonSession = 6;
+    bool isStp = 7;
+    string source = 8;
+}
+
+message CreateTaskInternalTransferSingleResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskInternalTransferData data = 4;
+}
+
+message CreateTaskInternalTransferMultipleRequest {
+    repeated InternalTransferData data = 1;
+    bool isDraft = 2;
+    string passCode = 3;
+    google.protobuf.Timestamp createdAt = 4;
+}
+
+message CreateTaskInternalTransferMultipleResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated CreateTaskInternalTransferMultipleResponseData data = 4;
+}
+
+message CreateTaskInternalTransferMultipleResponseData {
+    Task task = 1;
+    InternalTransferData data = 2;
+    bool error = 3;
+    string message = 4;
+}
+
+message CreateInternalTransferTransactionRequest {
+    uint64 taskID = 1;
+    InternalTransferData data = 2;
+    ValidateWorkflowData currentWorkflow = 3;
+}
+
+message CreateInternalTransferTransactionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message CancelInternalTransferTransactionRequest {
+    uint64 taskID = 1;
+    string reason = 2;
+}
+
+message CancelInternalTransferTransactionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ExecInternalTransferRequest {
+    uint64 id = 1;
+    uint64 AvaibleRetry = 2;
+}
+message ExecInternalTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    ExecInternalTransferResponseData data = 4;
+}
+message ExecInternalTransferResponseData {
+    string requestDetail = 1;
+    string responseDetail = 2;
+    string rootID = 3;
+    string status = 4;
+    repeated string journalSequence = 5;
+}
+
+message ExecFailedInternalTransferRequest {
+    uint64 id = 1;
+    string reason = 2;
+}
+message ExecFailedInternalTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ResponseDetail {
+    ResponseDetailData RESPONSE = 1;
+}
+message ResponseDetailData {
+    string RESPONSE_CODE = 1;
+    string RESPONSE_MESSAGE = 2;
+    string ERROR_CODE = 3;
+    repeated string JOURNAL_SEQUENCE = 4;
+}
+
+// ** Template **
+
+message InternalTransferSingleTemplateData {
+    InternalTransferSingleTemplate template = 1;
+    InternalTransferData data = 2;
+}
+
+message GetTaskInternalTransferSingleTemplateRequest {
+    string sort = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    Direction dir = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Sort DirectionEnum should be ASC or DESC",
+	}];
+    string filter = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+}
+
+message GetTaskInternalTransferSingleTemplateResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated InternalTransferSingleTemplateData data = 4;
+}
+
+message GetTaskInternalTransferSingleTemplateDetailRequest {
+    uint64 id = 1;
+}
+
+message GetTaskInternalTransferSingleTemplateDetailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    InternalTransferSingleTemplateData data = 4;
+}
+
+message CreateTaskInternalTransferSingleTemplateRequest {
+    uint64 id = 1;
+    string templateName = 2;
+    InternalTransferData data = 3;
+}
+
+message CreateTaskInternalTransferSingleTemplateResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message DeleteTaskInternalTransferSingleTemplateRequest {
+    uint64 id = 1;
+}
+
+message DeleteTaskInternalTransferSingleTemplateResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+
+// Report Telkomsel 
+
+message GetReceiptDataRequest {
+    string startDate = 1 [json_name="start_date"];
+    string endDate = 2 [json_name="end_date"];
+    string status = 3;
+    string companyId = 4 [json_name="company_id"];
+}
+
+message FromReceiptData {
+    string senderName = 1;
+    string senderAlias = 2;
+    string senderBankName = 3;
+    string senderBankCode = 4;
+    string senderAccountNumber = 5;
+}
+
+message ToReceiptData {
+    string beneficiaryName = 1;
+    string beneficiaryAlias = 2;
+    string beneficiaryBankName = 3;
+    string beneficiaryBankCode = 4;
+    string beneficiaryAccountNumber = 5;
+}
+
+message TransferDetailsReceiptData {
+    string senderCurrency = 1;
+    string sendAmount = 2;
+    string dealCode = 3;
+    string totalFee = 4;
+    string beneficiaryCurrency = 5;
+    string receiveAmount = 6;
+}
+
+message ReceiptData {
+    string transactionId = 1;
+    string category = 2;
+    string valueDate = 3;
+    string billingType = 4;
+    string scheduleType = 5;
+    string transactionStatus = 6;
+    string remittanceNumber = 7;
+    string referenceNumber = 8;
+    FromReceiptData from = 9;
+    ToReceiptData to = 10;
+    string remark1 = 11;
+    string remark2 = 12;
+    string remark3 = 13;
+    TransferDetailsReceiptData transferDetails = 14;
+}
+
+message GetReceiptDataResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    string total = 3;
+    repeated ReceiptData data = 4;
+}
+
+// receipt data download
+message DownloadReceiptRequest {
+    string transaction_id = 1 [(google.api.field_behavior) = REQUIRED, json_name="transaction_id"];
+    string tabs = 2 ;
+}
+
+message DownloadMultipleReceiptRequest {
+    Filter filter = 1;
+    Direction dir = 2;
+    uint32 page = 3;
+    uint32 limit = 4;
+    SortTransaction sort = 5;
+    string tabs = 12;
+    string transactionId = 6;
+}
+
+message DownloadTransactionDetails {
+    string from = 1;
+    string to = 2;
+    string remittanceNumber = 3;
+    string referenceNumber = 4;
+    string remark1 = 5;
+    string remark2 = 6;
+    string remark3 = 7;
+}
+
+message DownloadTransferSummary {
+    string sentAmount = 1;
+    string transferFee = 2;
+    string totalAmount = 3;
+}
+
+message DownloadTransactionData {
+    string createdDate = 1;
+    string scheduleType = 2;
+    string transactionStatus = 3;
+    string referenceNumber = 4;
+    DownloadTransactionDetails transactionDetails = 5;
+    DownloadTransferSummary transferSummary = 6;
+}
+
+message TaskStatusesCounterData {
+    uint32 all = 1;
+    uint32 draft = 2;
+    uint32 returned = 3;
+    uint32 onChecker = 4;
+    uint32 onSigner = 5;
+    uint32 onReleaser = 6;
+    uint32 success = 7;
+    uint32 failed = 8;
+    uint32 waiting = 9;
+    uint32 onProcess = 10;
+    uint32 cancelled = 11;
+    uint32 rejected = 12;
+    uint32 approved = 13;
+}
+
+
+message TaskHistoryCounterData {
+    uint32 all = 1;
+    uint32 success = 2;
+    uint32 failed = 3;
+    uint32 onProcess = 4;
+    uint32 onSigner = 5;
+    uint32 onReleaser = 6;
+}
+
+
+message GetTaskStatusesCounterRequest {
+    string tabs = 1;
+    string createdDateStart = 2;
+    string createdDateEnd = 3;
+}
+
+message GetTaskStatusesCounterResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskStatusesCounterData data = 4;
+}
+
+
+message GetHistoryInternalTransferRequest {
+    string createdDateStart = 1;
+    string createdDateEnd = 2;
+    StepTask filter = 3;
+    Direction dir = 4;
+    uint32 page = 5;
+    uint32 limit = 6;
+}
+
+
+// get list history ongoing transfer
+message  GetTaskInternalTransferV2Request {
+   Filter filter = 1;
+   Direction dir = 2;
+   uint32 page = 3;
+   uint32 limit = 4;
+   SortTransaction sort = 5;
+}
+
+message Filter {
+    string createdDateStart = 1;
+    string createdDateEnd = 2;
+    StepTask status = 3;
+    string updatedDateStart = 4;
+    string  updatedDatedEnd = 5;
+}
+
+message GetTaskInternalTransferV2Response {
+    bool Error = 1;
+    uint32 Code = 2;
+    string Message = 3;
+   repeated GetListOngoingInternalTransferResponseData Data = 4;
+    PaginationResponse Pagination = 5;
+}
+
+message GetByTransactionIDRequest {
+    string transactionID = 1;
+}
+
+message GetWorkflowTaskInternalTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    WorkflowTaskInternalFundTransfer data = 4;
+}
+
+message WorkflowTaskInternalFundTransfer {
+    string transactionID = 1;
+    string workflowStatus = 2;
+    string lastActivity = 3;
+    string createdAt = 4;
+    string createdBy = 5;
+
+    message Step {
+        enum StepType {
+            checker = 0;
+            signer = 1;
+            releaser = 2;
+        }
+        StepType step = 1;
+
+        enum Status {
+            pending = 0;
+            approved = 1;
+            rejected = 2;
+            returned = 3;
+        }
+        Status status = 2;
+        int32 requirement = 3;
+        int32 approvedCount = 4;
+
+        message Participant {
+            string username = 1;
+            string date = 2;
+            bool isApproved = 3;
+            bool isRejected = 4;
+            bool isReturned = 5;
+        }
+
+        repeated Participant participants = 5;
+    }
+
+    repeated Step steps = 6;
+
+    string reasons = 7;
+    string comment = 8;
+}
+
+// download v2
+message  GetTaskInternalTransferFileV2Request {
+    Filter filter = 1;
+    Direction dir = 2;
+    uint32 page = 3;
+    uint32 limit = 4;
+    SortTransaction sort = 5;
+    string  tabs = 6;
+    FormatTemplate fileFormat = 7;
+}
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package span_file_processor.service.v1;
+
+import "span-file-processor-service/span_file_processor_core.proto";
+
+option go_package = "./pb";
+
+message SpanFileProcessorRequest {
+    string app_key = 1;
+    string file_format = 2;
+    string file_key = 3;
+    uint64 task_id = 4;
+    string task_data = 5;
+    repeated uint64 role_ids = 6;
+    uint64 company_id = 7;
+}
+
+message StandardResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ErrorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message TaskDataSpan {
+    string transaction_id = 1;
+    Status status = 2;
+    uint64 company_id = 3;
+    string company_name = 4;
+    string file_description = 5;
+    string file_format = 6;
+    uint64 file_total_record = 7;
+    string file_name = 8;
+    uint64 valid_data = 11;
+    uint64 invalid_data = 12;
+    double total_amount = 13;
+    double total_valid_amount = 14;
+    double total_invalid_amount = 15;
+    uint64 transaction_completed = 16;
+    uint64 transaction_successful = 17;
+    uint64 transaction_failed = 18;
+    double transaction_total_amount = 19;
+    double transaction_valid_amount = 20;
+    double transaction_invalid_amount = 21;
+    string description_message = 49;
+    string transaction_type = 50;
+    uint64 total_batch_count = 51;
+    string currency = 52;
+  }
+
+  message ValidateDebitAccountByRole {
+    string account_number = 1;
+    repeated uint64 role_ids = 2;
+    uint64 company_id = 3;
+  }

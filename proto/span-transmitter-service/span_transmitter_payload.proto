@@ -1,0 +1,265 @@
+syntax = "proto3";
+
+import "span-transmitter-service/span_transmitter_core.proto";
+
+package span_transmitter.service.v1;
+option go_package = "./pb";
+
+message ErrorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+};
+
+message SpanProcessRequest {
+    string app_key = 1;
+    uint64 task_id = 2;
+    RequestType request_type = 3;
+    SpanProcessDoVoidRequest do_void_request = 4;
+    SpanProcessDoRejectRequest do_reject_request = 5;
+    SpanProcessUpdateCurrencyRequest update_currency_request = 6;
+};
+
+message SpanProcessDoVoidRequest {
+    string document_date = 1;
+    string document_number = 2;
+    string amount = 3;
+    string reason = 4;
+    string beneficiary_account = 5;
+    string beneficiary_bank = 6;
+    string beneficiary_bank_code = 7;
+    string beneficiary_name = 8;
+    string agent_bank_account_number = 9;
+    string agent_bank_account_name = 10;
+    string agent_bank_code = 11;
+    string currency = 12;
+    uint64 company_id = 13;
+    string company_name = 14;
+    string description = 15;
+    string email_address = 16;
+    string swift_code = 17;
+    string iban_code = 18;
+    string payment_method = 19;
+    string created_by_name = 51;
+    uint64 created_by_id = 52;
+}
+
+message SpanProcessDoRejectRequest {
+    string sp2d = 1;
+    string amount = 2;
+    string beneficiary_account = 3;
+    string beneficiary_bank = 4;
+    string beneficiary_bank_code = 5;
+    string beneficiary_name = 6;
+    string agent_bank_account_number = 7;
+    string agent_bank_account_name = 8;
+    string agent_bank_code = 9;
+    string currency = 10;
+    uint64 company_id = 11;
+    string company_name = 12;
+    string document_date = 13;
+    string description = 14;
+    string email_address = 15;
+    string swift_code = 16;
+    string iban_code = 17;
+    string payment_method = 18;
+    string document_number = 19;
+    string created_by_name = 51;
+    uint64 created_by_id = 52;
+}
+
+message SpanProcessUpdateCurrencyRequest {
+    string document_date = 1;
+    string document_number = 2;
+    string flag_completed = 3;
+    string currency_target = 4;
+    string swift_code = 5;
+    uint64 company_id = 6;
+    string company_name = 7;
+    StatusSpanAction status = 8;
+    string reason_message = 9;
+    string created_by_name = 51;
+    uint64 created_by_id = 52;
+}
+
+message SpanProcessResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+};
+
+message UpdateTaskRequest {
+    uint64 task_id = 1;
+    Status status = 2;
+    string description_message = 3;
+}
+
+message UpdateSpanItemRequest {
+    StatusSpanItem status = 1;
+    string message = 2;
+    uint64 task_id = 3;
+    string status_code = 4;
+    string status_desc = 5;
+    string document_number = 6;
+}
+
+message UpdateSummarySpan {
+    uint64 transaction_completed = 1;
+    uint64 transaction_successful = 2;
+    uint64 transaction_failed = 3;
+    double transaction_completed_amount = 4;
+    double transaction_successful_amount = 5;
+    double transaction_failed_amount = 6;
+    uint64 task_id = 7;
+    Status status = 8;
+    string description_message = 9;
+    string id_file = 10;
+  }
+  
+  message TaskDataSpan {
+    string transaction_id = 1;
+    Status status = 2;
+    uint64 company_id = 3;
+    string company_name = 4;
+    string file_description = 5;
+    string file_format = 6;
+    uint64 file_total_record = 7;
+    string file_name = 8;
+    uint64 valid_data = 11;
+    uint64 invalid_data = 12;
+    double total_amount = 13;
+    double total_valid_amount = 14;
+    double total_invalid_amount = 15;
+    uint64 transaction_completed = 16;
+    uint64 transaction_successful = 17;
+    uint64 transaction_failed = 18;
+    double transaction_total_amount = 19;
+    double transaction_valid_amount = 20;
+    double transaction_invalid_amount = 21;
+    string description_message = 49;
+    string transaction_type = 50;
+    string id_file = 51;
+  }
+
+  /* #region email */
+message NotificationData {
+    string creation_date = 1 [json_name='CREATION_DATE'];
+    string transaction_id = 2 [json_name='TRANSACTION_ID'];
+    string total_record = 3 [json_name='TOTAL_RECORD'];
+    string total_amount = 4 [json_name='TOTAL_AMOUNT'];
+    string transaction_status = 9 [json_name='TRANSACTION_STATUS'];
+    string user_maker = 10 [json_name='USER_MAKER'];
+    string reason = 11 [json_name='REASON'];
+    string reject_description = 12 [json_name='REJECT_DESCRIPTION'];
+    string reject_from = 13 [json_name='REJECT_FROM'];
+    string file_description = 14 [json_name='FILE_DESCRIPTION'];
+    string user_checker = 15 [json_name='USER_CHECKER'];
+    string user_signer = 16 [json_name='USER_SIGNER'];
+    string user_releaser = 17 [json_name='USER_RELEASER'];
+    string id_file = 18 [json_name='ID_FILE'];
+  }
+
+  message NotificationSpanActionData {
+    string creation_date = 1 [json_name='CREATION_DATE'];
+    string user = 2 [json_name='USER'];
+    string status = 3 [json_name='STATUS'];
+    string agent_bank_account_number = 4 [json_name='AGENT_BANK_ACCOUNT_NUMBER'];
+    string total_amount = 5 [json_name='TOTAL_AMOUNT'];
+    string document_number = 6 [json_name='DOCUMENT_NUMBER'];
+  }
+/* #end region email*/
+
+/* # region brigate # */ 
+message BrigateValidateUploadRequest {
+    string nama_file = 1 [json_name='namafile'];
+    repeated BrigateValidateUploadDataRequest data = 2;
+}
+
+message BrigateValidateUploadDataRequest {
+    string document_date = 1 [json_name='documentDate'];
+    string document_number = 2 [json_name='documentNumber'];
+    string beneficiary_name = 3 [json_name='beneficiaryName'];
+    string beneficiary_bank_code = 4 [json_name='beneficiaryBankCode'];
+    string beneficiary_bank = 5 [json_name='beneficiaryBank'];
+    string beneficiary_account = 6 [json_name='beneficiaryAccount'];
+    string amount = 7 [json_name='amount'];
+    string currency_target = 8 [json_name='currencyTarget'];
+    string description = 9 [json_name='description'];
+    string agent_bank_code = 10 [json_name='agentBankCode'];
+    string agent_bank_account_number = 11 [json_name='agentBankAccountNumber'];
+    string agent_bank_account_name = 12 [json_name='agentBankAccountName'];
+    string email_address = 13 [json_name='emailAddress'];
+    string swift_code = 14 [json_name='swiftCode'];
+    string iban_code = 15 [json_name='ibanCode'];
+    string payment_method = 16 [json_name='paymentMethod'];
+    string sp2d_count = 17 [json_name='sP2DCount'];
+    string jenis_transaksi = 18 [json_name='jenisTransaksi'];
+    string nama_supplier = 19 [json_name='namaSupplier'];
+    string kode_satker = 20 [json_name='kodeSatker'];
+    string address = 21 [json_name='address'];
+}
+
+message BrigateValidateUploadResponse {
+    string response_code = 1 [json_name='responseCode'];
+    string response_message = 2 [json_name='responseMessage'];
+    BrigateValidateUploadDataResponse response_data = 3 [json_name='responseData'];
+}
+
+message BrigateValidateUploadDataResponse {
+    string id_file = 1 [json_name='idFile'];
+    string created_date_file = 2 [json_name='createdDateFile'];
+    string document_date = 3 [json_name='documentDate'];
+    string nama_file = 4 [json_name='namaFile'];
+    string record = 5 [json_name='record'];
+    string total_nominal = 6 [json_name='totalNominal'];
+    string status = 7 [json_name='status'];
+    string status_desc = 8 [json_name='statusDesc'];
+    repeated BrigateValidateUploadResponseDataDetails response_data_details = 9 [json_name='responseDataDetails'];
+}
+
+message BrigateValidateUploadResponseDataDetails {
+    string document_date = 1 [json_name='documentDate'];
+    string document_number = 2 [json_name='documentNumber'];
+    string status_code = 3 [json_name='statusCode'];
+    string status_desc = 4 [json_name='statusDesc'];
+}
+
+message BrigateDoVoidRequest {
+    string document_date = 1 [json_name='documentDate'];
+    string document_number = 2 [json_name='documentNumber'];
+    string amount = 3 [json_name='amount'];
+    string alasan = 4 [json_name='alasan'];
+}
+
+message BrigateDoVoidResponse {
+    string response_code = 1 [json_name='responseCode'];
+    string response_message = 2 [json_name='responseMessage'];
+}
+
+message BrigateDoRejectRequest {
+    string documentNumber = 1 [json_name='documentNumber'];
+    string approvalStatus = 2 [json_name='approvalStatus'];
+    string nominal = 3 [json_name='nominal'];
+}
+
+message BrigateDoRejectResponse {
+    string response_code = 1 [json_name='responseCode'];
+    string response_message = 2 [json_name='responseMessage'];
+    string response_desc = 3 [json_name='responseDesc'];
+    string document_number = 4 [json_name='documentNumber'];
+}
+
+message BrigateUpdateCurrencyRequest {
+    string document_date = 1 [json_name='documentDate'];
+    string document_number = 2 [json_name='documentNumber'];
+    string flag_completed = 3 [json_name="flagCompleted"];
+    string currency_target = 4 [json_name='currencyTarget'];
+    string swift_code = 5 [json_name='swiftCode'];
+}
+
+message BrigateUpdateCurrencyResponse {
+    string response_code = 1 [json_name='responseCode'];
+    string response_message = 2 [json_name='responseMessage'];
+}
+
+/* # end region brigate # */ 

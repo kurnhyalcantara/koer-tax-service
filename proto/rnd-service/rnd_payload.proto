@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package rnd.service.v1;
+option go_package = "./pb";
+
+// #region General Request and Reuseable
+
+message Pagination {
+    int32 limit = 1;
+    int32 page = 2;
+    string sort = 3;
+    string dir = 4;
+    uint64 total_pages = 5;
+    uint64 total_rows = 6;
+    string filter = 7;
+};
+
+message GeneralBodyResponse {
+    string process_id = 1;
+    bool error = 2;
+    uint32 code = 3;
+    string message = 4;
+};
+
+// #endregion
+
+message HealthCheckResponse {
+    string message = 1;
+};
+
+message RabbitMqProcessRequest {
+    string process_id = 1;
+    int32 index_data = 2;
+    uint32 queue_priority = 3;
+};

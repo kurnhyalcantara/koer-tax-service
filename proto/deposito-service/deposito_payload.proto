@@ -1,0 +1,1036 @@
+syntax = "proto3";
+
+import "deposito-service/deposito_gorm_db.proto";
+
+package deposito.service.v1;
+option go_package = "./pb";
+
+// import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+}
+
+enum TaskStatus {
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+    RequestForDelete = 6;
+    Deleted = 7;
+}
+
+enum TaskStep {
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string updatedByName = 11;
+    string reasons = 12;
+    string comment = 13;
+    string workflow = 14;
+    uint64 companyID = 15;
+    string dataBak = 16;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+enum SortDirection {
+    DESC = 0;
+    ASC = 1;
+}
+
+message DepositoDataTask {
+    uint64 depositoID = 1 ;
+
+    uint64 companyID = 2;
+    string accNo_Deposito = 3 ;
+
+    uint64 accTDID = 7;
+    uint64 accInterestID = 8;
+    uint64 accPrincipalID = 9;
+    string depositoName = 10 ;
+    string depositType = 11 ;
+    string tenor = 12 ;
+    string amount = 13 ;
+    string interestRate = 14 ;
+    string currency = 15 ;
+    google.protobuf.Timestamp withdrawAt = 16 ;
+    string status = 17;
+    string penalty = 18;
+    string interest = 19;
+
+    uint64 createdById = 25 ;
+    uint64 updatedById = 26 ;
+    string code = 27 ;
+    string voucher = 28 ;
+    bool isWithdraw = 29;
+    google.protobuf.Timestamp openDate = 30 ;
+    google.protobuf.Timestamp lastRenewalDate = 31;
+    uint64 taskID = 32;
+    uint64 transaction_svc_id = 96;
+
+    google.protobuf.Timestamp withdrawDate = 80;
+
+    google.protobuf.Timestamp createdAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 103 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message ManageDeposit{
+    string tenor = 1;
+    string depositType = 2;
+    string interestRate = 3;
+    string voucher = 4;
+}
+
+message ManageDepositTaskRequest{
+    ManageDeposit data = 1;
+    uint64 taskID = 2;
+    bool isDraft = 3;
+    string passCode = 30;
+}
+
+message WithdrawDepositTaskRequest{
+     bool isWithdraw= 1;
+     
+    uint64 taskID = 2;
+    string passCode = 30;
+
+}
+
+message CreateDepositoTaskRequest{
+    DepositoDataTask data = 1;
+    uint64 taskID = 2;
+    bool isDraft = 3;
+    string passCode = 30;
+}
+
+message TaskData {
+    Task task = 1;
+    DepositoDataTask Deposito = 2;
+    Company company = 3;
+    accounts account = 4;
+    repeated WorkflowDataStatus workflowHistory = 5;
+    DepositoDataTask DepositoPrev = 6;
+    DepositoDataTask DepositoNew = 7;
+    repeated  string voucherHistory= 8;
+    uint64 uaID = 20;
+}
+
+message account {
+    string accountNumber = 1;
+    string accountName = 2;
+    string accountAlias = 3;
+    string cif = 4;
+}
+
+message accounts {
+    account accTD = 21;
+    account accPrincipal = 22;
+    account accInterest = 23;
+}
+
+message Company {
+    uint64 companyID = 1;
+    string companyName = 2;
+    uint64 holdingID = 3;
+    string groupName = 4;
+    string holdingCompanyName = 5;
+  //  string subsidiaries = 6;
+}
+
+message TaskActionRequest {
+    uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject', 'delete'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+    string passCode = 30;
+}
+
+message TaskActionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskData data = 4;
+}
+
+message CreateDepositoTaskResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskData data = 4; 
+}
+
+message DepositoListTaskRequest {
+    // message TaskListFilter{
+    //     // string beneficiaryCountryCode = 1;
+    //     // string beneficiaryBank = 2;
+    //     // string dateCreated = 3;
+    //     // string dateModified = 4;
+    //     // string createdBy = 5;
+    //     // string reviewerName = 6;
+    //     // string currency = 7;
+    //     // string beneficiaryCountryName = 8;
+
+    //     string status = 50;
+    //     string custom = 51;
+    // }
+    
+    TaskStatus status = 1;
+    TaskStep step = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5;
+    SortDirection dir = 6;
+    string filter = 7;
+    string query = 8;
+    bool myTaskOnly = 9;
+}
+
+message DepositoListTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TaskData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message FileTaskListRequest {
+    
+    TaskStatus status = 1;
+    TaskStep step = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 5;
+    SortDirection dir = 6;
+    string filter = 7;
+    string search = 8;
+    bool myTaskOnly = 9;
+
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 25;
+}
+
+message GetDepositoByRoleRequest{
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 4;
+    string filter = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 9;
+    uint64 productID = 11;
+}
+
+message GetDepositoByRoleResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated AccountData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message AccountData {
+    string accountID = 1;
+    uint64 companyID = 2;
+    string accountNumber = 3;
+    string accountAlias = 4;
+    string accountName = 5;
+    string accountType = 6;
+    string accountStatus = 7;
+    string accountCurrency = 8;
+    string accessLevel = 9;
+    string isOwnedByCompany = 10;
+    uint64 createdByID = 11;
+    uint64 updatedByID = 12;
+    uint64 deletedByID = 13;
+    bool disabled = 15;
+    string cif = 16;
+    string productCode = 17;
+    string statusCode = 18;
+    google.protobuf.Timestamp createdAt = 51;
+    google.protobuf.Timestamp updatedAt = 52;
+    google.protobuf.Timestamp deletedAt = 53;
+}
+
+message UpdateDepositoRoleRequest{
+    uint64 role_id = 1;
+    repeated string deposito_account = 2;
+    string company_id = 3;
+}
+
+message UpdateDepositoRoleResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Deposito_Account data = 4;
+}
+
+message GetDepositoTaskByIDRequest {
+    uint64 taskID = 1;
+}
+
+message GetDepositoTaskByIDResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskData data = 4;
+}
+
+message DepositoDataListRequest {
+    message DataListFilter{
+        string depositoName = 1;
+        string tenor = 2;
+        string interestRate = 3;
+        string code = 4;
+        // string createdBy = 5;
+        // string reviewerName = 6;
+        // string currency = 7;
+
+        string custom = 50;
+    }
+
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 3;
+    SortDirection dir = 4;
+    DataListFilter filter = 5;
+    string search = 6;
+
+}
+
+message DepositoDataks{
+    Deposito deposito = 1;
+    accounts accounts = 2;
+}
+
+message DepositoDataListResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated DepositoDataks data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message DepositoDataDetailRequest {
+    uint64 depositoID = 1;
+}
+
+message DepositoDataDetailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DepositoDataks data = 4;
+}
+
+message CreateDepositoRequest {
+    TaskData data = 1;
+}
+
+message CreateDepositoResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Deposito data = 4;
+}
+
+message GetProductDepositoRequest {
+    message DataListFilter{
+        string currency = 1;
+        string tenor = 2;
+        string custom = 50;
+    }
+    Deposito_Product product = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4;
+    SortDirection dir = 5;
+    DataListFilter filter = 6;
+    string search = 7;
+}
+
+message GetProductDepositoRespons {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Deposito_Product data = 4;
+}
+
+
+message TimeDepositActiveQueueReq {
+    string key = 1;
+}
+message TimeDepositActiveQueueRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Deposito data = 4;
+}
+
+message TimeDepositActiveReq {
+    uint64 depositoID = 1;
+}
+
+message TimeDepositActiveRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message TimeDepositMaturatedQueueReq {
+    string key = 1;
+}
+
+message TimeDepositMaturatedQueueRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Deposito data = 4;
+}
+
+message TimeDepositMaturatedReq {
+    uint64 depositoID = 1;
+}
+
+message TimeDepositMaturatedRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+
+
+// ========== exec transaction ===========
+message ExecTransactionDepositoReq {
+    uint64 id = 1;
+}
+
+message ResponseDetail {
+    ResponseDetailData RESPONSE = 1;
+}
+message ResponseDetailData {
+    string RESPONSE_CODE = 1;
+    string RESPONSE_MESSAGE = 2;
+    string ERROR_CODE = 3;
+    string DATA_RESPONSE = 4;
+    repeated string JOURNAL_SEQUENCE = 5;
+}
+
+message ExecTransactionDepositoRes {
+    string requestDetail = 2;
+    string responseDetail = 1;
+    string rootID = 3;
+    bool is_retry = 4;
+    uint32 retryNumber = 5;
+    string status = 6;
+    repeated string jurnal_seq = 7;
+    uint64 transaction_id = 8;
+}
+// ========= end payload ==================
+
+
+message DepositInquiryRateRequest{
+    string RATE_CURRENCY = 1 [json_name='RATE_CURRENCY']; //  "RATE_CURRENCY": "IDR",
+    string PROD_TYPE = 2 [json_name='PROD_TYPE']; // "PROD_TYPE": "DQ"
+}
+
+message DepositInquiryRate{
+    string ERROR_CODE = 1 [json_name='ERROR_CODE']; // "ERROR_CODE": "AS-000",
+    string RESPONSE_CODE = 2 [json_name='RESPONSE_CODE'];// "RESPONSE_CODE": "00",
+    string RESPONSE_MESSAGE = 3 [json_name='RESPONSE_MESSAGE'];// "RESPONSE_MESSAGE": "Transaction Successfully",
+    string RATE_NUMBER = 4 [json_name='RATE_NUMBER'];// "RATE_NUMBER": "702",
+    string RATE_CURRENCY = 5 [json_name='RATE_CURRENCY'];// "RATE_CURRENCY": "IDR",
+    string CURRENT_RATE = 6 [json_name='CURRENT_RATE'];// "CURRENT_RATE": "0.042500",
+    string MAXIMUM_RATE = 7 [json_name='MAXIMUM_RATE'];// "MAXIMUM_RATE": "0.075000",
+    string MINIMUM_RATE = 8 [json_name='MINIMUM_RATE'];// "MINIMUM_RATE": "0.042500"
+}
+
+message DepositInquiryRateRespons{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DepositInquiryRate data = 4;
+}
+
+
+message DepositoMaintananceRequest {
+    string ACCOUNT_NUMBER = 1 [json_name='ACCOUNT_NUMBER'];  // "ACCOUNT_NUMBER": "020601056922400",
+    string ACCOUNT_TYPE = 2 [json_name='ACCOUNT_TYPE'];  // "ACCOUNT_TYPE": "DQ",
+    string AUTORENEWAL = 3 [json_name='AUTORENEWAL'];   //"AUTORENEWAL": "N",
+    string RATE_VARIANCE = 4 [json_name='RATE_VARIANCE'];  //"RATE_VARIANCE": "0",
+    string RATE_VARIANCE_CODE = 5 [json_name='RATE_VARIANCE_CODE'];  //"RATE_VARIANCE_CODE": ""
+    string VOUCHER_CODE = 6 [json_name='VOUCHER_CODE'];  //"RATE_VARIANCE_CODE": ""
+}
+
+message DepositoMaintanance {
+    string ERROR_CODE = 1 [json_name='ERROR_CODE'];    // "ERROR_CODE": "AS-000",
+    string RESPONSE_CODE = 2 [json_name='RESPONSE_CODE'];    // "RESPONSE_CODE": "00",
+    string RESPONSE_MESSAGE = 3 [json_name='RESPONSE_MESSAGE'];    // "RESPONSE_MESSAGE": "Transaction Successfully",
+    string ACCOUNT_NUMBER = 4 [json_name='ACCOUNT_NUMBER'];    // "ACCOUNT_NUMBER": "0000001901000061441",
+    string ACCOUNT_TYPE = 5 [json_name='ACCOUNT_TYPE'];    // "ACCOUNT_TYPE": "E",
+    string AUTORENEWAL_CODE = 6 [json_name='AUTORENEWAL_CODE'];    // "AUTORENEWAL_CODE": "A",
+    string RATE_VARIANCE = 7 [json_name='RATE_VARIANCE'];    // "RATE_VARIANCE": "0.000000",
+    string RATE_VARIANCE_CODE = 8 [json_name='RATE_VARIANCE_CODE'];   // "RATE_VARIANCE_CODE": "1",
+    string STATUS_KODE_VOUCHER = 9 [json_name='STATUS_KODE_VOUCHER'];    // "STATUS_KODE_VOUCHER": "Kode Nego 180511Q1K7 sudah dipakai"
+}
+
+message DepositoMaintananceRespons{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DepositoMaintanance data = 4;
+}
+
+message DepositoCreateAccountRequest {
+    string ACCOUNT_PEMBAYARAN_POKOK = 1 [json_name='ACCOUNT_PEMBAYRAN_SEC_ACCOUNT_NUMBER'];   // "ACCOUNT_NO_PEMBAYRAN_BUNGA":"",
+    string BRANCH = 2 [json_name='BRANCH'];  // "BRANCH": "0019",
+    string CIF_NO = 3 [json_name='CIF_NO'];// "CIF_NO": "SY04223",
+    string CURRENCY = 4 [json_name='CURRENCY'];// "CURRENCY": "IDR",
+    string CUSTOMER_NAME = 5 [json_name='CUSTOMER_NAME'];// "CUSTOMER_NAME": "Domba - Domba Tersesat",
+   // dikurangin
+    string DATE_ISSEUD = 6 [json_name='DATE_ISSEUD'];// "DATE_ISSEUD": "221221",
+    string INTEREST_RATE = 7 [json_name='INTEREST_RATE'];// "INTEREST_RATE": "0.042500",
+    string JANGKA_WAKTU_DEPOSITO = 8 [json_name='JANGKA_WAKTU_DEPOSITO'];// "JANGKA_WAKTU_DEPOSITO": "1",
+    string POKOK_DEPOSITO = 9 [json_name='POKOK_DEPOSITO'];// "POKOK_DEPOSITO": "5123123.00",
+    string PRODUCT_TYPE = 10 [json_name='PRODUCT_TYPE'];// "PRODUCT_TYPE": "EE",
+    string RELATIONSHIP_CODE = 11 [json_name='RELATIONSHIP_CODE'];// "RELATIONSHIP_CODE": "042",
+    string RENEW = 12 [json_name='RENEW'];// "RENEW": "YES",
+    string REPORTING_BRANCH = 13 [json_name='REPORTING_BRANCH'];// "REPORTING_BRANCH": "0019"
+    string VARIANCE_CODE = 14 [json_name='VARIANCE_CODE'];//"VARIANCE_CODE":"180511Q1K7"
+    string VARIANCE_RATE = 15 [json_name='VARIANCE_RATE'];  //  "VARIANCE_RATE": "0",
+    string VOUCHER_CODE  = 16 [json_name='VOUCHER_CODE '];  //  "VOUCHER_CODE ": "+",
+    string SEC_ACCOUNT_NUMBER = 17[json_name='SEC_ACCOUNT_NUMBER'];//"VARIANCE_CODE":"180511Q1K7"
+}
+
+message DepositoCreateAccount {
+    string ERROR_CODE = 1 [json_name='ERROR_CODE'];  // "ERROR_CODE": "AS-000",
+    string RESPONSE_CODE = 2 [json_name='RESPONSE_CODE']; // "RESPONSE_CODE": "00",
+    string RESPONSE_MESSAGE = 3 [json_name='RESPONSE_MESSAGE']; // "RESPONSE_MESSAGE": "Transaction Successfully",
+    string ACCOUNT_NUMBER = 4 [json_name='ACCOUNT_NUMBER']; // "ACCOUNT_NUMBER": "0000001901000032442",
+    string CIF_NUMBER = 5 [json_name='CIF_NUMBER']; // "CIF_NUMBER": "SY04223",
+    string OPEN_DATE = 6 [json_name='OPEN_DATE']; // "OPEN_DATE": "0221221",
+    string TGL_JATUH_TEMPO = 7 [json_name='TGL_JATUH_TEMPO']; // "TGL_JATUH_TEMPO": "0220122"
+}
+
+message DepositoCreateAccountRespons{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DepositoCreateAccount data = 4;
+}
+
+message DepositoPlacementRequest{
+    string DEBIT_ACCOUNT = 1 [json_name='DEBIT_ACCOUNT'];// "DEBIT_ACCOUNT": "001901000162530",
+    string DEBIT_AMOUNT = 2 [json_name='DEBIT_AMOUNT']; // "DEBIT_AMOUNT": "1222",
+    string SELL_RATE = 3 [json_name='SELL_RATE']; // "SELL_RATE": "10000",
+    string BUY_RATE = 4 [json_name='BUY_RATE']; // "BUY_RATE": "10000",
+    string CHARGE_AMOUNT = 5 [json_name='CHARGE_AMOUNT']; // "CHARGE_AMOUNT": "100",
+    string CREDIT_ACCOUNT = 6 [json_name='CREDIT_ACCOUNT']; // "CREDIT_ACCOUNT": "0000020601056987400",
+    string CREDIT_AMOUNT = 7 [json_name='CREDIT_AMOUNT']; // "CREDIT_AMOUNT": "1000",
+    string NUM_LEMBAR = 8 [json_name='NUM_LEMBAR']; // "NUM_LEMBAR": "1",
+    string DEBIT_CURRENCY = 9 [json_name='DEBIT_CURRENCY']; // "DEBIT_CURRENCY": "IDR",
+    string CREDIT_CURRENCY = 10 [json_name='CREDIT_CURRENCY']; // "CREDIT_CURRENCY": "IDR",
+    string REMARK = 11 [json_name='REMARK']; // "REMARK": ""
+    string NOBILYET = 12 [json_name='NOBILYET']; // "NOBILYET": ""
+}
+
+message DepositoPlacement {
+    string ERROR_CODE = 1 [json_name='ERROR_CODE']; // "ERROR_CODE": "AS-000",
+    string RESPONSE_CODE = 2 [json_name='RESPONSE_CODE']; // "RESPONSE_CODE": "00",
+    string RESPONSE_MESSAGE = 3 [json_name='RESPONSE_MESSAGE']; // "RESPONSE_MESSAGE": "Transaction Successfully",
+    string JOURNAL_SEQ = 4 [json_name='JOURNAL_SEQ']; // "JOURNAL_SEQ": "7126648"
+}
+
+message DepositoPlacementRespons{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DepositoPlacement data = 4;
+}
+
+message DepositVoucherNegoRequest{
+    string voucherCode	 = 1 [json_name='voucherCode'];   // "kodeNego":"180514QBFG",
+    string amount = 2 [json_name='nominal'];   // "nominal":"1000",
+    string rate = 3 [json_name='rate'];   // "rate":"10,25"  
+    string accountNumber = 4 ;   // "rate":"10,25"  
+    uint64 taskID = 5 ;   // "rate":"10,25"  
+}
+
+message DepositInquiryRateNegoRequest{
+    string kodeNego	 = 1 [json_name='kodeNego'];   // "kodeNego":"180514QBFG",
+    string nominal = 2 [json_name='nominal'];   // "nominal":"1000",
+    string rate = 3 [json_name='rate'];   // "rate":"10,25"  
+}
+
+message DepositInquiryRateNego{
+    string responseStatus = 1 [json_name='responseStatus']; // "responseStatus": "Success",
+    string namaDeposan = 2 [json_name='namaDeposan']; // "namaDeposan": "Drake",
+    string kodeNego = 3 [json_name='kodeNego']; // "kodeNego": "180514QBFG",
+    string currency = 4 [json_name='currency']; // "currency": "IDR",
+    string nominal = 5 [json_name='nominal']; // "nominal": "1000",
+    string rate = 6 [json_name='rate']; // "rate": "10.25",
+    string jangkaWaktu = 7 [json_name='jangkaWaktu']; // "jangkaWaktu": "6 Bulan",
+    string tanggalNegosiasi = 8 [json_name='tanggalNegosiasi']; // "tanggalNegosiasi": "2018-05-14",
+    string namaPemutus = 9 [json_name='namaPemutus']; // "namaPemutus": "Yoga Arnindita"
+    string errorCode = 10  [json_name='errorCode']; // \"errorCode\": \"00\",\r\n
+    string responseCode = 11  [json_name='responseCode']; // \"responseCode\":\"BN-00\",\r\n 
+    string responseDesc = 20 [json_name='responseDesc']; // "responseDesc\":\"Kode Nego tidak ditemukan\"}
+}
+
+message DepositInquiryTDPinaltiRequest{
+    string ACCT_NO = 1 [json_name='ACCT_NO'];  // "ACCT_NO":"001901000191408",
+    string PENALTY_TYPE = 2 [json_name='PENALTY_TYPE'];// "PENALTY_TYPE":"1",
+    string ADMIN_FEE = 3 [json_name='ADMIN_FEE'];// "ADMIN_FEE":"1.00",
+    string KURS_JUAL = 4 [json_name='KURS_JUAL'];// "KURS_JUAL":"2.00",
+    string KURS_BELI = 5 [json_name='KURS_BELI'];// "KURS_BELI":"2.00" 
+}
+
+message DepositInquiryTDPinalti{
+    
+    string ERROR_CODE = 1 [json_name='ERROR_CODE']; // "ERROR_CODE": "DP-00",
+     string RESPONSE_CODE = 2 [json_name='RESPONSE_CODE']; //     "RESPONSE_CODE": "00",
+     string RESPONSE_MESSAGE = 3 [json_name='RESPONSE_MESSAGE']; //     "RESPONSE_MESSAGE": "Success",
+     string BUNGA_BELUM_DIBAYAR = 4 [json_name='BUNGA_BELUM_DIBAYAR']; //     "BUNGA_BELUM_DIBAYAR": "0.00",
+     string PAJAK_ATAS_BUNGA_BULAN_BERJALAN = 5 [json_name='PAJAK_ATAS_BUNGA_BULAN_BERJALAN']; //     "PAJAK_ATAS_BUNGA_BULAN_BERJALAN": "0.00",
+     string PEMBAYARAN_BUNGA_NET = 6 [json_name='PEMBAYARAN_BUNGA_NET']; //     "PEMBAYARAN_BUNGA_NET": "0.00",
+     string DENDA = 7 [json_name='DENDA']; //     "DENDA": "0.00",
+     string PELUNASAN_NET = 8 [json_name='PELUNASAN_NET']; //     "PELUNASAN_NET": "-1.00",
+     string BIAYA = 9 [json_name='BIAYA']; //     "BIAYA": "1.00",
+     string PELUNASAN = 10 [json_name='PELUNASAN']; //     "PELUNASAN": "0.00",
+     string AMT_CREDIT = 11 [json_name='AMT_CREDIT']; //     "AMT_CREDIT": "-1.00",
+     string PENALTY_ADJUSTMENT = 12 [json_name='PENALTY_ADJUSTMENT']; //     "PENALTY_ADJUSTMENT": "0.00",
+     string TAX_ADJUSTMENT = 13 [json_name='TAX_ADJUSTMENT']; //     "TAX_ADJUSTMENT": "0.00",
+     string REMARK2 = 14 [json_name='REMARK2']; //     "REMARK2": "InquiryLNTest2",
+     string CUST_NAME = 15 [json_name='CUST_NAME']; //     "CUST_NAME": "SARNO",
+     string ACCT_CURR = 16 [json_name='ACCT_CURR']; //     "ACCT_CURR": "IDR"
+     string PENALTY = 17 [json_name='PENALTY']; //     "PENALTY": "0.00",
+     string WITHHOLDING_TODAY = 18 [json_name='WITHHOLDING_TODAY']; //     "WITHHOLDING_TODAY": ""00000005179.00"
+     string FEDERAL_WH_TERM = 19 [json_name='FEDERAL_WH_TERM']; //     "FEDERAL_WH_TERM": ""00000005179.00"
+
+}
+
+message DepositInquiryTDPinaltiResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DepositInquiryTDPinalti data = 4;
+}
+
+
+message DepositInquiryRateNegoRespons{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DepositInquiryRateNego data = 4;
+}
+
+message DepositInquiryCIFRequest{
+    string ACCT_NO	 = 1 [json_name='ACCT_NO'];
+}
+
+message DepositInquiryCIFRespons{
+    string ERROR_CODE = 1 [json_name='ERROR_CODE']; // "ERROR_CODE": "AS-000",
+     string RESPONSE_CODE = 2 [json_name='RESPONSE_CODE']; // "RESPONSE_CODE": "00",
+     string RESPONSE_MESSAGE = 3 [json_name='RESPONSE_MESSAGE']; // "RESPONSE_MESSAGE": "Transaction Successfully",
+     string ACCT_NO = 4 [json_name='ACCT_NO']; // "ACCT_NO": "020601500741152",
+     string NIK = 5 [json_name='NIK']; // "NIK": "025342742017000",
+     string CIF = 6 [json_name='CIF']; // "CIF": "B707113",
+     string BRANCH = 7 [json_name='BRANCH']; // "BRANCH": "0230",
+     string CUST_NAME = 8 [json_name='CUST_NAME']; // "CUST_NAME": "PT  BIMA PALMA NUGRAHA",
+     string HP_NO = 9 [json_name='HP_NO']; // "HP_NO": "0217996139",
+     string EMAIL = 10 [json_name='EMAIL']; // "EMAIL": "",
+     string ADDRESS1 = 11 [json_name='ADDRESS1']; // "ADDRESS1": "JL WARUNG BUNCIT RAYA NO 49",
+     string ADDRESS2 = 12 [json_name='ADDRESS2']; // "ADDRESS2": "MAMPANG PRAPATAN JAKARTA SELATAN",
+     string ADDRESS3 = 13 [json_name='ADDRESS3']; // "ADDRESS3": "JAKARTA SELATAN",
+     string ADDRESS4 = 14 [json_name='ADDRESS4']; // "ADDRESS4": "MAMPANG PRAPATAN JAKARTA SELATAN",
+     string ZIPCODE = 15 [json_name='ZIPCODE']; // "ZIPCODE": "000012790",
+     string RT_NO = 16 [json_name='RT_NO']; // "RT_NO": "",
+     string RW_NO = 17 [json_name='RW_NO']; // "RW_NO": "",
+     string PLACE_OF_BIRTH = 18 [json_name='PLACE_OF_BIRTH']; // "PLACE_OF_BIRTH": "JAKARTA",
+     string DATE_OF_BIRTH = 19 [json_name='DATE_OF_BIRTH']; // "DATE_OF_BIRTH": "16082005",
+     string SEX = 20 [json_name='SEX']; // "SEX": "M",
+     string CITIZENSHIP = 21 [json_name='CITIZENSHIP']; // "CITIZENSHIP": "ID",
+     string ID_TYPE = 22 [json_name='ID_TYPE']; // "ID_TYPE": "NP",
+     string ID_NO = 23 [json_name='ID_NO']; // "ID_NO": "025342742017000",
+     string RELIGION = 24 [json_name='RELIGION']; // "RELIGION": "ISL",
+     string MARTIAL_STATUS = 25 [json_name='MARTIAL_STATUS']; // "MARTIAL_STATUS": "",
+     string MOTHER_NAME = 26[json_name='MOTHER_NAME']; // "MOTHER_NAME": ".",
+     string NPWP = 27 [json_name='NPWP']; // "NPWP": "",
+     string PENDIDIKAN_CODE = 28 [json_name='PENDIDIKAN_CODE']; // "PENDIDIKAN_CODE": "",
+     string PENDIDIKAN_DESC = 229 [json_name='PENDIDIKAN_DESC']; // "PENDIDIKAN_DESC": ""
+}
+
+message DepositWithdrawRequest{
+    string TD_ACCOUNT = 1 [json_name='TD_ACCOUNT'];    // "TD_ACCOUNT": "001901000333408",
+        // Tipe penalti. Isi untuk pencairan tanpa bilyet.
+    // 01 : Tanpa penalti
+    // 02 : Penalti bunga berjalan
+    // 03 : Penalti penuh
+    string PENALTY_TYPE = 2 [json_name='PENALTY_TYPE']; // "PENALTY_TYPE":"01",
+    string DEBIT_AMOUNT = 3 [json_name='DEBIT_AMOUNT']; // "DEBIT_AMOUNT": "14990000.00",
+    string TD_WITHDRAWAL_CASH = 4 [json_name='TD_WITHDRAWAL_CASH']; // "TD_WITHDRAWAL_CASH": "15122989.00",
+    string PROVISION_AMOUNT = 5 [json_name='PROVISION_AMOUNT']; // "PROVISION_AMOUNT": "3000.00",
+    string BUY_RATE = 6 [json_name='BUY_RATE']; // "BUY_RATE": "10000000",
+    string SELL_RATE = 7 [json_name='SELL_RATE']; // "SELL_RATE": "10000000",
+    string BUY_BOOKING_RATE = 8 [json_name='BUY_BOOKING_RATE']; // "BUY_BOOKING_RATE": "10000000",
+    string SELL_BOOKING_RATE = 9 [json_name='SELL_BOOKING_RATE']; // "SELL_BOOKING_RATE": "10000000",
+    string CR_GL_CASH_IDR = 10 [json_name='CR_GL_CASH_IDR']; // "CR_GL_CASH_IDR": "1000.00",
+    string CR_GL_IBT_CHARGES = 11 [json_name='CR_GL_IBT_CHARGES']; // "CR_GL_IBT_CHARGES": "1000.00",
+    string WAVE_TD_PENALTY_AMOUNT = 12 [json_name='WAVE_TD_PENALTY_AMOUNT']; // "WAVE_TD_PENALTY_AMOUNT": "3000.00",
+    string FEE_AMOUNT = 13 [json_name='FEE_AMOUNT']; // "FEE_AMOUNT": "5000.00",
+    string TD_WITH_HOLDING_TAX_AMOUNT = 14 [json_name='TD_WITH_HOLDING_TAX_AMOUNT']; // "TD_WITH_HOLDING_TAX_AMOUNT": "2000.00",
+    string ADJUST_WITH_HOLDING_TAX_AMOUNT = 15 [json_name='ADJUST_WITH_HOLDING_TAX_AMOUNT']; // "ADJUST_WITH_HOLDING_TAX_AMOUNT": "2000.00",
+    string CREDIT_ACCOUNT = 16 [json_name='CREDIT_ACCOUNT']; // "CREDIT_ACCOUNT": "020601047109502",
+    string CREDIT_AMOUNT = 17 [json_name='CREDIT_AMOUNT']; // "CREDIT_AMOUNT": "14990000.00",
+    string PENALTY_ATAS_TERM_TO_DATE_INTEREST = 18 [json_name='PENALTY_ATAS_TERM_TO_DATE_INTEREST']; // "PENALTY_ATAS_TERM_TO_DATE_INTEREST": "2000.00",
+    string EFFECTIVE_DATE = 19 [json_name='EFFECTIVE_DATE']; // "EFFECTIVE_DATE": "031220",
+    string REVERSAL = 20 [json_name='REVERSAL']; // "REVERSAL": "",
+    string DEBIT_CURRENCY = 21 [json_name='DEBIT_CURRENCY']; // "DEBIT_CURRENCY": "IDR",
+    string CREDIT_CURRENCY = 22 [json_name='CREDIT_CURRENCY']; // "CREDIT_CURRENCY": "IDR",
+    string REMARKS1 = 23 [json_name='REMARKS1']; // "REMARKS1": "TEST TD WITHDRAW TUNAI",
+    string REMARKS2 = 24 [json_name='REMARKS2']; // "REMARKS2": "TEST TD WITHDRAW TUNAI 2",
+    string REMARKS3 = 25 [json_name='REMARKS3']; // "REMARKS3": "DIAN PERMANA-001901000022405"
+}
+
+message DepositoWithdrwal {
+    string ERROR_CODE = 1 [json_name='ERROR_CODE'];   // "ERROR_CODE": "AS-000",
+    string RESPONSE_CODE = 2 [json_name='RESPONSE_CODE'];   // "RESPONSE_CODE": "00",
+    string RESPONSE_MESSAGE = 3 [json_name='RESPONSE_MESSAGE'];   // "RESPONSE_MESSAGE": "Transaction Successfully",
+    string TRANCODE1 = 4 [json_name='TRANCODE1'];   // "TRANCODE1": "3027",
+    string JOURNAL_SEQ1 = 5 [json_name='JOURNAL_SEQ1'];   // "JOURNAL_SEQ1": "7506066",
+    string TELLER_ID = 6 [json_name='TELLER_ID'];   // "TELLER_ID": "0206051",
+    string NEED_APPROVAL = 7 [json_name='NEED_APPROVAL'];   // "NEED_APPROVAL": "N"
+}
+
+message DepositWithdrawRespons{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DepositoWithdrwal data = 4;
+}
+
+
+message DepositInquiryTDRequest{
+    string REMARK2	 = 1 [json_name='REMARK2'];     // "REMARK2":"InquiryLNTest2",
+    string ACCT_NO	 = 2 [json_name='ACCT_NO'];     // "ACCT_NO":"001901000191408"
+}
+message DepositInquiryTD{
+    string ERROR_CODE	 = 1 [json_name='ERROR_CODE'];    //"ERROR_CODE": "AS-000",
+    string RESPONSE_CODE	 = 2 [json_name='RESPONSE_CODE'];    // "RESPONSE_CODE": "00",
+    string RESPONSE_MESSAGE	 = 3 [json_name='RESPONSE_MESSAGE'];    // "RESPONSE_MESSAGE": "Transaction Successfully",
+    string REMARK2	 = 4 [json_name='REMARK2'];    // "REMARK2": "InquiryTDTest2",
+    string REMARK3	 = 5 [json_name='REMARK3'];    // "REMARK3": "InquiryTDTest3",
+    string ACCT_NO	 = 6 [json_name='ACCT_NO'];    // "ACCT_NO": "020601057415406",
+    string BRANCH	 = 7 [json_name='BRANCH'];    // "BRANCH": "00206",
+    string CUST_NAME	 = 8 [json_name='CUST_NAME'];    // "CUST_NAME": "IDA HAMIDAH",
+    string PRODUCT_TYPE	 = 9 [json_name='PRODUCT_TYPE'];    // "PRODUCT_TYPE": "DO",
+    string ACCT_CURR	 = 10 [json_name='ACCT_CURR'];    // "ACCT_CURR": "IDR",
+    string ID_NO	 = 11 [json_name='ID_NO'];    // "ID_NO": "6371031605980007",
+    string STATUS	 = 12 [json_name='STATUS'];    // "STATUS": "1",
+    string BILYET_NO	 = 13[json_name='BILYET_NO'];    // "BILYET_NO": "00006128082",
+    string DATE_OPEN	 = 14 [json_name='DATE_OPEN'];    // "DATE_OPEN": "0190621",
+    string TERM_OF_INTEREST	 = 15 [json_name='TERM_OF_INTEREST'];    // "TERM_OF_INTEREST": "001",
+    string LAST_RENEWAL_DATE	 = 16 [json_name='LAST_RENEWAL_DATE'];    // "LAST_RENEWAL_DATE": "0000000",
+    string BEGINNING_BAL	 = 17 [json_name='BEGINNING_BAL'];    // "BEGINNING_BAL": "0000012000000.00",
+    string MATURITY_DATE	 = 18 [json_name='MATURITY_DATE'];    // "MATURITY_DATE": "0180721",
+    string PRINCIPLE_AMT	 = 19 [json_name='PRINCIPLE_AMT'];    // "PRINCIPLE_AMT": "0000012000000.00",
+    string RATE	 = 20 [json_name='RATE'];    // "RATE": "0.010000",
+    string PAID_AMT	 = 21 [json_name='PAID_AMT'];    // "PAID_AMT": "0000012000329.00",
+    string PENDING_INTEREST	 = 22 [json_name='PENDING_INTEREST'];    // "PENDING_INTEREST": "00000000000.00",
+    string ACCRUE_INTEREST	 = 23 [json_name='ACCRUE_INTEREST'];    // "ACCRUE_INTEREST": "0000000000329.00",
+    string TAX_ACCRUE_INTEREST	 = 24 [json_name='TAX_ ACCRUE_INTEREST'];    // "TAX_ ACCRUE_INTEREST": "00000000462.00",
+    string HOLD_AMT	 = 25 [json_name='HOLD_AMT'];    // "HOLD_AMT": "0000000000000.00",
+    string STMT_PASSBOOK	 = 26 [json_name='STMT_PASSBOOK'];    // "STMT_PASSBOOK": "",
+    string FLOAT_BAL	 = 27 [json_name='FLOAT_BAL'];    // "FLOAT_BAL": "0000000000000.00",
+    string ARO	 = 28 [json_name='ARO'];    // "ARO": "Y",
+    string PENALTY_AMT	 = 29 [json_name='PENALTY_AMT'];    // "PENALTY_AMT": "00000000000.00",
+    string TERM_TO_DATE_INT	 = 30 [json_name='TERM_TO_DATE_INT'];    // "TERM_TO_DATE_INT": "00000002303.00",
+    string WITHHOLDING_TODAY	 = 31 [json_name='WITHHOLDING_TODAY'];    // "WITHHOLDING_TODAY": "00000000462.00",
+    string FEDERAL_WH_TERM	 = 32 [json_name='FEDERAL_WH_TERM'];    // "FEDERAL_WH_TERM": "00000000462.00",
+    string PENALTY_TTD	 = 33 [json_name='PENALTY_TTD'];    // "PENALTY_TTD": "00000002303.00",
+    string PENALTY_ACC_INT	 = 34 [json_name='PENALTY_ACC_INT'];    // "PENALTY_ACC_INT": "0000000000329.00",
+    string PENALTY_TTD_PCT	 = 35 [json_name='PENALTY_TTD_PCT'];    // "PENALTY_TTD_PCT": "0.250000",
+    string PENALTY_ACC_INT_PCT	 = 36 [json_name='PENALTY_ACC_INT_PCT'];    // "PENALTY_ACC_INT_PCT": "1.000000",
+    string PENALTY_FR_HOST	 = 37 [json_name='PENALTY_FR_HOST'];    // "PENALTY_FR_HOST": "00000000000.00",
+    string TAX_DEDUCTION	 = 38 [json_name='TAX_DEDUCTION'];    // "TAX_DEDUCTION": "00000000000.00",
+    string TENOR	 = 39 [json_name='TENOR'];    // "TENOR": "00029",
+    string TENOR_UNIT	 = 40 [json_name='TENOR_UNIT'];    // "TENOR_UNIT": "D"
+}
+
+message DepositInquiryTDRespons{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DepositInquiryTD data = 4;
+}
+
+
+// workflow strucktur 
+
+message Participant {
+    uint64 userID = 1;
+    string userName = 2;
+    uint64 roleID = 3;
+    bool isReject = 5;
+    google.protobuf.Timestamp approvedAt = 6;
+    string step = 7;
+}
+
+message Participants {
+    int32 approvedCount = 1;
+    int32 rejectedCount = 2;
+    int32 Requirement = 3;
+    repeated Participant participants = 4;
+}
+
+message Flow {
+    uint64 workflowLogicID = 1;
+    Participants verifier = 2;
+    Participants approver = 3;
+    Participants releaser = 4;
+    bool isRejected = 5;
+    google.protobuf.Timestamp completedAt = 7;
+    int32 verCurrPriority = 8;
+    int32 appCurrPriority = 9;
+    int32 relCurrPriority = 10;
+    repeated uint64 approvedUserIDs = 11;
+    repeated uint32 listRoles = 12;
+}
+
+
+message WorkflowRecords {
+    google.protobuf.Timestamp lastUpdatedAt = 1;
+    uint64 topRange = 2;
+    uint64 bottomRange = 3;
+    repeated Flow flows = 4;
+}
+
+message UserData {
+    uint64 userID = 1;
+    string username = 2;
+}
+
+message MakerData {
+    uint64 userID = 1;
+    string userName = 2;
+}
+
+message WorkflowHeader {
+    uint64 productID = 1;
+    string productName = 2;
+    uint64 currencyID = 3;
+    string currencyName = 5;
+    uint64 companyID = 6;
+    string companyName = 7;
+    uint64 transactionalNumber = 10;
+    uint64 workflowID = 11;
+    MakerData maker = 12;
+    uint64 uaID = 13; // used account id
+}
+
+message RejectedBy {
+    uint64 userID = 1;
+    string rejecterName = 2;
+    uint64 roleID = 3;
+    string roleName = 4;
+    google.protobuf.Timestamp rejectedAt = 5;
+}
+
+message WorkflowPayload {
+    WorkflowHeader header = 1;
+    WorkflowRecords records = 2;
+    UserData createdBy = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    bool isDefault = 5;
+    bool isTransactional = 6;
+    repeated uint64 currentRoleIDs = 7;
+    string currentStep = 8;
+    repeated uint64 participantUserIDs = 9;
+}
+
+message WorkflowDataStatus {
+    WorkflowPayload workflow = 1;
+    string nextStatus = 2;
+    string nextStep = 3;
+    repeated uint64 transaction_svc_id = 4;
+}
+
+
+// end workflow strucktur 
+
+
+// notification
+message DepositoNotificationData {
+
+    // task data 
+    string USERNAME_MAKER = 1 [json_name='USERNAME_MAKER'];
+    string USERNAME_CHECKER = 2 [json_name='USERNAME_CHECKER'];
+    string USERNAME_APPROVER = 3 [json_name='USERNAME_APPROVER'];
+    string USERNAME_RELEASER = 4 [json_name='USERNAME_RELEASER'];
+    string CHECKER_DATE = 5 [json_name='CHECKER_DATE'];
+    string APPROVER_DATE = 6 [json_name='APPROVER_DATE'];
+    string RELEASER_DATE = 7 [json_name='RELEASER_DATE'];
+    string USERNAME_REJECTOR = 8 [json_name='USERNAME_REJECTOR'];
+    string TASK_ID = 9 [json_name='TASK_ID'];
+    // create task date
+    string CREATED_DATETIME = 10 [json_name='CREATED_DATETIME'];
+    string CREATED_DATE = 11 [json_name='CREATED_DATE'];
+    string CREATED_TIME = 12 [json_name='CREATED_TIME'];
+    // update task data
+    string EVENT_DATETIME = 13 [json_name='EVENT_DATETIME'];
+    string EVENT_DATE = 14 [json_name='EVENT_DATE'];
+    string EVENT_TIME = 15 [json_name='EVENT_TIME'];
+
+    // deposito data 
+    string ACCOUNT_TD = 16 [json_name='ACCOUNT_TD'];
+    string ACCOUNT_SOURCE = 17 [json_name='ACCOUNT_SOURCE'];
+    string ACCOUNT_PRINCIPAL = 18 [json_name='ACCOUNT_PRINCIPAL'];
+    string ACCOUNT_INTEREST = 19 [json_name='ACCOUNT_INTEREST'];
+    string CURRENCY_NAME = 20 [json_name='CURRENCY_NAME'];
+    string AMOUNT = 21 [json_name='AMOUNT'];
+    string CODE = 22 [json_name='CODE'];
+    string DEPOSIT_TYPE = 23 [json_name='DEPOSIT_TYPE'];
+    string DEPOSIT_NAME = 24 [json_name='DEPOSIT_NAME'];
+    string INTEREST_RATE = 25 [json_name='INTEREST_RATE'];
+    string TENOR = 26 [json_name='TENOR'];
+    string VOUCHER = 27 [json_name='VOUCHER'];
+    string STATUS_DEPOSIT = 28 [json_name='STATUS_DEPOSIT'];
+    string OPEN_DATE = 29 [json_name='OPEN_DATE'];
+    string WITHDRAW_AT = 30 [json_name='WITHDRAW_AT'];
+    string TRANSACTION_ID = 70 [json_name='TRANSACTION_ID'];
+    
+ 
+
+    // TASK
+    string COMPANY_NAME = 31 [json_name='COMPANY_NAME'];
+    string MODULE = 32 [json_name='MODULE'];
+    string MESSAGE = 33 [json_name='MESSAGE'];
+    string TEMPLATE = 34 [json_name='TEMPLATE'];
+    string STATUS_SEND = 35 [json_name='STATUS_SEND'];
+    string STATUS_ACTION = 36 [json_name='STATUS_ACTION'];
+    string STATUS_REQUEST_DELETE = 37 [json_name='STATUS_REQUEST_DELETE'];
+    string REASON = 38 [json_name='REASON'];
+    string COMMENT = 39 [json_name='COMMENT'];
+
+
+    string FEATURE = 40 [json_name='FEATURE'];
+}
+
+message ListDepositoAccountResponse {
+    uint32 status_code = 1;
+    string error_code = 2;
+    string response_code = 3;
+    string response_message = 4;
+    string errors = 5;
+    repeated DepositoDetails data = 6;
+    PaginationResponse pagination = 7;
+}
+
+message DepositoDetails {
+    string deposito_account = 1 [json_name='depositoAccount'];
+    string cif = 2 [json_name='cif']; 
+    string company_id = 3 [json_name='companyId'];
+    string company_code = 4 [json_name='companyCode'];
+    string company_name = 5 [json_name='companyName'];
+    string deposito_name = 6 [json_name='depositoName'];
+    string currency = 7 [json_name='currency'];
+    string placement_date = 8 [json_name='placementDate'];
+    string due_date = 9 [json_name='maturedDate'];
+    string status = 10  [json_name='status'];
+    string deposito_id = 11 [json_name='depositoId'];
+    string last_update = 12 [json_name='lastUpdate'];
+}
+
+message ListDepositoAccountRequest {
+    int32 page = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+	}];
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    string query = 3;
+    string filter = 4;
+    string sort = 5;
+    SortDirection dir = 6;
+}
+
+
+message DownloadListDepositoRequest{
+    string filter = 1;
+    string sort = 2;
+    SortDirection dir = 3;
+    FormatTemplate format_file = 4 [json_name='formatFile'];
+    int32 page = 5;
+    int32 limit = 6;
+}
+
+enum FormatTemplate {
+	UNKNOWN_FORMATTEMPLATE = 0;
+	CSV = 1;
+	XLSX = 2;
+	PDF = 3;
+  }

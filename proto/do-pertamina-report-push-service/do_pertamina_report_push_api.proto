@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "do-pertamina-report-push-service/do_pertamina_report_push_payload.proto";
+
+package do_pertamina_report_push.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "BRICaMS ADDONS GRPC DO Pertamina Report Push Service";
+    version: "1.0";
+  }
+
+  schemes: HTTP;
+  // schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service DOPertaminaReportPushService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pertamina/health-check"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Health Check"]
+      summary: "Health Check DO Pertamina Report Push"
+      description: "This API for health check DO Pertamina Report Push"
+    };
+  };
+
+  rpc ReportPush(ReportPushRequest) returns (ReportPushResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/report-push"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Report Push"]
+      summary: "Report Push DO Pertamina"
+      description: "This API for report push DO Pertamina"
+    };
+  };
+}

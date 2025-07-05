@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+package update_user.service.v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "update-user-service/update_user_payload.proto";
+
+option go_package = "./pb";
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  security_definitions: {
+    security: {
+      key: "bearer"
+      value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "Authorization"
+        description: "Authentication token, prefixed by Bearer: Bearer <token>"
+      }
+    }
+  }
+  security: {
+    security_requirement: {key: "bearer"}
+  }
+};
+
+service UpdateUserService {
+  rpc HealthCheck(Empty) returns (HealthCheckResponse) {
+    option (google.api.http) = {get: "/api/update-user/health"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: {} /* Disable security key */
+      summary: "Health Check"
+      tags: ["HealthCheck"]
+      description: "This API for check health server"
+    };
+  }
+
+  rpc GetListUserRequest(GetListUserRequestRequest) returns (GetListUserRequestResponse) {
+    option (google.api.http) = {
+      post: "/api/update-user/list"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["ListUser"]
+      // security: {} // Disable security key
+      summary: "List User Request"
+      description: "This API to get list user request"
+    };
+  }
+
+  rpc GetUserRequestDetail(GetUserRequestDetailRequest) returns (GetUserRequestDetailResponse) {
+    option (google.api.http) = {
+      post: "/api/update-user/detail"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["UserDetail"]
+      // security: {} // Disable security key
+      summary: "Get User Request Detail"
+      description: "This API to get user request detail by task ID"
+    };
+  }
+
+  rpc GetListUserRequestNDS(GetListUserRequestNDSRequest) returns (GetListUserRequestNDSResponse) {
+    option (google.api.http) = {
+      post: "/api/update-user/list-nds"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["ListUserNDS"]
+      // security: {} // Disable security key
+      summary: "List User Request"
+      description: "This API to get list user request"
+    };
+  }
+
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      post: "/api/update-user/task/{taskId}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["UpdateUser"]
+      security: {} /* Disable security key */
+      summary: "Create Request Update User"
+      description: "This API to update or insert into pegadaian DB"
+    };
+  }
+
+  rpc DownloadTemplate(DownloadTemplateRequest) returns (DownloadTemplateResponse) {
+    option (google.api.http) = {
+      post: "/api/update-user/download-template"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Template"]
+      summary: "Download Template File"
+      description: "This API to download template surat kuasa in account registration"
+    };
+  }
+
+  rpc ActionUpdateUser(ActionUpdateUserRequest) returns (ActionUpdateUserResponse) {
+    option (google.api.http) = {
+      post: "/api/update-user/action"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["ActionUpdateUser"]
+      summary: "Action Update User"
+      description: "This API to action update user"
+    };
+  }
+
+  rpc ActionUpdateUserNDS(ActionUpdateUserNDSRequest) returns (ActionUpdateUserTaskResponse) {
+    option (google.api.http) = {
+      post: "/api/update-user/action-nds"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["ActionUpdateUser"]
+      summary: "Action Update User for NDS"
+      description: "This API to action update user for NDS"
+    };
+  }
+}

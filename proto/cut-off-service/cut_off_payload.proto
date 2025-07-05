@@ -1,0 +1,788 @@
+syntax = "proto3";
+
+import "cut-off-service/cut_off_gorm_db.proto";
+
+package cut.off.service.v1;
+option go_package = "./pb";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+}
+
+enum TaskStatus {
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+    RequestForDelete = 6;
+    Deleted = 7;
+}
+
+enum TaskStep {
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string updatedByName = 11;
+    string reasons = 12;
+    string comment = 13;
+    string workflow = 14;
+    uint64 companyID = 15;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+enum SortDirection {
+    DESC = 0;
+    ASC = 1;
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message ListProductUsedReq {
+    string scheduleType = 1; 
+}
+
+message ListProductUsedRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated module data = 4;
+}
+
+message module {
+    uint64 moduleID = 1; 
+    string name = 2;
+    string currency = 3;
+}
+
+message scheduleTime {
+    string startTime = 1 [(validator.field) = {regex: "^\\d{2}:\\d{2}$"}];
+    string endTime = 2 [(validator.field) = {regex: "^\\d{2}:\\d{2}$"}];
+}
+
+// message repeat {
+//     string repeatPattern = 1;
+//     repeated string pattern = 6;
+// }
+
+message CutOffData  {
+    uint64 scheduleID = 1;
+    string scheduleName = 2 [(validator.field) = {regex: "^.*\\S.*$"}];
+    string scheduleDescription = 3 [(validator.field) = {regex: "^.*\\S.*$"}];
+    repeated module modules = 4;
+    repeated scheduleTime scheduleTimes= 5;
+    repeated string repeatOn = 6;
+    string repeatPattern = 7;
+    bool saved = 8;
+    string status = 9;
+    google.protobuf.Timestamp createdAt = 16;
+    uint64 createdByID = 17;
+    google.protobuf.Timestamp updatedAt = 18;
+    uint64 updatedByID = 19;
+    google.protobuf.Timestamp deletedAt = 20; 
+    uint64 deletedByID = 21; 
+}
+
+
+message CreateCutOffTaskRequest{
+    CutOffData data = 1;
+    uint64 taskID = 2;
+    bool isDraft = 3;
+}
+
+message TaskData {
+    Task task = 1;
+    CutOffData data = 2;
+}
+
+message CreateCutOffTaskResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskData data = 4; 
+}
+
+message CutOffTaskActionRequest{
+    uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject', 'delete'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+}
+
+message CutOffTaskActionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskData data = 4;
+}
+
+message ListCutOffTaskRequest {
+    message TaskListFilter{
+        string scheduleName = 2;
+        string module = 3;
+        string createdBy = 4;
+        string reviewedBy = 5;
+        string dateCreated = 6;
+        string dateModified = 7;
+
+        string status = 50;
+        string custom = 51;
+    }
+    
+    TaskStatus status = 1;
+    TaskStep step = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5;
+    SortDirection dir = 6;
+    TaskListFilter filter = 7;
+    string search = 8;
+    string in = 10;
+    bool myTaskOnly = 9;
+}
+
+message ListCutOffTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TaskData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message FileListCutOffTaskRequest {
+    
+    TaskStatus status = 1;
+    TaskStep step = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 5;
+    SortDirection dir = 6;
+    ListCutOffTaskRequest.TaskListFilter filter = 7;
+    string search = 8;
+    bool myTaskOnly = 9;
+
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 25;
+}
+
+message GetCutOffTaskByIDRequest {
+    uint64 taskID = 1;
+}
+
+message GetCutOffTaskByIDResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskData data = 4;
+}
+
+message ListCutOffDataRequest {
+    message DataListFilter{
+        // string beneficiaryCountry = 1;
+        // string beneficiaryBank = 2;
+        // string dateCreated = 3;
+        // string dateModified = 4;
+        // string createdBy = 5;
+        // string reviewerName = 6;
+        // string currency = 7;
+
+        string custom = 50;
+    }
+
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 3;
+    SortDirection dir = 4;
+    DataListFilter filter = 5;
+    string search = 6;
+
+}
+
+
+message ListCutOffDataScheduleTodayRequest {
+    string Product = 6;
+}
+message ListCutOffDataScheduleTodayRespons {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    google.protobuf.Timestamp timeExecute = 20; 
+    bool cutOffAvaibility = 6;
+}
+
+
+message ListCutOffDataScheduleRequest {
+    string Product = 6;
+}
+
+message dayproduct {
+    string name = 1;
+    repeated scheduleTime scheduleTime = 2;
+}
+
+message scheduledCutOff{
+    string day = 1;
+    repeated dayproduct product = 2;
+}
+
+message ListCutOffScheduledDataResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated scheduledCutOff data = 4;
+    PaginationResponse pagination = 5;
+}
+
+
+message scheduleTimeByTime {
+    string startTime = 1;
+    string endTime = 2;
+    repeated string module = 3;
+}
+
+message scheduledCutOffByTime{
+    string day = 1;
+    repeated scheduleTimeByTime timeDay = 2;
+}
+
+message ListCutOffScheduledDataByTimeResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated scheduledCutOffByTime data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ListCutOffDataResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated CutOffData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message cutOffTemplate {
+    uint64 scheduleID = 1;
+    string scheduleName = 2;
+}
+
+message ListCutOffDataTemplateResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated cutOffTemplate data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message GetCutOffDataByIDRequest {
+    uint64 ScheduleID = 1;
+}
+
+message GetCutOffDataByIDResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    CutOffData data = 4;
+}
+
+message SaveCutOffDataRequest {
+    CutOffData data = 1;
+}
+
+message SaveCutOffDataResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    CutOff data = 4;
+}
+
+
+message ArrayString {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated string data = 4;
+}
+
+message HolidaySchedule {
+    string date = 1 [(validator.field) = {regex: "^(saturday)$|^(sunday)$|^\\d{4}-\\d{2}-\\d{2}$"}];
+    string label = 2 [(validator.field) = {regex: "^.*\\S.*$"}];
+    string pattern = 3 [(validator.field) = {regex: "^(Yearly)|(Monthly)|(Weekend)|(yearly)|(monthly)|(Adhoc)|(adhoc)$"}];
+}
+
+message HolidayModule {
+    uint64 moduleID = 1;
+    string name = 2;
+}
+
+message GetHolidayDataRes {
+    uint64 scheduleID = 1;
+    string scheduleName = 2;
+    string scheduleDescription = 3;
+    string scheduleDate = 4;
+    string scheduleLabel = 8;
+    string schedulePattern = 9;
+    uint64 moduleID = 5;
+    string moduleName= 10;
+    bool saved = 6;
+    string status = 7;
+    uint64 taskID = 11;
+    google.protobuf.Timestamp createdAt = 16;
+    uint64 createdByID = 17;
+    google.protobuf.Timestamp updatedAt = 18;
+    uint64 updatedByID = 19;
+    google.protobuf.Timestamp deletedAt = 20; 
+    uint64 deletedByID = 21; 
+}
+
+message HolidayData {
+    uint64 scheduleID = 1;
+    string scheduleName = 2 [(validator.field) = {regex: "^.*\\S.*$"}];
+    string scheduleDescription = 3 [(validator.field) = {regex: "^.*\\S.*$"}];
+    repeated HolidaySchedule scheduleDates = 4;
+    repeated HolidayModule modules = 5;
+    bool saved = 6;
+    string status = 7;
+    google.protobuf.Timestamp createdAt = 16;
+    uint64 createdByID = 17;
+    google.protobuf.Timestamp updatedAt = 18;
+    uint64 updatedByID = 19;
+    google.protobuf.Timestamp deletedAt = 20; 
+    uint64 deletedByID = 21;
+    string countryCode = 22;
+}
+
+message HolidayTaskData {
+    Task task = 1;
+    HolidayData data = 2;
+}
+
+message HolidayTaskDataV2 {
+    Task task = 1;
+    HolidayData holiday = 2;
+}
+
+message CreateHolidayTaskRequest {
+    HolidayData data = 1;
+    uint64 taskID = 2;
+    bool isDraft = 3;
+}
+
+message CreateHolidayTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message GetHolidayTaskRequest {
+
+    TaskStatus status = 1;
+    TaskStep step = 2;
+
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    SortDirection dir = 6;
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string search = 9;
+}
+
+message GetHolidayTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated HolidayTaskDataV2 data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message GetHolidayTaskByIDRequest {
+    uint64 taskID = 1;
+    bool myTaskOnly = 2;
+}
+
+message GetHolidayTaskByIDResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    HolidayTaskData data = 4;
+}
+
+message GetHolidayRequest {
+    Holiday holiday = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    SortDirection dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+
+message GetHolidayResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated GetHolidayDataRes data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message GetHolidayByFeatureIDRequest {
+    uint64 featureID = 1;
+}
+
+message GetHolidayByFeatureIDResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    HolidayData data = 4;
+}
+
+message CreateHolidayRequest {
+    HolidayData data = 1;
+    uint64 taskID = 2;
+}
+
+message CreateHolidayResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message DeleteHolidayRequest {
+    uint64 taskID = 2;
+}
+
+message HolidayTaskActionRequest{
+    uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject', 'delete'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+}
+
+message HolidayTaskActionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+}
+
+message GetHolidaySchedulesRequest {
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    SortDirection dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+}
+
+message GetHolidaySchedulesResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated HolidayScheduleRes data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message HolidayScheduleRes {
+    string date = 1;
+    string label = 2;
+    string pattern = 3;
+    uint64 moduleID = 4;
+    string moduleName = 5;
+}
+
+message DownloadListHolidayTaskRequest {
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 1;
+
+    TaskStatus status =2;
+    TaskStep step = 3;
+    string search = 10;
+
+    int32 limit = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    SortDirection dir = 7;
+    string filter = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+}
+
+message HolidayNotificationData {
+    string USERNAME_MAKER = 1 [json_name='USERNAME_MAKER'];
+    string USERNAME_APPROVER = 2 [json_name='USERNAME_APPROVER'];
+    string CREATED_DATETIME = 3 [json_name='CREATED_DATETIME'];
+    string CREATED_DATE = 4 [json_name='CREATED_DATE'];
+    string CREATED_TIME = 5 [json_name='CREATED_TIME'];
+    string EVENT_DATETIME = 6 [json_name='EVENT_DATETIME'];
+    string EVENT_DATE = 7 [json_name='EVENT_DATE'];
+    string EVENT_TIME = 8 [json_name='EVENT_TIME'];
+    string SCHEDULE_NAME = 9 [json_name='SCHEDULE_NAME'];
+    string SCHEDULE_DESCRIPTION = 10 [json_name='SCHEDULE_DESCRIPTION'];
+    string SCHEDULE_MODULES = 11 [json_name='SCHEDULE_MODULES'];
+    string SCHEDULE_DATES = 12 [json_name='SCHEDULE_DATES'];
+    // string CURRENCY_NAME = 13 [json_name='CURRENCY_NAME'];
+    string TASK_ID = 14 [json_name='TASK_ID'];
+    string USERNAME_REJECTOR = 15 [json_name='USERNAME_REJECTOR'];
+    string COMPANY_NAME = 16 [json_name='COMPANY_NAME'];
+    string USERNAME_CHECKER = 17 [json_name='USERNAME_CHECKER'];
+    string USERNAME_RELEASER = 18 [json_name='USERNAME_RELEASER'];
+    string MODULE = 19 [json_name='MODULE'];
+    string MESSAGE = 20 [json_name='MESSAGE'];
+    string TEMPLATE = 21 [json_name='TEMPLATE'];
+    string STATUS_SEND = 22 [json_name='STATUS_SEND'];
+    string STATUS_ACTION = 23 [json_name='STATUS_ACTION'];
+    string STATUS_REQUEST_DELETE = 24 [json_name='STATUS_REQUEST_DELETE'];
+    string REASON = 25 [json_name='REASON'];
+    string COMMENT = 26 [json_name='COMMENT'];
+}
+
+message CutOffNotificationData {
+    string USERNAME_MAKER = 1 [json_name='USERNAME_MAKER'];
+    string USERNAME_APPROVER = 2 [json_name='USERNAME_APPROVER'];
+    string CREATED_DATETIME = 3 [json_name='CREATED_DATETIME'];
+    string CREATED_DATE = 4 [json_name='CREATED_DATE'];
+    string CREATED_TIME = 5 [json_name='CREATED_TIME'];
+    string EVENT_DATETIME = 6 [json_name='EVENT_DATETIME'];
+    string EVENT_DATE = 7 [json_name='EVENT_DATE'];
+    string EVENT_TIME = 8 [json_name='EVENT_TIME'];
+    string SCHEDULE_NAME = 9 [json_name='SCHEDULE_NAME'];
+    string SCHEDULE_DESCRIPTION = 10 [json_name='SCHEDULE_DESCRIPTION'];
+    string SCHEDULE_MODULES = 11 [json_name='SCHEDULE_MODULES'];
+    string SCHEDULE_TIME = 12 [json_name='SCHEDULE_TIME'];
+    string SCHEDULE_DAY = 13 [json_name='SCHEDULE_DAY'];
+    // string CURRENCY_NAME = 13 [json_name='CURRENCY_NAME'];
+    string TASK_ID = 14 [json_name='TASK_ID'];
+    string USERNAME_REJECTOR = 15 [json_name='USERNAME_REJECTOR'];
+    string COMPANY_NAME = 16 [json_name='COMPANY_NAME'];
+    string USERNAME_CHECKER = 17 [json_name='USERNAME_CHECKER'];
+    string USERNAME_RELEASER = 18 [json_name='USERNAME_RELEASER'];
+    string MODULE = 19 [json_name='MODULE'];
+    string MESSAGE = 20 [json_name='MESSAGE'];
+    string TEMPLATE = 21 [json_name='TEMPLATE'];
+    string STATUS_SEND = 22 [json_name='STATUS_SEND'];
+    string STATUS_ACTION = 23 [json_name='STATUS_ACTION'];
+    string STATUS_REQUEST_DELETE = 24 [json_name='STATUS_REQUEST_DELETE'];
+    string REASON = 25 [json_name='REASON'];
+    string COMMENT = 26 [json_name='COMMENT'];
+}
+
+message GetAvailableTimeRequest {
+    string time = 1[(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "YYYY-MM-DD hh:mm",
+	}];
+    uint64 modulID = 2;
+    string currency = 3;
+    string countryCode = 4;
+}
+enum frequencies {
+    NULL_FREQUENCIES = 0;
+    Daily = 1;
+    Weekly = 2;
+    Monthly = 3;
+}
+
+enum days {
+    NULL_DAYS = 0;
+	Monday = 1;
+	Tuesday = 2;
+	Wednesday = 3;
+	Thursday = 4;
+	Friday = 5;
+	Saturday  = 6;
+    Sunday =7;
+}
+
+message GetAvailableTimeRecurringRequest {
+    string startDate = 1[
+        (validator.field) = {regex: "^\\d{4}-\\d{2}-\\d{2}$"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "This Field for define start date recurring format YYYY-MM-DD and this field mandatory",
+	}];
+    string endDate = 2[
+        (validator.field) = {regex: "^\\d{4}-\\d{2}-\\d{2}$"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "This Field for define end date recurring format YYYY-MM-DD and this field mandatory",
+	}];
+    days day =  3[
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "This Field for define day in week for frequency weekly recurring and mandatory when frequency choose weekly",}
+    ];
+    uint64 dateMonthly = 4[(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "This Field for define date number in motnhly for frequency motnhly recurring and mandatory when frequency choose weekly",
+	}];
+    string time = 5[
+        (validator.field) = {regex: "^\\d{2}:\\d{2}$"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {   
+		description: "This field for define time execution trancastion format is hh:mm 24 hours",
+	}];
+
+
+
+    
+    // (validator.field) = {regex: "^(Daily)|(Weekly)|(Monthly)|$"},
+
+    frequencies Frequency = 6[
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {   
+		description: "This Field for define frequency execution daily, monthly, and weekly",
+	}];
+    uint64 modulID = 7[(validator.field) = {regex: "^-?\\d+(\\.\\d+)?$"}];
+}
+
+message GetAvailableTimeResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Availabletime data  = 4;
+}
+
+message GetAvailableTimeRecurringResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Availabletime data  = 4;
+}
+
+message Availabletime {
+    bool isValid = 1;
+    bool isCutOff = 2;
+    bool isHoliday = 3;
+    string fastestAvailableTime = 4; 
+    string endTime = 5;
+}
+
+message GetHolidayPatternListRequest {
+
+}
+
+message GetHolidayPatternListResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated string data  = 4;
+}
+
+message GetWeekendDayListRequest {
+
+}
+
+message GetWeekendDayListResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated string data  = 4;
+}
+
+message GetAvailableCurrencyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated string data  = 4;
+}

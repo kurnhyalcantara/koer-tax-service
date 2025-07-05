@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+package share_folder_service.service.v1;
+option go_package = "./pb";
+

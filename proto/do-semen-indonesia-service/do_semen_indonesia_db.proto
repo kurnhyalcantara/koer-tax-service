@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package do_semen_indonesia.service.v1;
+
+import "do-semen-indonesia-service/do_semen_indonesia_core.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pb";
+
+message Orders {
+    uint64 order_id = 1;
+    uint64 task_id = 2;
+    string transaction_id = 3;
+    Status status = 4;
+    string debit_account = 5;
+    string debit_account_name = 6;
+    string debit_account_type = 7;
+    ScheduleType schedule_type = 8;
+    google.protobuf.Timestamp schedule_date = 9;
+    string delivery_order_number = 10;
+    string data_inquiry = 11;
+    uint64 created_by_id = 12;
+    string created_by_name = 13;
+    google.protobuf.Timestamp created_at = 14;
+    string updated_by_name = 15;
+    uint64 updated_by_id = 16;
+    google.protobuf.Timestamp updated_at = 17;
+    string name_of_distributor = 18;
+    string supplier = 19;
+    double total_amount = 20;
+    double amount = 21;
+    string address_of_distributor = 22;
+    uint64 company_id = 23;
+    string company_name = 24;
+    string workflow_doc = 25;
+    double fee = 26;
+    double fee_inquiry = 27;
+    google.protobuf.Timestamp transaction_date = 28;
+    string fee_account = 29;
+    string external_id = 30;
+};
+
+message Tasks {
+    uint64 task_id = 1;
+    uint64 company_id = 2;
+    uint64 holding_id = 3;
+    uint64 parents_id = 4;
+    string comment = 5;
+    string data = 6;
+    uint32 status = 7;
+    uint32 step = 8;
+    string type = 9;
+    uint64 feature_id = 10;
+    uint64 parent_id = 11;
+    bool is_parent_active = 12;
+    string reasons = 13;
+    string data_bak = 14;
+    string child_bak = 15;
+    string workflow_doc = 16;
+    google.protobuf.Timestamp approved_at = 17;
+    uint64 last_approved_by_id = 18;
+    string last_approved_by_name = 19;
+    google.protobuf.Timestamp rejected_at = 20;
+    uint64 last_rejected_by_id = 21;
+    string last_rejected_by_name = 22;
+    google.protobuf.Timestamp created_at = 23;
+    uint64 created_by_id = 24;
+    string created_by_name = 25;
+    google.protobuf.Timestamp updated_at = 26;
+    uint64 updated_by_id = 27;
+    string updated_by_name = 28;
+    google.protobuf.Timestamp deleted_at = 29;
+};
+
+message Result {
+    uint64 result_id = 1;
+    uint64 task_id = 2;
+    uint32 http_status_code = 3;
+    string response_code = 4;
+    string response_message = 5;
+    string external_id = 6;
+    string request_data = 7;
+    string response_data = 8;
+    google.protobuf.Timestamp date_hit = 9;
+    google.protobuf.Timestamp date_response = 11;
+    string created_by = 12;
+    google.protobuf.Timestamp created_dt = 13;
+    string updated_by = 14;
+    google.protobuf.Timestamp updated_dt = 15;
+  }

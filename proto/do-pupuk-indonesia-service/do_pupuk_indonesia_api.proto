@@ -1,0 +1,233 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/empty.proto";
+import "do-pupuk-indonesia-service/do_pupuk_indonesia_payload.proto";
+import "google/api/httpbody.proto";
+
+package do_pupuk_indonesia.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  security_definitions: {
+    security: {
+        key: "bearer"
+        value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "Authorization"
+        description: "Authentication token, prefixed by Bearer: Bearer <token>"
+      }
+    }
+  }
+
+  security: {
+    security_requirement: {
+      key: "bearer"
+    }
+  }
+};
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service DOPupukIndonesiaService {
+  rpc HealthCheck(google.protobuf.Empty) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pupuk-indonesia/health-check"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Heath Check"]
+      summary: "Health Check"
+      description: "This API for Health Check"
+    };
+  };
+
+
+  rpc SubmitDOPupukIndonesia(SubmitDOPupukIndonesiaRequest) returns (SubmitDOPupukIndonesiaResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pupuk-indonesia/task/submit"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Task"]
+      summary: "Submit Order"
+      description: "This API for submit order"
+    };
+  };
+
+  rpc UpdateDOPupukIndonesia(UpdateDOPupukIndonesiaRequest) returns (SubmitDOPupukIndonesiaResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pupuk-indonesia/task/update"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Task"]
+      summary: "Update Order"
+      description: "This API for update order"
+    };
+  };
+
+  rpc DeleteTaskByTaskID(DeleteTaskRequest) returns (DeleteTaskResponse) {
+    option (google.api.http) = {
+        post: "/api/do-pupuk-indonesia/task/delete"
+        body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Task"]
+        summary: "Delete task"
+        description: "This API for delete task by task id"
+    };
+  };
+
+  rpc SetStatusesTask(SetStatusesTaskRequest) returns (SetStatusesTaskResponse) {
+    option (google.api.http) = {
+        post: "/api/do-pupuk-indonesia/task/action"
+        body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { }
+        tags:["Task"]
+        summary: "Update Status"
+        description: "This API for update status task"
+    };
+  };
+
+  rpc GetDetailOrderTransaction(OrderDetailRequest) returns (OrderDetailResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pupuk-indonesia/task/detail/{transaction_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { } 
+      tags: ["Task"]
+      summary: "Get detail order"
+      description: "This API for get detail task do pupuk indonesia"
+    };
+  };
+
+  rpc ListTask(ListTaskRequest) returns (ListTaskResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pupuk-indonesia/task/list"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Task"]
+      summary: "List Task"
+      description: "This API is List for Transaction and History"
+    };
+  };
+
+  rpc GetDetailOrderHistory(OrderDetailRequest) returns (OrderDetailResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pupuk-indonesia/history/detail/{transaction_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { } 
+      tags: ["History"]
+      summary: "Get detail order"
+      description: "This API for get detail history do pupuk indonesia"
+    };
+  };
+
+  rpc ScheduledPayment(AppKey) returns (ScheduledPaymentResponse) {
+    option (google.api.http) = {
+        post: "/api/do-pupuk-indonesia/history/scheduled-payment"
+        body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["History"]
+        summary: "ScheduledPayment"
+        description: "This API for scheduled payment"
+    };
+  };
+
+  rpc Inquiry(InquiryRequest) returns (InquiryResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pupuk-indonesia/outbound/inquiry"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Outbound"]
+      summary: "Inquiry"
+      description: "This API for Inquiry"
+    };
+  };
+
+  rpc CheckDebitAccount(CheckDebitAccountRequest) returns (CheckDebitAccountResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pupuk-indonesia/outbound/check-debit-account"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Outbound"]
+      summary: "Get debit account"
+      description: "This API for Get debit account info"
+    };
+  };
+
+  rpc DownloadReceiptFile(DownloadReceiptFileRequest) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+      post: "/api/do-pupuk-indonesia/history/download/receipt"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["History"]
+      summary: "Download Receipt"
+      description: "This API for download receipt"
+    };
+  };
+  
+  rpc DownloadTaskListFile(ListTaskFileRequest) returns (google.api.HttpBody){
+    option (google.api.http) = {
+      get: "/api/do-pupuk-indonesia/task/list/download/{file_format}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Task"]
+      summary: "Download List Task"
+      description: "This API for download list task"
+    };
+  };
+
+  rpc GetStatusGroup(GetStatusGroupRequest) returns (GetStatusGroupResponse) {
+    option (google.api.http) = {
+        get: "/api/do-pupuk-indonesia/filter/status"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Filter"]
+        summary: "Get workflow step count"
+        description: "This API for get workflow step count"
+    };
+  };
+
+  rpc GetListFilter(GetListFilterRequest) returns (GetListFilterResponse) {
+    option (google.api.http) = {
+        get: "/api/do-pupuk-indonesia/task/list/filter"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        tags:["Task"]
+        summary: "Dropdown Filter"
+        description: "This API for get data unique based on fields"
+    };
+  };
+
+  rpc GetFeeFromMenuLicense(google.protobuf.Empty) returns (GetFeeFromMenuLicenseResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pupuk-indonesia/outbound/fee-menu-license"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Outbound"]
+      summary: "Fee"
+      description: "This API for get fee from menu license"
+    };
+  };
+
+}

@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+
+package file_object.service.v1;
+option go_package = "./pb";
+
+message FileData {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "files",
+    };
+
+    enum FileStatus {
+        null = 0;
+        checking = 1;
+        failedToRead = 2;
+        idle = 3;
+        processing = 4;
+        processed = 5;
+        failedToProcess = 6;
+    }
+
+    uint64 fileID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column:"FileID" primary_key: true not_null: true}];
+    string fileName = 2 [(gorm.field).tag = {column:"FileName" type: "varchar(255)"}];
+    string fileUrl = 3 [(gorm.field).tag = {column:"FilePath" type: "text"}];
+    string fileOriginName = 4 [(gorm.field).tag = {not_null: true column:"FileOriginName" type: "varchar(255)"}];
+    string fileOriginUrl = 5 [(gorm.field).tag = {not_null: true column:"FileOriginPath" type: "text"}];
+    string status = 6 [(gorm.field).tag = {column:"Status" type: "varchar(20)" default: "checking"}];
+    string taskType = 7 [(gorm.field).tag = {column:"TaskType" type: "varchar(20)"}];
+    uint64 taskID = 8 [(gorm.field).tag = {column:"TaskID" type: "bigint"}];
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+}
+
+
+message FileManager {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "file_managers",
+    };
+    uint64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column:"id" type: "bigint" primary_key: true not_null: true }];
+    uint64 taskID = 2 [(gorm.field).tag = {column:"task_id" type: "bigint"}];
+    string taskType = 3 [(gorm.field).tag = {column:"task_type" type: "varchar(50)"}];
+    string objectName = 4 [(gorm.field).tag = {column:"object_name" type: "varchar(255)"}];
+    string status = 5 [(gorm.field).tag = {column:"status" type: "varchar(20)" default: "pending"}];
+    string step = 6 [(gorm.field).tag = {column:"step" type: "varchar(20)" default: "0"}];
+    string files = 7 [(gorm.field).tag = {column:"files" type: "jsonb" default: "[]"}];
+
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+}
+
+message FileManagerDTO {
+    uint64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 taskID = 2;
+    string taskType = 3;
+    string objectName = 4;
+    string status = 5;
+    string step = 6;
+    repeated string files = 7;
+
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message FileProcessor {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "file_processors",
+    };
+    uint64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column:"id" type: "bigint" primary_key: true not_null: true }];
+    uint64 managerID = 2 [(gorm.field).tag = {column:"manager_id" type: "bigint"}];
+    uint64 taskID = 3 [(gorm.field).tag = {column:"task_id" type: "bigint"}];
+    string taskType = 4 [(gorm.field).tag = {column:"task_type" type: "varchar(50)"}];
+    string data = 5 [(gorm.field).tag = {column:"data" type: "jsonb" default: "{}"}];
+    string status = 6 [(gorm.field).tag = {column:"status" type: "varchar(20)" default: "pending"}];
+    
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+}
+
+message FileProcessorDTO {
+    uint64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 managerID = 2;
+    uint64 taskID = 3;
+    string type = 4;
+    string data = 5;
+    string status = 6;
+    
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message FileDetails {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "file_details",
+    };
+    string fileID = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string fileName = 2 [(gorm.field).tag = {not_null: true}];
+    string fileExtension = 4 [(gorm.field).tag = {not_null: true}];
+    string companyID = 7 [(gorm.field).tag = {not_null: true}];
+    string uploadedByID = 8;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+}

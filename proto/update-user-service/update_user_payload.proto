@@ -1,0 +1,250 @@
+syntax = "proto3";
+
+package update_user.service.v1;
+
+import "google/protobuf/timestamp.proto";
+import "update-user-service/update_user_core.proto";
+
+option go_package = "./pb";
+
+message HealthCheckResponse {
+  string message = 1;
+}
+
+message Empty {}
+
+message User {
+  string idType = 1;
+  string idNumber = 2;
+  string authority = 3;
+  string firstName = 4;
+  string lastName = 5;
+  string motherOriginName = 6;
+  string address = 7;
+  string zipCode = 8;
+  string emailAddress = 9;
+  string phoneNumber = 10;
+  string mobileNumber = 11;
+  string gender = 12;
+  int32 requestType = 13;
+  string idCardFileName = 14;
+  string employeeIdCard = 15;
+  string referenceFileName = 16;
+  string statementLetter = 17;
+}
+
+message UserGetList {
+  string userID = 1;
+  string username = 2;
+  string idType = 3;
+  string idNumber = 4;
+  string authority = 5;
+  string companyID = 6;
+  string companyName = 7;
+  string firstName = 8;
+  string lastName = 9;
+  string motherOriginName = 10;
+  string address = 11;
+  string zipCode = 12;
+  string emailAddress = 13;
+  string phoneNumber = 14;
+  string mobileNumber = 15;
+  string taxID = 16;
+  string gender = 17;
+  string status = 18;
+  string channel = 19;
+  string branchCode = 20;
+  string branchName = 21;
+  string idCard = 22;
+  string employeeIdCard = 23;
+  string referenceLetter = 24;
+  string statementLetter = 25;
+}
+
+message UpdateUserRequest {
+  User user = 1;
+  bool isDraft = 2;
+  string taskId = 3;
+}
+
+message UpdateUserResponse {
+  bool error = 1;
+  int32 code = 2;
+  string message = 3;
+}
+
+message DownloadTemplateRequest {
+  int32 fileType = 1;
+}
+
+message DownloadTemplateResponse {
+  bytes file = 1;
+}
+
+message UploadUpdateUserFileResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  string fileName = 4;
+}
+
+message GetListUserRequestRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string query = 3;
+  string filter = 4;
+  string filterOr = 5;
+  string sort = 6;
+  Direction dir = 7;
+  bool isHistory = 8;
+}
+
+message Task {
+  string taskID = 1;
+  string status = 2;
+  string step = 3;
+  string featureID = 4;
+  string lastApprovedByName = 5;
+  string lastRejectedByName = 6;
+  string createdByName = 7;
+  string updatedByName = 8;
+  string reasons = 9;
+  string comment = 10;
+  google.protobuf.Timestamp createdAt = 11;
+  google.protobuf.Timestamp updatedAt = 12;
+}
+
+message UserRequestData {
+  UserGetList user = 1;
+  Task task = 2;
+  string workflow = 3;
+}
+
+message Summary {
+  string draft = 1;
+  string pending = 2;
+  string approved = 3;
+  string rejected = 4;
+  string pendingRm = 6;
+  string pendingBoh = 7;
+  string pendingBaMaker = 8;
+  string pendingBaSigner = 9;
+}
+
+message GetListUserRequestResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated UserRequestData data = 4;
+  PaginationResponse pagination = 5;
+  Summary summary = 6;
+}
+
+message ActionUpdateUserRequest {
+  string reason = 1;
+  string comment = 2;
+  string action = 3;
+  string tokenId = 4;
+  repeated string taskId = 5;
+}
+
+message ActionUpdateUserNDSRequest {
+  string reason = 1;
+  string application = 2;
+  string action = 3;
+  string userName = 4;
+  string userCode = 5;
+
+  message Data {
+    string taskId = 1;
+    string branchCode = 2;
+  }
+
+  Data data = 6;
+}
+
+message ActionUpdateUserTaskResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  string taskId = 4;
+}
+
+message ActionUpdateUserResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated ActionUpdateUserTaskResponse data = 4;
+}
+
+message GetUserRequestDetailRequest {
+  string taskID = 1;
+  bool isHistory = 2;
+}
+
+message UserRequestDetailData {
+  UserGetList newUser = 1;
+  UserGetList oldUser = 2;
+  Task task = 3;
+  string workflow = 4;
+}
+
+message GetUserRequestDetailResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  UserRequestDetailData data = 4;
+}
+
+message GetListUserRequestNDSRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string filter = 3;
+  string filterOr = 4;
+  string sort = 5;
+  Direction dir = 6;
+  bool isHistory = 7;
+  string application = 8;
+}
+
+message TaskNDS {
+  string taskID = 1;
+  string companyID = 2;
+  string companyName = 3;
+  string username = 4;
+  google.protobuf.Timestamp requestDate = 5;
+  string pnRm = 6;
+  string status = 7;
+  string branchCode = 8;
+}
+
+message GetListUserRequestNDSResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated TaskNDS data = 4;
+  PaginationResponse pagination = 5;
+}
+
+message UserNotificationData {
+  string USERNAME_MAKER = 1;
+  string USERNAME_APPROVER = 2;
+  string USERNAME_REJECTOR = 3;
+  string CREATED_DATETIME = 4;
+  string CREATED_DATE = 5;
+  string CREATED_TIME = 6;
+  string EVENT_DATETIME = 7;
+  string EVENT_DATE = 8;
+  string EVENT_TIME = 9;
+  string TASK_ID = 10;
+  string MODULE = 11;
+  string BRANCH_NAME = 12;
+  string REASON = 13;
+  string COMMENT = 14;
+  string USER_ID = 15;
+  string FIRST_NAME = 16;
+  string LAST_NAME = 17;
+  string NEW_EMAIL = 18;
+  string IDENTITY_TYPE = 19;
+  string COMPANY_NAME = 20;
+}

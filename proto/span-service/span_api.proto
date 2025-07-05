@@ -1,0 +1,254 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/empty.proto";
+import "span-service/span_payload.proto";
+import "google/api/httpbody.proto";
+
+package span.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  security_definitions: {
+    security: {
+        key: "bearer"
+        value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "Authorization"
+        description: "Authentication token, prefixed by Bearer: Bearer <token>"
+      }
+    }
+  }
+
+  security: {
+    security_requirement: {
+      key: "bearer"
+    }
+  }
+};
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service SpanService {
+  rpc HealthCheck(google.protobuf.Empty) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      get: "/api/span/health-check"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Heath Check"]
+      summary: "Health Check"
+      description: "This API for Health Check"
+    };
+  };
+
+  rpc SubmitSpan(SubmitSpanRequest) returns (StandardWithTransactionIdResponse) {
+    option (google.api.http) = {
+      post: "/api/span/task/submit"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Task"]
+      summary: "Submit Span"
+      description: "This API for submit span "
+    };
+  };
+
+  rpc SendApprovalSpan(SendApprovalSpanRequest) returns (StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/span/task/send"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Task"]
+      summary: "Send Approval Span"
+      description: "This API for send approval span after upload file "
+    };
+  };
+
+  rpc GetDetailTransactionSpan(SpanDetailRequest) returns (SpanDetailResponse) {
+    option (google.api.http) = {
+      get: "/api/span/task/detail/{transaction_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Task"]
+      summary: "Get detail span"
+      description: "This API for get detail span"
+    };
+  };
+
+  rpc GetListTransaction(ListRequest) returns (ListResponse) {
+    option (google.api.http) = {
+      get: "/api/span/transaction/list"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["List"]
+      summary: "List Transaction"
+      description: "This API for List Span Upload, System Upload (Span Utama), Verify Reject, Void dan Download ACK"
+    };
+  };
+
+  rpc DeleteTaskSpanByTaskID(DeleteTaskSpanRequest) returns (DeleteTaskSpanResponse) {
+    option (google.api.http) = {
+      post: "/api/span/task/delete"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Task"]
+      summary: "Delete Span"
+      description: "This API for delete span"
+    };
+  };
+
+  rpc SetStatusesTaskSpan(SetStatusesTaskSpanRequest) returns (SetStatusesTaskSpanResponse) {
+    option (google.api.http) = {
+        post: "/api/span/task/action"
+        body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { }
+        tags:["Task"]
+        summary: "Update Status"
+        description: "This API for update status task"
+    };
+  };
+
+  rpc DownloadListTransaction(ListFileRequest) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+      get: "/api/span/transaction/list/download/{file_format}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["File"]
+      summary: "Download List Transaction"
+      description: "This API for download List Span Upload, System Upload (Span Utama), Verify Reject, Void dan Download ACK"
+    };
+  };
+
+  rpc DownloadListSpanItems(DownloadListSpanItemsRequest) returns (google.api.HttpBody)  {
+    option (google.api.http) = {
+      get: "/api/span/task/detail/download/{file_format}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["File"]
+      summary: "Download List Span Items"
+      description: "This API for download list span items"
+    };
+  };
+
+  rpc GetDetailHistorySpan(SpanDetailRequest) returns (SpanDetailResponse) {
+    option (google.api.http) = {
+      get: "/api/span/history/detail/{transaction_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["History"]
+      summary: "Get detail span history task"
+      description: "This API for get detail history task span"
+    };
+  };
+
+  rpc GetListHistory(ListRequest) returns (ListResponse) {
+    option (google.api.http) = {
+      get: "/api/span/history/list"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["List"]
+      summary: "List History"
+      description: "This API for List History Span Upload, System Upload (Span Utama), Verify Reject, Void dan Download ACK"
+    };
+  };
+
+  rpc GetListAgentBankAccountNumber(google.protobuf.Empty) returns (ListAgentBankAccountNumberResponse) {
+    option (google.api.http) = {
+      get: "/api/span/verify-reject/outbound/agent-bank-account"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Verify Reject"]
+      summary: "List Agent Bank Account Number"
+      description: "This API for List Agent Bank Account Number"
+    };
+  };
+
+  rpc RejectAction(RejectActionRequest) returns (SpanActionResponse) {
+    option (google.api.http) = {
+      post: "/api/span/verify-reject/outbound/action"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Verify Reject"]
+      summary: "Action reject"
+      description: "This API for action reject span"
+    };
+  };
+
+  rpc VoidAction(VoidActionRequest) returns (SpanActionResponse) {
+    option (google.api.http) = {
+      post:"/api/span/void/outbound/action"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Void"]
+      summary: "Action void"
+      description: "This API for action void span"
+    };
+  };
+
+  rpc UpdateCurrency(UpdateCurrencyRequest) returns (StandardResponse) {
+    option (google.api.http) = {
+      post:"/api/span/outbound/update-currency"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Outbound"]
+      summary: "Update currency"
+      description: "This API for update currency span"
+    };
+  };
+
+  rpc GetListSpanDetail(ListSpanDetailRequest) returns (ListSpanDetailResponse) {
+    option (google.api.http) = {
+      get: "/api/span/kemenkeu/outbound/detail/{id_file}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Upload Kemenkeu"]
+      summary: "List Span Detail"
+      description: "This API for List Span Detail"
+    };
+  };
+
+  rpc DownloadFileACK(DownloadFileACKRequest) returns (google.api.HttpBody)  {
+    option (google.api.http) = {
+      post: "/api/span/ack/outbound/download"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["File"]
+      summary: "Download ACK"
+      description: "This API for download ACK file"
+    };
+  };
+
+  rpc GetPaymentMethod(GetPaymentMethodRequest) returns (GetPaymentMethodResponse)  {
+    option (google.api.http) = {
+      get: "/api/span/payment-method"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Payment Method"]
+      summary: "List Payment Method"
+      description: "This API for List Payment Method"
+    };
+  };
+
+  
+}

@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "do-semen-indonesia-transmitter-service/do_semen_indonesia_transmitter_payload.proto";
+
+package do_semen_indonesia_transmitter.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "DO Semen Transmitter";
+    version: "1.0";
+  }
+
+  schemes: HTTP;
+  // schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service DOSemenTransmitterService {
+  rpc ProcessPayment(PaymentRequest) returns (PaymentResponse) {
+    option (google.api.http) = {
+      post: "/api/do-semen-indonesia/transmitter/process-payment"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Transmitter BRI"]
+      summary: "Process Transaction"
+      description: "This API for process transaction"
+    };
+  };
+}

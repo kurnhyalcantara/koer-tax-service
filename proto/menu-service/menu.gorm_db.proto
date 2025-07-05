@@ -1,0 +1,460 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package menu.service.v1;
+option go_package = "./pb";
+
+enum EncryptionType {
+    NULL = 0;
+    AES128 = 1;
+    AES256 = 2;
+    GNUPG = 3;
+}
+
+enum KliringActionType {
+    UNKNOWN = 0;
+    NEXT_BUSINESS_DATE = 1;
+    SAMEDAY = 2;
+    CANCEL = 3;
+}
+
+enum RejectionType{
+    NULL_REJECTION_TYPE = 0;
+    REJECTION_RECORD = 1; 
+    REJECTION_FILE = 2; 
+  }
+// Example User
+message User {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "users",
+    };
+    uint64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    string username = 2 [(google.api.field_behavior) = REQUIRED, (validator.field) = {msg_exists : true}, (gorm.field).tag = {unique: true not_null: true}];
+    string password = 3 [(google.api.field_behavior) = REQUIRED, (validator.field) = {msg_exists : true}, (gorm.field).tag = {not_null: true}];
+    string role = 4 [(validator.field) = {msg_exists : true}, (gorm.field).tag = {default: "user" not_null: true}];
+    google.protobuf.Timestamp created_at = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updated_at = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deleted_at = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message Module {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "modules",
+    };
+    uint64 moduleID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    string name = 2 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "varchar(255)"}];
+    bool isTransactional = 3 [(google.api.field_behavior) = REQUIRED];
+    google.protobuf.Timestamp createdAt = 4 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+}
+
+message Menu {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "menus",
+    };
+
+    uint64 menuID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "MenuID" primary_key: true not_null: true}];
+    uint64 parentID = 2 [(google.api.field_behavior) = OPTIONAL, (gorm.field).tag = {column: "ParentID"}];
+    string userType = 3 [(google.api.field_behavior) = OPTIONAL, (gorm.field).tag = {type: "varchar(255)"}];
+    string label = 4 [(google.api.field_behavior) = OPTIONAL, (gorm.field).tag = {type: "varchar(255)"}];
+    bool isModule = 5 [(google.api.field_behavior) = OPTIONAL];
+    // uint64 moduleID = 6 [(google.api.field_behavior) = OPTIONAL, (gorm.field).tag = { column: "ModuleID"}];
+    string rootPath = 7 [(google.api.field_behavior) = OPTIONAL, (gorm.field).tag = {type: "varchar(255)"}];
+    google.protobuf.Timestamp createdAt = 8 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    uint64 createdByID = 9 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 updatedByID = 11 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp deleted_at = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 deletedByID = 13 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+
+    repeated Menu menus = 14 [
+        (gorm.field).has_many = {
+            foreignkey: "ParentID"
+            foreignkey_tag: {column: "ParentID" not_null: true}
+            preload: true
+        }
+    ];
+
+    uint64 productID = 15 [(google.api.field_behavior) = OPTIONAL, (gorm.field).tag = {}];
+    string productName = 16 [(google.api.field_behavior) = OPTIONAL, (gorm.field).tag = {}];
+    bool isTransactional = 22 [(google.api.field_behavior) = OPTIONAL];
+
+    string orderNumber = 17 [(gorm.field).tag = {not_null: true column: "OrderNumber"}];
+    string iconURI = 18 [(gorm.field).tag = {type: "text"}];
+
+    string name = 19 [(gorm.field).tag = {
+        type: "varchar(255)"
+        // unique: true
+        // not_null: true
+    }];
+    bool isEnable = 20;
+    bool enableScheduled = 21; 
+    string authorities = 23 [(gorm.field).tag = {type: "jsonb" default: "{}"}];
+    
+    // Menu parent = 41 [
+    //     (gorm.field).belongs_to = {
+    //         foreignkey: "ParentID"
+    //         foreignkey_tag: {column: "ParentID"}
+    //         preload: false
+    //     },
+    //     (google.api.field_behavior) = OUTPUT_ONLY
+    // ];
+
+    // MenuTask Task = 61 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).has_one = {
+    //     foreignkey: "_MenuID"
+    // }];
+
+    repeated MenuDisable disables = 101 [
+        (gorm.field).has_many = {
+            foreignkey: "MenuID"
+            foreignkey_tag: {column: "MenuID" not_null: true}
+            preload: true
+        }
+    ];
+}
+
+message MenuDisable {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "menu_disables",
+    };
+    uint64 menuDisableID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "MenuDisableID" primary_key: true not_null: true}];
+    Menu menu = 2 [
+        (google.api.field_behavior) = REQUIRED,
+        (gorm.field).belongs_to = {
+            foreignkey: "menu_id"
+            foreignkey_tag: {column: "menu_id" not_null: true}
+            preload: false
+        }
+    ];
+    google.protobuf.Timestamp startDateTime = 3 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {}];
+    google.protobuf.Timestamp endDateTime = 4 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {}];
+    string customTime = 5 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "jsonb"}];
+    google.protobuf.Timestamp createdAt = 6 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    uint64 createdByID = 7 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 updatedByID = 9 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp deleted_at = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 deletedByID = 11 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+
+    uint64 menuID = 12 [(gorm.field).tag = {column: "MenuID" not_null: true}];
+}
+
+message MenuLicense {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "menu_licenses",
+    };
+    uint64 menuLicenseID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    // Module module = 2 [(google.api.field_behavior) = REQUIRED, (gorm.field).belongs_to = {foreignkey: "module_id"}];
+    uint64 companyID = 3 [(google.api.field_behavior) = REQUIRED];
+    bool isAllowed = 4 [(google.api.field_behavior) = REQUIRED];
+    uint64 fee = 5 [(google.api.field_behavior) = REQUIRED];
+    string feeType = 6 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "varchar(255)"}];
+    // uint64 transactionLimit = 7 [(google.api.field_behavior) = REQUIRED];
+    string transactionLimit = 7 [(gorm.field).tag = { type: "jsonb" }];
+    uint64 productID = 15 [(google.api.field_behavior) = OPTIONAL, (gorm.field).tag = {}];
+    string productName = 16 [(google.api.field_behavior) = OPTIONAL, (gorm.field).tag = {}];
+    TempCompany Company = 17;
+    // google.protobuf.Timestamp chargeDate = 8 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    string chargeDate = 8 [(gorm.field).tag = { type: "jsonb" }];
+    google.protobuf.Timestamp createdAt = 9 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    uint64 createdByID = 10 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 updatedByID = 12 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    string name = 13 [(gorm.field).tag = {type: "varchar(255)"}];
+    bool isEnable = 14;
+    uint64 accountID = 18;
+    string accountNumber = 19;
+    string accountName = 20;
+    uint64 menuID = 21;
+    string label = 22;
+    bool isModule = 23;
+    string feeCurrency = 24;
+    string orderNumber = 25;
+    string accountAlias = 26;
+    bool isTransactional = 27;
+    uint64 moduleID = 28 [(google.api.field_behavior) = OPTIONAL, (gorm.field).tag = {}];
+    string penalty = 29;
+    uint64 feeMultiple = 30;
+    string hostToHost = 31 [(gorm.field).tag = { type: "jsonb" }];
+    bool isBiRtgs = 32;
+    bool isMTEnable = 33;
+    bool isBalanceSummary = 34;
+    bool isReportStatement = 35;
+    bool enableDecryption = 36;
+    EncryptionType encryptionType = 37;
+    string encryptionKey = 38;
+    string kodePerusahaanEfek = 39;
+    string feeMass = 40 [(gorm.field).tag = { type: "jsonb" }];
+    KliringActionType kliringActionType = 41;
+    RejectionType rejectionType = 42;
+}
+
+message MenuTask {
+    option(gorm.opts) = {
+        ormable: true,
+        table: 'menu_tasks'
+    };
+
+    uint64 taskID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 menuID = 2 [(gorm.field).tag = {}];
+}
+
+message Company {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "company",
+    };
+
+    uint64 companyID = 1 [(google.api.field_behavior) = OPTIONAL, (validator.field) = {msg_exists : true}, (gorm.field).tag = {column:"CompanyID" primary_key: true not_null: true}];
+    string name = 2 [(google.api.field_behavior) = OPTIONAL, (gorm.field).tag = {column:"Name" not_null: true type: "varchar(150)"}];
+
+    uint64 createdByID = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column:"CreatedByID" }];
+    uint64 updatedByID = 4 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column:"UpdatedByID" }];
+    uint64 deletedByID = 5 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column:"DeletedByID" }];
+
+    google.protobuf.Timestamp createdAt = 6 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp updatedAt = 7 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp deletedAt = 8 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+
+}
+
+message TempCompany {
+    uint64 companyID = 1;
+    string companyName = 2;
+}
+
+message Package {
+    option(gorm.opts) = {
+        ormable: true,
+        table: 'packages'
+    };
+
+    uint64 packageID = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "package_id", primary_key: true, not_null: true, auto_increment: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string packageName = 2 [
+        (google.api.field_behavior) = OPTIONAL,
+        (gorm.field).tag = {column: "package_name", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string packageDescription = 3 [
+        (google.api.field_behavior) = OPTIONAL,
+        (gorm.field).tag = {column: "package_description", type: "varchar(255)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string packageStatus = 4 [
+        (google.api.field_behavior) = OPTIONAL,
+        (gorm.field).tag = {column: "package_status", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string createdByName = 96 [
+        (google.api.field_behavior) = OPTIONAL,
+        (gorm.field).tag = {column: "created_by_name", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    string updatedByName = 97 [
+        (google.api.field_behavior) = OPTIONAL,
+        (gorm.field).tag = {column: "updated_by_name", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    uint64 createdByID = 98 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "created_by_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 updatedByID = 99 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "updated_by_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 deletedByID = 100 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "deleted_by_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    google.protobuf.Timestamp createdAt = 101 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "created_at"}
+    ];
+
+    google.protobuf.Timestamp updatedAt = 102 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "updated_at"}
+    ];
+
+    google.protobuf.Timestamp deletedAt = 103 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {column: "deleted_at"}
+    ];
+
+    repeated MenuPackage packageMenu = 110 [
+        (gorm.field).has_many = {
+            association_foreignkey: "packageID",
+            foreignkey: "PackageID",
+            foreignkey_tag: {column: "package_id" primary_key: true not_null: true},
+            preload: false
+        }
+    ];
+
+    string countryName = 111 [
+        (google.api.field_behavior) = OPTIONAL,
+        (gorm.field).tag = {column: "country_name", type: "varchar(100)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+}
+
+message MenuPackage {
+    option(gorm.opts) = {
+        ormable: true,
+        table: 'menu_packages'
+    };
+
+    uint64 packageID = 1 [
+        (gorm.field).tag = {column: "package_id", primary_key: true, not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 menuID = 2 [
+        (gorm.field).tag = {column: "menu_id", primary_key: true, not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 fee = 3 [
+        (google.api.field_behavior) = OPTIONAL,
+        (gorm.field).tag = {column: "fee"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 limit = 4 [
+        (google.api.field_behavior) = OPTIONAL,
+        (gorm.field).tag = {column: "limit"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 fee_multiple = 5 [
+        (google.api.field_behavior) = OPTIONAL,
+        (gorm.field).tag = {column: "fee_multiple"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    uint64 limit_multiple = 6 [
+        (google.api.field_behavior) = OPTIONAL,
+        (gorm.field).tag = {column: "limit_multiple"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+     string label = 7 [
+        (gorm.field).tag = {column: "label", type: "varchar(255)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+    bool isTransactional = 8 [
+        (gorm.field).tag = {column: "is_transactional"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+    string currency = 9 [
+        (gorm.field).tag = {column: "currency", type: "varchar(255)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {}
+    ];
+
+    Menu menu = 101 [
+        (gorm.field).belongs_to = {
+            association_foreignkey: "menuID",
+            foreignkey: "MenuID",
+            foreignkey_tag: {column: "menu_id" not_null: true},
+            preload: true
+        },
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+    uint64 parentID = 102 [
+        (gorm.field).tag = {},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+}
+
+message ViewTaskLicenses {
+    option(gorm.opts) = {
+        ormable: true,
+        table: 'view_task_licenses'
+    };
+
+    string companyID = 1 [
+        (gorm.field).tag = {column: "company_id"}
+    ];
+
+    string companyCode = 2 [
+        (gorm.field).tag = {column: "company_code"}
+    ];
+
+    string companyName = 3 [
+        (gorm.field).tag = {column: "company_name"}
+    ];
+
+    string countryCode = 4 [
+        (gorm.field).tag = {column: "country_code"}
+    ];
+
+    string countryName = 5 [
+        (gorm.field).tag = {column: "country_name"}
+    ];
+
+    string taskID = 6 [
+        (gorm.field).tag = {column: "task_id"}
+    ];
+
+    string status = 9 [
+        (gorm.field).tag = {column: "status"}
+    ];
+
+    string createdByName = 10 [
+        (gorm.field).tag = {column: "created_by_name"}
+    ];
+
+    string reviewedByName = 11 [
+        (gorm.field).tag = {column: "reviewed_by_name"}
+    ];
+
+    string createdAt = 17 [
+        (gorm.field).tag = {column: "created_at"}
+    ];
+
+    string updatedAt = 18 [
+        (gorm.field).tag = {column: "updated_at"}
+    ];
+
+}
+
+message GetDistinctNonEmptyKodePerusahaanEfek {
+    option(gorm.opts) = {
+        ormable: true,
+        table: 'menu_licenses'
+    };
+
+    uint64 companyID = 1 [
+        (gorm.field).tag = {column: "company_id"}
+    ];
+
+    uint64 productID = 2 [
+        (gorm.field).tag = {column: "product_id"}
+    ];
+
+    string kodePerusahaanEfek = 3 [
+        (gorm.field).tag = {column: "kode_perusahaan_efek"}
+    ];
+}

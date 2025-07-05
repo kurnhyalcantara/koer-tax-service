@@ -1,0 +1,344 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "workflow-service/workflow_payload.proto";
+import "workflow-service/workflow_core.proto";
+
+package workflow.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+
+    rpc HealthCheck(Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/workflow/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Health Check"
+            description: "This API for check health server"
+        };
+    }
+
+    rpc ListWorkflow(ListWorkflowRequest) returns (ListWorkflowResponse) {}
+
+    rpc ListWorkflowHTTP(ListWorkflowRequest) returns (ListWorkflowResponse) {
+        option (google.api.http) = {
+            post: "/api/workflow/data"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get List workflow data"
+            description: "This API for get list workflow data"
+        };
+    }
+
+    rpc CreateWorkflowV2(WorkflowTask) returns (CreateWorkflowResponse){}
+
+    rpc CreateWorkflow(WorkflowTask) returns (CreateWorkflowResponse){
+        option (google.api.http) = {
+            post: "/api/workflow"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Create workflow data"
+            description: "This API for create workflow data"
+        };
+    }
+    rpc DeleteWorkflow(WorkflowTask) returns (CreateWorkflowResponse){}
+
+    rpc CreateWorkflowTask(CreateWorkflowTaskRequest) returns (CreateWorkflowTaskResponse){
+        option (google.api.http) = {
+            post: "/api/workflow/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    post: "/api/workflow/task/edit/{taskID}"
+                    body: "*"
+                }
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Save workflow task"
+            description: "This API for save workflow task"
+        };
+    }
+
+    rpc ListWorkflowTask(ListWorkflowTaskRequest) returns (ListWorkflowTaskResponse) {
+        // option (google.api.http) = {
+        //     get: "/api/workflow/task"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     // security: { }
+        //     summary: "Get List task workflow"
+        //     description: "This API for get list task workflow"
+        // };
+    }
+
+    rpc GetWorkflowTask(GetWorkflowTaskRequest) returns (GetWorkflowTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/workflow/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get List task workflow"
+            description: "This API for get list task workflow"
+        };
+    }
+
+    rpc RequestDeleteWorkflowTask(GetWorkflowTaskRequest) returns (GetWorkflowTaskResponse){
+        option (google.api.http) = {
+            post: "/api/workflow/task/delete/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Delete request workflow task"
+            description: "This API for deletes workflow task"
+        };
+    }
+
+    rpc DownloadListWorkflowTask(DownloadListWorkflowTaskRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/workflow/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            //security: { }
+            summary: "Get List task workflow"
+            description: "This API for get list task workflow"
+        };
+    }
+
+    rpc ListMyWorkflowTask(ListWorkflowTaskRequest) returns (ListWorkflowTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/workflow/task/me"
+            additional_bindings: [
+                {
+                    get: "/api/workflow/task"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my workflow tasks"
+            description: "This API for get list workflow task"
+        };
+    }
+
+    rpc ValidateWorkflow(ValidateWorkflowRequest) returns (ValidateWorkflowResponse){
+        option (google.api.http) = {
+            post: "/api/workflow/validate"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Validate workflow data"
+            description: "This API for validate workflow data"
+        };
+    }
+
+    rpc GenerateWorkflow(GenerateWorkflowRequest) returns (ValidateWorkflowResponse){
+        option (google.api.http) = {
+            post: "/api/workflow/generate"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Generate workflow data"
+            description: "This API for generate workflow data"
+        };
+    }
+
+    
+    rpc GenerateWorkflowTaskMassTransfer(GenerateWorkflowTaskMassTransferRequest) returns (GenerateWorkflowTaskMassTransferResponse){
+        option (google.api.http) = {
+            post: "/api/workflow/mass-transfer/task/generate"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Generate mass transfer workflow data"
+            description: "This API for generate mass transfer workflow data"
+        };
+    }
+
+    rpc GenerateWorkflowMassTransfer(GenerateWorkflowMassTransferRequest) returns (GenerateWorkflowMassTransferResponse){
+        option (google.api.http) = {
+            post: "/api/workflow/mass-transfer/generate"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Generate mass transfer workflow data"
+            description: "This API for generate mass transfer workflow data"
+        };
+    }
+    rpc ListCompanyWorkflow(ListCompanyWorkflowRequest) returns (ListCompanyWorkflowResponse){
+        option (google.api.http) = {
+            get: "/api/workflow/company"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "List company workflow data"
+            description: "This API for list company workflow data"
+        };
+    }
+
+    rpc GetCompanyWorkflow(GetCompanyWorkflowRequest) returns (GetCompanyWorkflowResponse) {}
+
+    rpc GetCompanyWorkflowHTTP(GetCompanyWorkflowRequest) returns (GetCompanyWorkflowResponse) {
+        option (google.api.http) = {
+            get: "/api/workflow/company/{companyID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get company workflow"
+            description: "This API for get company workflow"
+        };
+    }
+
+    rpc CreateCompanyWorkflow(CreateCompanyWorkflowRequest) returns (CreateCompanyWorkflowResponse){
+        option (google.api.http) = {
+            post: "/api/workflow/company"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create company workflow data"
+            description: "This API for create company workflow data"
+        };
+    }
+
+    rpc GetAvailableCurrency(GetAvailableCurrencyRequest) returns (GetAvailableCurrencyResponse) {
+        option (google.api.http) = {
+            post: "/api/workflow/currency"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get available currency"
+            description: "This API for get available currency"
+        };
+    }
+
+    rpc DeleteRequirement(DeleteRequirementRequest) returns (Empty) {}
+
+
+    rpc DeleteWorkflows(DeleteWorkflowsRequest) returns (DeleteWorkflowsRes) {}
+
+    rpc GenerateWorkflowWithoutSession(GenerateWorkfloWithoutSessionRequest) returns (ValidateWorkflowResponse){}
+    rpc GenerateWorkflowWithoutSessionV2(GenerateWorkfloWithoutSessionRequest) returns (ValidateWorkflowResponse){
+        option (google.api.http) = {
+            post: "/api/workflow/v2/generate"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Generate workflow data"
+            description: "This API for generate workflow data"
+        };
+    }
+
+    // Use this function to handle feature that has mass transactions
+    rpc GenerateWorkflowTemplateWithoutSession(GenerateWorkflowTemplateWithoutSessionRequest) returns (ValidateWorkflowResponse){}
+
+    // get workflow V2
+    rpc ListWorkflowV2 (ListWorkflowV2Request) returns (ListWorkflowV2Response) {
+        option (google.api.http) = {
+            get:  "/api/workflow/v2/task"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get list all workflow with table view"
+            description: "This API for list all workflow"
+        };
+    }
+
+    // get created updated
+    rpc ListCreatedApproved (Empty) returns (ListCreatedApprovedResponse) {
+        option (google.api.http) = {
+            get: "/api/workflow/v2/created-approved"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        // security: {}
+            summary: "Get list user created approved"
+            description: "This is API for list user created and approved"
+        };
+    }
+
+    // download workflow file v2
+    rpc ListWorkflowV2File (ListWorkflowV2FileRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/workflow/v2/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        // security: {}
+            summary: "Get list workflow v2 for download"
+            description: "This is an API for retrieving a list of workflow v2 and saving it to a file."
+        };
+    }
+
+    rpc ValidateWorkflowWithoutSession(ValidateWorkflowWithoutSessionReq) returns (ValidateWorkflowResponse);
+
+    rpc CreateWorkflowTaskWithoutSession(CreateWorkflowTaskWithoutSessionRequest) returns (CreateWorkflowTaskResponse) {
+        option (google.api.http) = {
+            post: "/api/workflow/company/without-session"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create company workflow data"
+            description: "This API for create company workflow data"
+        };
+    }
+
+    rpc GenerateWorkflowAccountRegister(GenerateWorkflowRequest) returns (ValidateWorkflowAccountRegisterResponse);
+    rpc ValidateWorkflowAccountRegister(ValidateAccountRegisterWorkflowReq) returns (ValidateAccountRegisterWorkflowResp);
+
+    rpc DeleteWorkflowNative(WorkflowTask) returns (CreateWorkflowResponse){
+        option (google.api.http) = {
+            post: "/api/workflow/delete-native"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Workflow"]
+            summary: "Delete Workflow Native"
+            description: "This API for Delete Workflow Native"
+        };
+    }
+
+    rpc CreateWorkflowV3(WorkflowTask) returns (CreateWorkflowResponse){}
+    rpc GetWorkflowTier(GetWorkflowTierRequest) returns (GetWorkflowTierResponse);
+
+    rpc RollbackWorkflowByWorkflowCode(RollbackWorkflowByWorkflowCodeRequest) returns (DeleteWorkflowsRes){
+        option (google.api.http) = {
+            post: "/api/workflow/rollback-workflow"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Workflow"]
+            summary: "Rollback Workflow Native"
+            description: "This API for Rollback Workflow Native"
+        };
+    }
+
+    rpc GetAvailableCurrencyWithoutSession(GetAvailableCurrencyRequest) returns (GetAvailableCurrencyResponse);
+}
+
+
+

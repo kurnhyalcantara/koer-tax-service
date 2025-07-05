@@ -1,0 +1,323 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/empty.proto";
+import "df-pupuk-indonesia-service/df_pupuk_indonesia_payload.proto";
+import "google/api/httpbody.proto";
+
+package df_pupuk_indonesia.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  security_definitions: {
+    security: {
+        key: "bearer"
+        value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "Authorization"
+        description: "Authentication token, prefixed by Bearer: Bearer <token>"
+      }
+    }
+  }
+
+  security: {
+    security_requirement: {
+      key: "bearer"
+    }
+  }
+};
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service DFPupukIndonesiaService {
+  rpc HealthCheck(google.protobuf.Empty) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/health-check"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Heath Check"]
+      summary: "Health Check"
+      description: "This API for Health Check"
+    };
+  };
+
+  /* # region BA DF Pupuk Management # */
+  rpc CreateMappingAccount(CreateMappingAccountRequest) returns (StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/df-pupuk-indonesia/management/create"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["DF Pupuk Management"]
+      summary: "Create Mapping Account"
+      description: "This API for create mapping account by BA"
+    };
+  };
+
+  rpc UpdateMappingAccount(UpdateMappingAccountRequest) returns (StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/df-pupuk-indonesia/management/update"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["DF Pupuk Management"]
+      summary: "Update Mapping Account"
+      description: "This API for update mapping account by BA"
+    };
+  };
+
+
+  rpc ValidateMappingAccountCompany(ValidateMappingAccountCompanyRequest) returns (StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/df-pupuk-indonesia/management/validate-company"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["DF Pupuk Management"]
+      summary: "Validate company"
+      description: "This API for validate mapping account company"
+    };
+  };
+
+  rpc SetStatusesTaskMappingAccount(SetStatusesTaskRequest) returns (SetStatusesTaskResponse) {
+    option (google.api.http) = {
+        post: "/api/df-pupuk-indonesia/management/action"
+        body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { }
+        tags:["DF Pupuk Management"]
+        summary: "Update Status"
+        description: "This API for update status task"
+    };
+  };
+
+  rpc DeleteMappingAccount(DeleteTaskRequest) returns (DeleteTaskResponse) {
+    option (google.api.http) = {
+        post: "/api/df-pupuk-indonesia/management/delete"
+        body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Task"]
+        summary: "Delete task"
+        description: "This API for delete task by task id"
+    };
+  };
+
+  rpc GetDetailMappingAccount(GetDetailMappingAccountRequest) returns (GetDetailMappingAccountResponse) {
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/management/detail/{transaction_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { } 
+      tags: ["DF Pupuk Management"]
+      summary: "Get detail mapping account"
+      description: "This API for get detail mapping account"
+    };
+  };
+
+  rpc GetListManagement(ListRequest) returns (ListResponse) {
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/management/list"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { } 
+      tags: ["DF Pupuk Management"]
+      summary: "Get List"
+      description: "This API for get list df pupuk management"
+    };
+  };
+
+  rpc DownloadListMappingAccountFile(ListFileRequest) returns (google.api.HttpBody){
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/management/list/download/{file_format}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["DF Pupuk Management"]
+      summary: "Download List"
+      description: "This API for download list df pupuk management"
+    };
+  };
+
+  rpc GetCompanyCodePupuk(google.protobuf.Empty) returns (GetCompanyCodePupukResponse) {
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/management/outbound/company-code-pupuk"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { } 
+      tags: ["Mapping Account"]
+      summary: "Get all company code pupuk;"
+      description: "This API for get all company code pupuk"
+    };
+  };
+  /* # end region BA DF Pupuk Management # */
+
+
+  /* # region CU DF Pupuk Indonesia # */
+  rpc SubmitDFPupukIndonesia(SubmitDFPupukIndonesiaRequest) returns (SubmitDFPupukIndonesiaResponse) {
+    option (google.api.http) = {
+      post: "/api/df-pupuk-indonesia/task/submit"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Task"]
+      summary: "Submit Order"
+      description: "This API for submit order"
+    };
+  };
+
+  rpc DownloadReceiptFile(DownloadReceiptFileRequest) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+      post: "/api/df-pupuk-indonesia/history/download/receipt"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["History"]
+      summary: "Download Receipt"
+      description: "This API for download receipt"
+    };
+  };
+
+  rpc UpdateDFPupukIndonesia(UpdateDFPupukIndonesiaRequest) returns (UpdateDFPupukIndonesiaResponse) {
+    option (google.api.http) = {
+      post: "/api/df-pupuk-indonesia/task/update"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Task"]
+      summary: "Update Order"
+      description: "This API for update order"
+    };
+  };
+
+  rpc GetDetailOrderTransaction(OrderDetailRequest) returns (OrderDetailResponse) {
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/task/detail/{transaction_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { } 
+      tags: ["Task"]
+      summary: "Get detail order"
+      description: "This API for get detail task df pupuk indonesia"
+    };
+  };
+
+  rpc GetDetailOrderHistory(OrderDetailRequest) returns (OrderDetailResponse) {
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/history/detail/{transaction_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { } 
+      tags: ["History"]
+      summary: "Get detail order"
+      description: "This API for get detail history df pupuk indonesia"
+    };
+  };
+
+  rpc DeleteTaskByTaskID(DeleteTaskRequest) returns (DeleteTaskResponse) {
+    option (google.api.http) = {
+        post: "/api/df-pupuk-indonesia/task/delete"
+        body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Task"]
+        summary: "Delete task"
+        description: "This API for delete task by task id"
+    };
+  };
+
+  rpc SetStatusesTask(SetStatusesTaskRequest) returns (SetStatusesTaskResponse) {
+    option (google.api.http) = {
+        post: "/api/df-pupuk-indonesia/task/action"
+        body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags:["Task"]
+      summary: "Update Status"
+      description: "This API for update status task"
+    };
+  };
+
+  rpc GetDfList(google.protobuf.Empty) returns (GetDfListResponse) {
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/outbound/df-list"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { } 
+      tags: ["Outbound"]
+      summary: "Get df list;"
+      description: "This API for get df list"
+    };
+  }
+
+  rpc CheckDebitAccount(CheckDebitAccountRequest) returns (CheckDebitAccountResponse) {
+    option (google.api.http) = {
+      post: "/api/df-pupuk-indonesia/outbound/check-debit-account"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Outbound"]
+      summary: "Get debit account"
+      description: "This API for Get debit account info"
+    };
+  };
+
+  rpc GetFeeFromMenuLicense(google.protobuf.Empty) returns (GetFeeFromMenuLicenseResponse) {
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/outbound/fee-menu-license"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Outbound"]
+      summary: "Fee"
+      description: "This API for get fee from menu license"
+    };
+  };
+
+  rpc GetList(ListRequest) returns (ListResponse) {
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/list"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { } 
+      tags: ["DF Pupuk Indonesia"]
+      summary: "Get List"
+      description: "This API for get list df pupuk indonesia"
+    };
+  };
+
+  rpc DownloadTaskListFile(ListFileRequest) returns (google.api.HttpBody){
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/task/list/download/{file_format}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["DF Pupuk Indonesia"]
+      summary: "Download List Task"
+      description: "This API for download list task"
+    };
+  };
+
+  rpc ScheduledPayment(ScheduledPaymentRequest) returns (StandardResponse) {
+    option (google.api.http) = {
+        post: "/api/df-pupuk-indonesia/history/scheduled-payment"
+        body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["History"]
+        summary: "ScheduledPayment"
+        description: "This API for scheduled payment"
+    };
+  };
+  /* # end region CU DF Pupuk Indonesia # */
+};

@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+import "do-pupuk-indonesia-report-push/do_pupuk_indonesia_report_push_core.proto";
+
+package do_pupuk_indonesia_report_push.service.v1;
+option go_package = "./pb";
+
+message ErrorBodyResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message ReportPushRequest {
+  string app_key = 1;
+  string process_id = 2;
+  uint64 task_id = 3;
+  string esb_request = 4;
+  string esb_response = 5;
+  string http_status_code = 6;
+  string external_id = 7;
+  Status status = 8;
+  string description_message = 9;
+}
+
+message ReportPushResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message HealthCheckRequest {
+
+}
+
+message HealthCheckResponse {
+  string message = 1;
+}
+
+message UpdateTaskRequest {
+  uint64 task_id = 1;
+  Status status = 2;
+  string description_message = 3;
+}
+
+message TaskDataDOPupuk {
+  double amount = 1;
+  Status status = 2;
+  uint64 order_id = 3;
+  string warehouse = 4;
+  uint64 company_id = 5;
+  string destination = 6;
+  string booking_code = 7;
+  double total_amount = 8;
+  string debit_account = 9;
+  uint32 schedule_date = 10;
+  ScheduleType schedule_type = 11;
+  string transaction_id = 12;
+  string pickup_deadline = 13;
+  string booking_time_limit = 14;
+  string debit_account_name = 15;
+  string debit_account_type = 16;
+  string sales_order_number = 17;
+  string company_name_inquiry = 18;
+  string description_message = 19;
+}
+
+message NotificationData {
+  string creation_date = 1 [json_name='CREATION_DATE'];
+  string transaction_id = 2 [json_name='TRANSACTION_ID'];
+  string booking_code = 3 [json_name='BOOKING_CODE'];
+  string so_number = 4 [json_name='SO_NUMBER'];
+  string company_name = 5 [json_name='COMPANY_NAME'];
+  string debit_account_number = 6 [json_name='DEBIT_ACCOUNT_NUMBER'];
+  string debit_account_name = 7 [json_name='DEBIT_ACCOUNT_NAME'];
+  string total_amount = 8 [json_name='TOTAL_AMOUNT'];
+  string transaction_status = 9 [json_name='TRANSACTION_STATUS'];
+  string user_maker = 10 [json_name='USER_MAKER'];
+  string user_checker = 11 [json_name='USER_CHECKER'];
+  string user_signer = 12 [json_name='USER_SIGNER'];
+  string user_releaser = 13 [json_name='USER_RELEASER'];
+  string reason = 14 [json_name='REASON'];
+  string description_reject = 15 [json_name='DESCRIPTION_REJECT'];
+  string reject_from = 16 [json_name='REJECT_FROM'];
+  string description_rework = 17 [json_name='DESCRIPTION_REWORK'];
+  string rework_from = 18 [json_name='REWORK_FROM'];
+}

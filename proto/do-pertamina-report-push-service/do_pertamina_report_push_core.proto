@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package do_pertamina_report_push.service.v1;
+option go_package = "./pb";
+
+enum Status{
+  UNKNOWN_STATUS = 0;
+  DRAFT = 1;
+  ON_CHECKER = 2;
+  ON_SIGNER = 3;
+  ON_RELEASER = 4;
+  RETURNED = 5;
+  REJECTED = 6;
+  DELETED = 7;
+  SUSPEND = 8;
+  PROCESS = 9;
+  SUCCESS = 10;
+  FAILED = 11;
+};
+
+enum ModuleTypes {
+  UNKNOWN_MODULE = 0;
+  CASH_CARRY = 1;
+  QUOTATION = 2;
+  PRODUCT_ALLOCATION = 3;
+};

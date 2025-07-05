@@ -1,0 +1,292 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "issuance-lc-service/issued_lc_gorm_db.proto";
+import "google/protobuf/any.proto";
+import "issuance-lc-service/issued_lc_payload.proto";
+
+package issued.lc.service.v1;
+option go_package = "./pb";
+
+enum BgType {
+    BidBond = 0;
+    AdvancePayment = 1;
+    PerformanceBond = 2;
+    GovernmentPaymentGuarantee = 3;
+    MaintenanceBond = 4;
+    ProcurementBond = 5;
+    TransactionRiskBond = 6;
+    CustomsBond = 7;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 createdByID = 17;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string updatedByName = 11;
+    string reasons = 12;
+    string comment = 13;
+    string workflow = 14;
+    uint64 companyID = 15;
+    uint64 holdingID = 16;
+    google.protobuf.Timestamp createdAt = 101;
+    google.protobuf.Timestamp updatedAt = 102;
+}
+
+message WorkflowHeader {
+    uint64 productID = 1;
+    string productName = 2;
+    uint64 currencyID = 3;
+    string currencyName = 5;
+    uint64 companyID = 6;
+    string companyName = 7;
+    uint64 transactionalNumber = 10;
+    uint64 workflowID = 11;
+}
+
+message Participant {
+    uint64 userID = 1;
+    string userName = 2;
+    uint64 roleID = 3;
+    bool isReject = 5;
+    google.protobuf.Timestamp approvedAt = 6;
+    string step = 7;
+}
+
+message Participants {
+    int32 approvedCount = 1;
+    int32 rejectedCount = 2;
+    int32 Requirement = 3;
+    repeated Participant participants = 4;
+}
+
+message UserData {
+    uint64 userID = 1;
+    string username = 2;
+}
+
+message Flow {
+    uint64 workflowLogicID = 1;
+    Participants verifier = 2;
+    Participants approver = 3;
+    Participants releaser = 4;
+    bool isRejected = 5;
+    google.protobuf.Timestamp completedAt = 7;
+}
+
+message WorkflowRecords {
+    google.protobuf.Timestamp lastUpdatedAt = 1;
+    uint64 topRange = 2;
+    uint64 bottomRange = 3;
+    repeated Flow flows = 4;
+}
+
+message WorkflowPayload {
+    WorkflowHeader header = 1;
+    WorkflowRecords records = 2;
+    UserData createdBy = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    bool isDefault = 5;
+    bool isTransactional = 6;
+    repeated uint64 currentRoleIDs = 7;
+    string currentStep = 8;
+}
+
+message WorkflowTask {
+    WorkflowPayload workflow = 1;
+    string nextStatus = 2;
+    string nextStep = 3;
+}
+
+message CreateTaskIssuingRequest {
+    uint64 taskID = 1;
+    SaveIssuanceLC data = 2;
+    bool isDraft = 3;
+}
+
+message CreateTaskIssuingResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+}
+
+message GetTaskIssuingDetailRequest {
+    uint64 taskID = 1;
+}
+
+message GetTaskIssuingDetailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskIssuingData data = 4;
+}
+
+message TaskIssuingData {
+    Task task = 1;
+    Company company = 2;
+//    IssuingData data = 3;
+    WorkflowTask WorkflowTask = 4;
+}
+
+message IssuingData {
+    uint64 step = 1;
+    string referenceNo = 2 [(google.api.field_behavior) = OUTPUT_ONLY];;
+    string registrationNo = 3 [(google.api.field_behavior) = OUTPUT_ONLY];;
+    PublishingData publishing = 4;
+    AccountData account = 5;
+    ApplicantData applicant = 6;
+    ProjectData project = 7;
+    DocumentData document = 8;
+}
+
+message PublishingData {
+    ApplicantType applicantType = 1;
+    PublishingType publishingType = 2;
+    uint64 thirdPartyID = 3;
+    string thirdPartyName = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+    BgType bgType = 5;
+    string effectiveDate = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            format: "date",
+            pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            example: "\"2022-07-06\""
+        },
+        (validator.field) = {regex: "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"}
+    ];
+    string expiryDate = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            format: "date",
+            pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            example: "\"2022-07-06\""
+        },
+        (validator.field) = {regex: "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"}
+    ];
+    string remark = 8;
+    uint64 claimPeriod = 9;
+    string lawArticle = 10;
+    uint64 openingBranchId = 11;
+    string openingBranchName = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 publishingBranchId = 13;
+    string publishingBranchName = 14 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message AccountData {
+    string cif = 1;
+    string name = 2;
+    string accountNumber = 3;
+}
+
+message ApplicantData {
+    ApplicantType applicantType = 1;
+    string name = 2;
+    string birthDate = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            format: "date",
+            pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            example: "\"2022-07-06\""
+        },
+        (validator.field) = {regex: "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"}
+    ];
+    string dateEstablished = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            format: "date",
+            pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            example: "\"2022-07-06\""
+        },
+        (validator.field) = {regex: "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"}
+    ];
+    CompanyType companyType = 5;
+    Gender gender = 6;
+    string address = 7;
+    string contactPerson = 8;
+    string beneficiaryName = 9;
+    string beneficiaryAddress = 10;
+    string npwpNo = 11;
+    string phoneNumber = 12;
+    string email = 13;
+    string nik = 14;
+}
+
+message ProjectData {
+    string contractNumber = 1;
+    string name = 2;
+    string projectDate = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            format: "date",
+            pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            example: "\"2022-07-06\""
+        },
+        (validator.field) = {regex: "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"}
+    ];
+    string nrkNumber = 4;
+    string projectCurrency = 5;
+    double projectAmount = 6 [(validator.field) = {float_gte: 0}];
+    string bgCurrency = 7;
+    double bgAmount = 8 [(validator.field) = {float_gte: 0}];
+    string cashAccountNo = 9;
+    double cashAccountAmount = 10 [(validator.field) = {float_gte: 0}];
+    string cashAccountAmountString = 11;
+    string nonCashAccountNo = 12;
+    double nonCashAccountAmount = 13 [(validator.field) = {float_gte: 0}];
+    string nonCashAccountAmountString = 14;
+    ContractGuaranteeType contractGuaranteeType = 15;
+    double counterGuaranteeAmount = 16 [(validator.field) = {float_gte: 0}];
+    string counterGuaranteeAmountString = 17;
+    string insuranceLimitId = 18;
+    string sp3No = 19;
+}
+
+message DocumentData {
+    string businessLegal = 1;
+    string tender = 2;
+    string sp = 3;
+    string bg = 4;
+    string other = 5;
+}
+
+message TaskActionRequest {
+    uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject', 'delete'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+}
+message TaskActionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+}
+
+
+message GetTemplateResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    TemplateData data = 3;
+    SummaryLCAndCoverageAccountResponse summaryLC = 4;
+    GetTaskIssuingDetailResponse workflow = 5;
+}
+
+message GetWorkflowStatusRequest {
+    string transactionEventId = 1;
+}
+
+message GetWorkflowStatusResponse {
+    GetTaskIssuingDetailResponse workflow = 1;
+}

@@ -1,0 +1,312 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+
+package notification.service.v1;
+option go_package = "./pb";
+
+// Example User
+message User {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "users",
+    };
+    uint64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    string username = 2 [(google.api.field_behavior) = REQUIRED, (validator.field) = {msg_exists : true}, (gorm.field).tag = {unique: true not_null: true}];
+    string password = 3 [(google.api.field_behavior) = REQUIRED, (validator.field) = {msg_exists : true}, (gorm.field).tag = {not_null: true}];
+    string role = 4 [(validator.field) = {msg_exists : true}, (gorm.field).tag = {default: "user" not_null: true}];
+    google.protobuf.Timestamp createdAt = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deleted_at = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message NotificationModule {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "notification_modules",
+    };
+
+    uint64 moduleID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    string name = 2 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "varchar(255)"}];
+    bool isUKLN = 8 [(gorm.field).tag = {column: "is_ukln"}];
+    google.protobuf.Timestamp created_at = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deleted_at = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+    repeated ModuleEvent moduleEvents = 6 [(gorm.field).has_many = {preload: false}];
+    repeated ModuleVariable moduleVariables = 7 [(gorm.field).has_many = {preload: false}];
+}
+
+message ModuleEvent {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "module_events",
+    };
+
+    uint64 eventID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    NotificationModule module = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).belongs_to = {preload: false}];
+    string name = 3 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "varchar(255)"}];
+    google.protobuf.Timestamp created_at = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deleted_at = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+    repeated EventVariable eventVariables = 7 [(gorm.field).has_many = {preload: false}];
+    string notify = 8 [(gorm.field).tag = {type: "varchar(20)"}];
+    string template_title = 9 [(gorm.field).tag = {type: "text"}];
+    string template_description = 10 [(gorm.field).tag = {type: "text"}];
+    uint64 notification_module_module_id = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message ModuleVariable {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "module_variables",
+    };
+
+    uint64 variableID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    NotificationModule module = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).belongs_to = {preload: false}];
+    string name = 3 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "varchar(255)"}];
+    google.protobuf.Timestamp created_at = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deleted_at = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message EventVariable {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "event_variables",
+    };
+    uint64 variableID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    ModuleEvent event = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).belongs_to = {preload: false}];
+    string name = 3 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "varchar(255)"}];
+    string table = 4 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "varchar(255)"}];
+    string columnName = 5 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "varchar(255)"}];
+    google.protobuf.Timestamp created_at = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deleted_at = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message Notification {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "notifications",
+    };
+
+    uint64 notificationID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    ModuleEvent event = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).belongs_to = {}];
+    uint64 eventID = 16 [(gorm.field).tag = {column: "module_event_event_id"}];
+    string code = 4 [(gorm.field).tag = {type: "varchar(255)"}];
+    string description = 5 [(gorm.field).tag = {type: "varchar(255)"}];
+    google.protobuf.Timestamp createdAt = 6 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    uint64 createdByID = 7 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 updatedByID = 9 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp deleted_at = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 deletedByID = 11 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    NotificationSMS notificationSms = 12;
+    NotificationEmail notificationEmail = 13;
+    google.protobuf.Timestamp startAt = 17;
+    google.protobuf.Timestamp endAt = 18;
+    bool allCompany = 19;
+    uint64 userID = 20 [(gorm.field).tag = {column: "user_id"}];
+    string title = 21 [(gorm.field).tag = {type: "varchar(255)"}];
+    string moduleName = 22;
+    string countryName = 23 [ (gorm.field).tag = {column:"country_name" type: "text" not_null: true}];
+    bool isActive = 24 [(gorm.field).tag = {column: "is_active" type: "bool" not_null: true}];
+}
+
+message NotificationFCM {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "notification_fcms",
+    };
+
+    uint64 notificationID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 userID = 2 [(gorm.field).tag = {column: "user_id"}];
+    string title = 3 [(gorm.field).tag = {type: "varchar(255)"}];
+    string description = 4 [(gorm.field).tag = {type: "varchar(255)"}];
+    uint64 moduleID = 5 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp createdAt = 6 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    uint64 createdByID = 7 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 updatedByID = 9 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp deleted_at = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 deletedByID = 11 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    string moduleName = 13;
+    string times = 14;
+    bool isRead = 15;
+}
+
+message NotificationCompany {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "notification_company",
+    };
+
+    uint64 notificationCompanyID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 companyID = 7 [(gorm.field).tag = {}];
+    string name = 2 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "varchar(255)"}];
+    Notification notification = 15 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).belongs_to = {}];
+    google.protobuf.Timestamp created_at = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deleted_at = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message NotificationTask {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "notification_tasks",
+    };
+
+    uint64 taskID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true column: "TaskID"}];
+    uint64 notificationID = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true column: "NotificationID"}];
+    Notification Notification = 3 [(gorm.field).tag = {foreignkey: "NotificationID"}];
+}
+
+message NotificationSMS {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "notification_sms",
+    };
+    uint64 smsDeliveryID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    Notification notification = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).belongs_to = {}];
+    string rekening = 3 [(gorm.field).tag = {type: "varchar(255)"}];
+    string produk = 4 [(gorm.field).tag = {type: "text"}];
+    string phoneNumber = 5 [(gorm.field).tag = {type: "text"}];
+    string content = 6 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "text"}];
+    uint64 createdByID = 7 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    uint64 updatedByID = 8 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    uint64 deletedByID = 9 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deletedAt = 103 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message NotificationEmail {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "notification_emails",
+    };
+    uint64 emailDeliveryID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    Notification notification = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).belongs_to = {}];
+    string produk = 3 [(gorm.field).tag = {type: "text"}];
+    string emailTo = 4 [(gorm.field).tag = {type: "text"}];
+    string emailCc = 5 [(gorm.field).tag = {type: "text"}];
+    string subject = 6 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "text"}];
+    string body = 7 [(google.api.field_behavior) = REQUIRED, (gorm.field).tag = {type: "text"}];
+    uint64 createdByID = 8 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    uint64 updatedByID = 9 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    uint64 deletedByID = 10 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deletedAt = 103 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message TempClient {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "temp_clients",
+    };
+
+    uint64 clientID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true column: "ClientID"}];
+    string name = 2 [(gorm.field).tag = {column: "Name"}];
+    string email = 3 [(gorm.field).tag = {column: "Email"}];
+    string phone = 4 [(gorm.field).tag = {column: "Phone"}];
+}
+
+message DefaultNotifications {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "default_notifications",
+    };
+    uint64 defaultID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    string eventName = 2 [(gorm.field).tag = {type: "varchar(255)"}];
+    string title = 3 [(gorm.field).tag = {type: "varchar(255)"}];
+    string message = 4 [(gorm.field).tag = {type: "text"}];
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {}];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deletedAt = 103 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message NotificationEmailTemplate {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "notification_emails_template",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string key = 3 [(gorm.field).tag = {not_null: true}];
+    string value = 4 [(gorm.field).tag = {not_null: true}];
+}
+
+message ViewTaskNotifications{
+    option (gorm.opts) = {
+        ormable: true,
+        table: "view_task_notifications",
+    };
+
+    string taskID = 1 [
+        (gorm.field).tag = {column: "task_id"}
+    ];
+
+    string notificationCode = 2 [
+        (gorm.field).tag = {column: "notification_code"}
+    ];
+
+    string module = 3 [
+        (gorm.field).tag = {column: "module"}
+    ];
+
+    string notificationDescription = 4 [
+        (gorm.field).tag = {column: "notification_description"}
+    ];
+
+    string event = 5 [
+        (gorm.field).tag = {column: "event"}
+    ];
+
+    string startDate = 6 [
+        (gorm.field).tag = {column: "start_date"}
+    ];
+
+    string endDate = 7 [
+        (gorm.field).tag = {column: "end_date"}
+    ];
+
+    string data = 8 [
+        (gorm.field).tag = {column: "data"}
+    ];
+
+    string countryName = 9 [
+        (gorm.field).tag = {column: "country_name"}
+    ];
+
+    string createdAt = 10 [
+        (gorm.field).tag = {column: "created_at"}
+    ];
+
+    string updatedAt = 11 [
+        (gorm.field).tag = {column: "updated_at"}
+    ];
+
+    string createdByName = 12 [
+        (gorm.field).tag = {column: "created_by_name"}
+    ];
+
+    string reviewedByName = 13 [
+        (gorm.field).tag = {column: "reviewed_by_name"}
+    ];
+
+    string status = 14 [
+        (gorm.field).tag = {column: "status"}
+    ];
+
+    bool isActive = 15 [
+        (gorm.field).tag = {column: "is_active"}
+    ];
+}
+
+message MappingVariable {
+    string key = 1;
+    string value = 2;
+}

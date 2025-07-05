@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "forecasting-generate-email-service/forecasting_generate_email_payload.proto";
+import "google/protobuf/empty.proto";
+// import "google/api/httpbody.proto";
+
+package forecasting_generate_email.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+    rpc HealthCheck(google.protobuf.Empty) returns (HealthCheckResponse){
+        option (google.api.http) = {
+            get: "/api/forecasting-generate-email/health-check"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Health Check"
+            description: "",
+        };
+    }
+
+    rpc ScheduleNotification(google.protobuf.Empty) returns (ScheduleNotificationResponse){
+        option (google.api.http) = {
+            get: "/api/forecasting-generate-email/schedule"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Summary Schedule"
+            description: "",
+        };
+    }
+
+    rpc RetryFileDownload(google.protobuf.Empty) returns (RetryFileDownloadResponse) {
+        option (google.api.http) = {
+            get: "/api/forecasting-generate-email/retry"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "summary schedule"
+            description: "",
+        };
+    }
+    
+    rpc ResendNotification(ResendNotificationRequest) returns (ResendNotificationResponse) {
+        option (google.api.http) = {
+            post: "/api/forecasting-generate-email/resend"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "summary resend"
+            description: "",
+        };
+    }
+
+    rpc ReportForecasting(ReportForecastingRequest) returns (ReportForecastingResponse) {};
+
+}

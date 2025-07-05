@@ -1,0 +1,189 @@
+syntax = "proto3";
+
+package transfer.service.v1;
+option go_package = "./pb";
+
+import "google/protobuf/timestamp.proto";
+
+enum TaskStatus {
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+    DeleteRequest = 6;
+    Deleted = 7;
+}
+
+enum TaskStep {
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+}
+
+message Participant {
+    uint64 userID = 1;
+    string userName = 2;
+    uint64 roleID = 3;
+    bool isReject = 5;
+    google.protobuf.Timestamp approvedAt = 6;
+    string step = 7;
+}
+
+message Participants {
+    int32 approvedCount = 1;
+    int32 rejectedCount = 2;
+    int32 Requirement = 3;
+    repeated Participant participants = 4;
+}
+
+message Flow {
+    uint64 workflowLogicID = 1;
+    Participants verifier = 2;
+    Participants approver = 3;
+    Participants releaser = 4;
+    bool isRejected = 5;
+    google.protobuf.Timestamp completedAt = 7;
+}
+
+message WorkflowRecords {
+    google.protobuf.Timestamp lastUpdatedAt = 1;
+    uint64 topRange = 2;
+    uint64 bottomRange = 3;
+    repeated Flow flows = 4;
+}
+
+message UserData {
+    uint64 userID = 1;
+    string username = 2;
+}
+
+message WorkflowHeader {
+    uint64 productID = 1;
+    string productName = 2;
+    uint64 currencyID = 3;
+    string currencyName = 5;
+    uint64 companyID = 6;
+    string companyName = 7;
+    uint64 transactionalNumber = 10;
+    uint64 workflowID = 11;
+    uint64 uaID = 12; // used account id
+}
+
+message WorkflowPayload {
+    WorkflowHeader header = 1;
+    WorkflowRecords records = 2;
+    UserData createdBy = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    bool isDefault = 5;
+    bool isTransactional = 6;
+    repeated uint64 currentRoleIDs = 7;
+    string currentStep = 8;
+    repeated uint64 participantUserIDs = 9;
+}
+
+message ValidateWorkflowData {
+    WorkflowPayload workflow = 1;
+    string nextStatus = 2;
+    string nextStep = 3;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string updatedByName = 11;
+    string reasons = 12;
+    string comment = 13;
+    uint64 companyID = 22;
+    uint64 holdingID = 23;
+    google.protobuf.Timestamp createdAt = 101;
+    google.protobuf.Timestamp updatedAt = 102;
+    uint64 createdByID = 103;
+}
+
+message HealthCheckRequest {}
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message NotificationData {
+    string ACCOUNT_ALIAS = 1 [json_name='ACCOUNT_ALIAS'];
+    string ACCOUNT_HOLDER_NAME = 2 [json_name='ACCOUNT_HOLDER_NAME'];
+    string ACCOUNT_NUMBER = 3 [json_name='ACCOUNT_NUMBER'];
+    string BANK_NAME = 4 [json_name='BANK_NAME'];
+    string BENEFICIARY_ACCOUNT_ALIAS = 5 [json_name='BENEFICIARY_ACCOUNT_ALIAS'];
+    string BENEFICIARY_ACCOUNT_CURRENCY_NAME = 6 [json_name='BENEFICIARY_ACCOUNT_CURRENCY_NAME'];
+    string BENEFICIARY_ACCOUNT_HOLDER_NAME = 7 [json_name='BENEFICIARY_ACCOUNT_HOLDER_NAME'];
+    string BENEFICIARY_ACCOUNT_NUMBER = 8 [json_name='BENEFICIARY_ACCOUNT_NUMBER'];
+    string COMMENT = 9 [json_name='COMMENT'];
+    string COMPANY_NAME = 10 [json_name='COMPANY_NAME'];
+    string CREATED_DATE = 11 [json_name='CREATED_DATE'];
+    string CREATED_DATETIME = 12 [json_name='CREATED_DATETIME'];
+    string CREATED_TIME = 13 [json_name='CREATED_TIME'];
+    string CURRENCY_NAME = 14 [json_name='CURRENCY_NAME'];
+    string EVENT_DATE = 15 [json_name='EVENT_DATE'];
+    string EVENT_DATETIME = 16 [json_name='EVENT_DATETIME'];
+    string EVENT_TIME = 17 [json_name='EVENT_TIME'];
+    string EXCHANGE_RATE = 18 [json_name='EXCHANGE_RATE'];
+    string EXCHANGE_RATE_CURRENCY = 19 [json_name='EXCHANGE_RATE_CURRENCY'];
+    string MODULE = 20 [json_name='MODULE'];
+    string REASON = 21 [json_name='REASON'];
+    string RECEIVED_AMOUNT = 22 [json_name='RECEIVED_AMOUNT'];
+    string REMARK = 23 [json_name='REMARK'];
+    string SEND_AMOUNT = 24 [json_name='SEND_AMOUNT'];
+    string STATUS_ACTION = 25 [json_name='STATUS_ACTION'];
+    string TASK_ID = 26 [json_name='TASK_ID'];
+    string TRANSACTION_ID = 27 [json_name='TRANSACTION_ID'];
+    string USERNAME_APPROVER = 28 [json_name='USERNAME_APPROVER'];
+    string USERNAME_CHECKER = 29 [json_name='USERNAME_CHECKER'];
+    string USERNAME_MAKER = 30 [json_name='USERNAME_MAKER'];
+    string USERNAME_REJECTOR = 31 [json_name='USERNAME_REJECTOR'];
+    string USERNAME_RELEASER = 32 [json_name='USERNAME_RELEASER'];
+}
+
+message GetListOngoingInternalTransferResponseData {
+    string createdDate = 1;
+    string transactionID = 2;
+    string senderAccountName = 3;
+    string senderAccountNumber = 4;
+    string receiverAccountName = 5;
+    string receiverAccountNumber = 6;
+    string transactionSchedule = 7;
+    double amount = 8;
+    double receivedAmount = 9;
+    string createdByName = 10;
+    string lastApprovedByName = 11;
+    string status = 12;
+    repeated  string nextApprover = 13;
+    ValidateWorkflowData workflow = 14;
+    string dealCode = 15;
+    string parentID = 16;
+    string transactionDate = 17;
+    string senderAccountCurrency = 18;
+    string receiverAccountCurrency = 19;
+    uint64 taskID = 20;
+    string scheduleAt = 21;
+    string scheduleDate = 22;
+    string scheduleTime = 23;
+    string recurringDate = 24;
+    string recurringDay = 25;
+    string recurringFrequency = 26;
+    string recurringPeriodEnd = 27;
+    string recurringPeriodStart = 28;
+    string recurringTime = 29;
+    double exchangeRate = 30;
+    string exchangeRateCurrency = 31;
+    double feeAmount = 32;
+    double feeAmountSender = 33;
+}

@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+import "issuance-lc-service/issued_lc_payload.proto";
+import "google/protobuf/empty.proto";
+
+package issued.lc.service.v1;
+option go_package = "./pb";
+message FileIssuedLCListRequest {
+    string page = 1;
+    string limit = 2;
+    string channelId = 3;
+    string channelCompanyId = 4;
+    string channelUserId = 5;
+    string registrationNo = 6;
+    string currency = 7;
+    string applicantName = 8;
+    string beneficiaryName = 9;
+    string beneficiaryCountry = 10;
+    string subProduct = 11;
+    string statusChannel = 12;
+    string approvalPosition = 13;
+    string statusInternal = 14;
+    string teamPosition = 15;
+    string issueDate = 16;
+    string expiryDate = 17;
+    string startIncomingDate = 18;
+    string endIncomingDate = 19;
+    string fileFormat = 25;
+}
+
+message DownloadPreviewMTRequest {
+    string transactionEventId = 1;
+}
+
+message DownloadFileFromMinioRequest {
+    string fileName = 1;
+    string contentDisposition = 2;
+}
+
+message GetFileDownloadFromMinioRequest {
+    string fileName = 1;
+}
+
+message GetFileDownloadFromMinioResponse {
+    string urlDownload = 1;
+}
+
+message FileUploadHandlerResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    string fileID = 4;
+    string urlDownload = 5;
+    string originalFileName = 6;
+}

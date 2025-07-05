@@ -1,0 +1,538 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+// import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/httpbody.proto";
+
+import "task-service/task.payload.proto";
+import "task-service/task.payload_ev.proto";
+
+package task.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Task Service";
+        version: "0.1";
+    };
+
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+
+    schemes: HTTP;
+    // schemes: HTTPS;
+    consumes: "application/json";
+    produces: "application/json";
+};
+
+service TaskService {
+    rpc SaveTaskWithData(SaveTaskRequest) returns (SaveTaskResponse) {};
+    rpc SaveTaskWithDataEV(SaveTaskRequestEV) returns (SaveTaskResponseEV) {};
+
+    rpc GenerateTaskWithWokflow(GenerateTaskWithWokflowRequest) returns (SaveTaskResponse) {};
+    rpc SaveTaskWithWorkflow(SaveTaskRequest) returns (SaveTaskResponse) {};
+
+    rpc SetTask(SetTaskRequest) returns (SetTaskResponse) {
+        option (google.api.http) = {
+            post: "/api/task/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+    rpc SetTaskWithWorkflowEncrypted(SetTaskWithWorkflowRequestEncrypted) returns (SetTaskWithWorkflowResponse) {
+        option (google.api.http) = {
+            post: "/api/task/v2/workflow/ev"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task encrypted by action"
+            description: "This API is used for set task encrypted taskID by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    }
+
+    rpc SetTaskWithWorkflowWithResCache(SetTaskWithWorkflowRequestWithResCache) returns (SetTaskWithWorkflowResponse) {
+        option (google.api.http) = {
+            post: "/api/task/workflow"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    }
+    rpc SetTaskWithWorkflow(SetTaskWithWorkflowRequest) returns (SetTaskWithWorkflowResponse) {
+        // option (google.api.http) = {
+        //     post: "/api/task/workflow"
+        //     body: "*"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     summary: "Set status task by action"
+        //     description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        // };
+    };
+    rpc SetTaskEV(SetTaskRequestEV) returns (SetTaskResponseEV) {
+        option (google.api.http) = {
+            post: "/api/task/{taskID}/ev"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+    rpc GetListTaskWithToken(ListTaskRequest) returns (ListTaskWithTokenResponse) {
+        option (google.api.http) = {
+            get: "/api/task/normal"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list data task"
+            description: "This API is used for get list data task"
+        };
+    };
+    rpc GetListTask(ListTaskRequest) returns (ListTaskResponse);
+    rpc GetListTaskV2(ListTaskRequestV2) returns (ListTaskResponse);
+    rpc GetListUserTask(UserListTaskRequest) returns (UserListTaskResponse);
+    rpc GetListTaskNewFilter(ListTaskNewFilterRequest) returns (ListTaskNewFilterResponse);
+
+    rpc GetListTaskRPC(ListTaskRequest) returns (ListTaskResponse);
+
+    rpc GetListMenuTask(ListTaskRequest) returns (MenuListTaskResponse);
+    rpc GetMenuTaskByID(MenuTaskByID) returns (MenuTaskByIDResponse);
+
+
+    rpc GetListTaskPluck(ListTaskPluckRequest) returns (ListTaskPluckResponse);
+
+    rpc GetListTaskEV(ListTaskRequestEV) returns (ListTaskResponseEV) {
+        option (google.api.http) = {
+            get: "/api/task"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list data task"
+            description: "This API is used for get list data task"
+        };
+    };
+
+    rpc GetTaskGraphStatus(GraphStatusRequest) returns (GraphStatusResponse) {
+        option (google.api.http) = {
+            get: "/api/task/graph/status"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get graph data by status task"
+            description: "This API is used for get graph data base on status task"
+        };
+    };
+
+    rpc GraphStatusColumnType(GraphStatusColumnTypeRequest) returns (GraphStatusColumnTypeResponse) {
+        option (google.api.http) = {
+            get: "/api/task/graph/column-type"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get graph data by column name"
+            description: "This API is used for get graph data base on column name"
+        };
+    };
+
+    rpc GetTaskGraphStepWithGrpc(GraphStepRequest) returns (GraphStepResponse) {
+        option (google.api.http) = {
+            get: "/api/task/graph/steps"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get graph data by step task"
+            description: "This API is used for get graph data base on step task"
+        };
+    };
+
+    rpc GetMyPendingTaskWithWorkflowGraph(GetMyPendingTaskWithWorkflowGraphRequest) returns (GetMyPendingTaskWithWorkflowGraphResponse) {
+        option (google.api.http) = {
+            get: "/api/task/my-graph/workflow"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get my pending task graph "
+            description: "This API is used for get user own pending task graph for task with workflow only"
+        };
+    }
+
+    rpc GetListAnnouncement(ListRequest) returns (ListTaskResponse);
+    
+    rpc AssignTypeID(AssignaTypeIDRequest) returns (AssignaTypeIDResponse);
+    rpc AssignTypeIDEV(AssignaTypeIDRequestEV) returns (AssignaTypeIDResponse);
+
+    rpc GetTaskByID(GetTaskByIDReq) returns (GetTaskByIDRes);
+    rpc GetTaskByTypeID(GetTaskByTypeIDReq) returns (GetTaskByTypeIDRes);
+
+    rpc GetTaskByIDNoFilter(GetTaskByIDReq) returns (GetTaskByIDRes);
+
+    rpc RejectBySystem(RejectBySystemReq) returns (RejectBySystemRes);
+
+    rpc GetActivityLogs(GetActivityLogsReq) returns (GetActivityLogsRes){
+        option (google.api.http) = {
+            post: "/api/task/activity-logs/{type}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get activity logs"
+            description: "This API is used for get activity logs"
+        };
+    };
+
+    rpc DownloadActivityLogs(DownloadActivityLogsReq) returns (google.api.HttpBody){
+        option (google.api.http) = {
+            post: "/api/task/activity-logs/{type}/download/{fileformat}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Download activity logs"
+            description: "This API is used for download activity logs"
+        };
+    };
+
+    rpc TestLogger(LoggerTestReq) returns (LoggerTestRes){
+        option (google.api.http) = {
+            post: "/api/task/test/logger"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: {}
+        };
+    }
+
+    // rpc GetTaskGraphStepWithGrpc(GraphStepRequest) returns (GraphStepResponse) {
+    //     option (google.api.http) = {
+    //         get: "/api/task/graph/stepswithgrpc"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         summary: "Get graph data by step task"
+    //         description: "This API is used for get graph data base on step task"
+    //     };
+    // };
+
+    rpc UpdateTaskData(UpdateTaskDataReq) returns (UpdateTaskDataRes){
+    }
+
+    rpc UpdateTaskWorkflow(UpdateTaskWorkflowReq) returns (UpdateTaskWorkflowRes){
+    }
+
+    rpc UpdateTaskRaw(UpdateTaskRawReq) returns (SetTaskResponse){
+    }
+
+    rpc DeleteDraftTask(DeleteDraftTaskRequest) returns (DeleteDraftTaskResponse);
+
+    rpc DeleteFinishedTask(DeleteFinishedTaskRequest) returns (DeleteFinishedTaskResponse);
+
+    rpc GetTaskSummary(ListTaskRequest) returns (TaskSummaryResponse);
+
+    rpc GetTaskSummaryAmount(ListTaskRequest) returns (TaskSummaryAmountResponse);
+
+    rpc GetResCache(ResCacheReq) returns (ResCacheRes) {
+        option (google.api.http) = {
+            post: "/api/task/rescache"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Response Cache"]
+            summary: "Get Response Cache"
+            description: "This API for get response cache"
+        };
+      }
+
+    rpc SaveCompanyTaskWithData(SaveCompanyTaskRequest) returns (SaveCompanyTaskResponse) {};
+
+    rpc SaveUserTask(SaveUserTaskRequest) returns (SaveUserTaskResponse) {};
+
+    rpc Bidi_GetTasks_(stream BidiGetTasksReq) returns (stream BidiGetTasksRes){};
+
+    rpc SaveTaskFromProxy(SaveTaskRequest) returns (SaveTaskResponse){};
+    rpc FindCompanyByCode(FindCompanyByCodeReqeust) returns (SetTaskResponse){};
+
+     // Mass transfer
+    rpc SetMassTransferTask(SetTaskMassTransfer) returns (SetTaskMassTransferResponse){
+        option (google.api.http) = {
+            post: "/api/task/mass-transfer/workflow"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action based on mass transfer ids"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+    // Task Mass Transfer
+    rpc GenerateTaskMassTransfer(GenerateTaskMassTransferRequest) returns (GenerateTaskMassTransferResponse) {
+        option (google.api.http) = {
+            post: "/api/task/mass-transfer"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action based on mass transfer ids"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    }
+    
+    rpc GetTaskMassTransfer(GetTaskMassTransferReq) returns (GetTaskMassTransferRes){};
+
+    rpc CheckTaskMassTransferAuthorized(CheckTaskMassTransferAuthorizedReqV2) returns (CheckTaskMassTransferAuthorizedResV2){};
+
+    rpc SaveTaskMassTransferWithWorkflow(SaveTaskMassTransferRequest) returns (SaveTaskMassTransferResponse) {};
+
+    rpc GetResponsibleUser(ListTaskRequest) returns (ResponsibleUserRes) {
+        option (google.api.http) = {
+            get: "/api/task/get-responsible-user"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list company task created and approved by V2"
+            description: "This API for get list company admins task V2",
+        };
+    };
+    
+    rpc GetListByColumn(GetListRequest) returns (ListTaskPluckResponse) {
+        option (google.api.http) = {
+            post: "/api/task/list"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list task by column"
+            description: "This API for get data by column",
+        };
+    };
+    
+    rpc DeleteFinishedTaskMassTransfer(DeleteFinishedTaskMassTransferRequest) returns (DeleteFinishedTaskMassTransferResponse);
+    rpc SetActivityLogs(SetActivityLogRequest) returns (SetActivityLogRespoonse){
+        option (google.api.http) = {
+            post: "/api/task/set-activity-logs"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set activity logs"
+            description: "This API is used for get activity logs"
+        };
+    };
+    rpc SetActivityLogsWithoutContext(SetActivityLogRequest) returns (SetActivityLogRespoonse);
+
+    rpc GetListTaskMassTransfer(GetListTaskMassTransferRequest) returns (GetListTaskMassTransferResponse){
+        option (google.api.http) = {
+            get: "/api/task/mass-transfer/list"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list task mass transfer"
+            description: "This API for get list task mass transfer",
+        };
+    };
+
+    rpc GetOnlyAuthorizedListTaskMassTransfer(GetOnlyAuthorizedListTaskMassTransferRequest) returns (GetOnlyAuthorizedListTaskMassTransferResponse){};
+
+    rpc GetListMassTransferWithoutRole(GetListTaskMassTransferRequest) returns (GetListTaskMassTransferResponse){};
+
+    // BEGIN UKLN 
+    // UKLN IFT
+    rpc UpdateUklnTaskChildBak (UpdateUklnTaskChildBakRequest) returns (UpdateUklnTaskChildBakResponse) {};
+    rpc GetTaskUkln(GetTaskUklnRequest) returns (GetTaskUklnResponse){};
+    rpc GetListTaskUKLN(GetListTaskUKLNRequest) returns (GetListTaskUKLNResponse){
+        option (google.api.http) = {
+            get: "/api/task/ukln-ift"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list task UKLN"
+            description: "This API for get list task UKLN",
+        };
+    };
+    rpc DeleteUklnTask(DeleteUklnTaskRequest) returns (DeleteUklnTaskResponse) {};
+
+    rpc SaveTaskWithDataWithoutSession(SaveTaskWithoutSessionRequest) returns (SaveTaskResponse) {};
+
+    // UKLN Mass Transaction
+    rpc GetTaskGlobalMassTransaction (GetTaskGlobalMassTransactionRequest) returns (GetTaskGlobalMassTransactionResponse) {
+        option (google.api.http) = {
+            post: "/api/task/global-mass-transaction"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list task global mass transaction"
+            description: "This API for get task global mass transaction"
+        };
+    };
+
+    rpc SetTaskGlobalMassTransaction (SetTaskGlobalMassTransactionRequest) returns (SetTaskGlobalMassTransactionResponse) {
+       option (google.api.http) = {
+            post: "/api/task/global-mass-transaction/set"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set task for handle M/C/S/R for task global mass transaction"
+            description: "This API for set task global mass transaction"
+        };         
+    }
+
+    
+    rpc SaveTaskGlobalMassTransactionWithDataWithoutSession(SaveTaskGlobalMassTransactionWithDataWithoutSessionRequest) returns (SaveTaskResponse) {};
+    // END UKLN
+
+
+    //This section is for task proxy
+    rpc GetTaskProxy (ListTaskRequestV2) returns (ListTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/task/v3"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list data task"
+            description: "This API is used for get list data task"
+        };
+    };
+
+    // Get Task Statuses Counter
+    rpc GetTaskStatusesCounter(GetTaskStatusesCounterRequest) returns (GetTaskStatusesCounterResponse){
+        option (google.api.http) = {
+            get: "/api/task/statuses/counter"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Task Statuses Counter"
+            description: "This API is for Get task statuses counter"
+        };
+    }
+
+    rpc SetTaskWithoutSession(SetTaskWithoutSessionRequest) returns (SetTaskResponse) {
+        option (google.api.http) = {
+            post: "/api/task/without-session/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    }
+    rpc GetListTransactionPegadaian(GetListTransactionPegadaianRequest) returns (ListTaskResponse){};
+    rpc CountStatusItems(CountStatusItemsRequest) returns (CountStatusItemsResponse){};
+    rpc FilterDistinct (FilterDistinctRequest) returns (FilterDistinctResponse){};
+    rpc CountStatusItemsV2(CountStatusItemsRequest) returns (CountStatusItemsResponse){};
+    rpc DistinctByColumn(DistinctByColumnRequest) returns (DistinctByColumnResponse){};
+    rpc SaveTaskWithWorkflowWithoutSession(SaveTaskWithoutSessionReq) returns (SaveTaskResponse) {};
+
+    rpc CountStatusItemMPN(CountStatusItemsRequest) returns (CountStatusItemMPNResponse){};
+    rpc GetTaskPendingMPNWithApproverName(GetTaskMPNWithApproverNameRequest) returns (GetTaskMPNWithApproverNameResponse){};
+
+    rpc CheckCompanyTaskWithLoginCode(CheckCompanyTaskWithLoginCodeRequest) returns (CheckCompanyTaskWithLoginCodeResponse){};
+
+    rpc DeleteTaskByCompanyIdRPC(DeleteTaskByCompanyIdRequest) returns (DeleteFinishedTaskResponse){};
+
+    rpc DeleteTaskByDataCompanyIdRegolRPC(DeleteTaskByDataCompanyIdRegolRequest) returns (DeleteFinishedTaskResponse){};
+
+    rpc GetHistoryTasks(GetHistoryTasksRequest) returns (ListTaskResponse) {
+        option (google.api.http) = {
+            post: "/api/task/history"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get history task"
+            description: "This API is used to get history task"
+        };
+    }
+
+    rpc GetHistoryTaskById(GetHistoryTaskByIdRequest) returns (GetHistoryTaskByIdResponse) {
+        option (google.api.http) = {
+            post: "/api/task/history/by-id"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get history task by id"
+            description: "This API is used to get history task by task id"
+        };
+    }
+
+    rpc ListTaskV4(ListTaskV4Request) returns (ListTaskV4Response) {
+        option (google.api.http) = {
+            get: "/api/v4/tasks"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "List task general for pending/finished"
+            description: "This API is used to get list task general for pending/finished"
+            tags: ["V4"]
+        };
+    }
+
+    rpc SaveTaskV4(SaveTaskRequestV4) returns (SaveTaskResponseV4) {
+        option (google.api.http) = {
+            post: "/api/v4/tasks"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Save task v4"
+            description: "This API is used to save task v4"
+            tags: ["V4"]
+        };
+    }
+
+    rpc GetMenuByCompanyAndIsParent(GetMenuByCompanyAndIsParentRequest) returns (GetMenuByCompanyAndIsParentResponse) {
+        option (google.api.http) = {
+            post: "/api/task/getmenu/by-company-and-is-parent"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get menu by company and type"
+            description: "This API is get menu by company and is parent"
+        };
+    }
+
+    rpc RollbackTaskByProductAndCompanyIDRPC(DeleteTaskByCompanyIdRequest) returns (DeleteFinishedTaskResponse){};
+
+    rpc SaveTaskWithoutSessionV4(SaveTaskRequestWithoutSessionV4) returns (SaveTaskResponseV4) {
+        option (google.api.http) = {
+            post: "/api/v4/tasks/without-session"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Save task without session v4"
+            description: "This API is used to save task without session v4"
+            tags: ["V4"]
+        };
+    }
+    rpc GetTaskByIDNative(GetTaskByIDReq) returns (GetTaskByIDRes) {};
+    rpc DeleteDraftTaskRPC(DeleteDraftTaskRPCRequest) returns (DeleteDraftTaskResponse);
+
+    rpc GetListTaskRegol(GetListTaskRegolRequest) returns (ListTaskResponse);
+
+    rpc GetFileNameAccountRegistration(GetFileNameAccountRegistrationRequest) returns (GetFileNameAccountRegistrationResponse) {};
+
+    rpc GetTaskMultipaymentV2(GetTaskMultipaymentRequest) returns (GetTaskMultipaymentListResponse) {};
+
+    // Get Task Statuses Counter for ift
+    rpc GetTaskStatusesCounterIFT(GetTaskStatusesCounterIFTRequest) returns (GetTaskStatusesCounterResponse){}
+}
+
+message ResCacheReq {
+    string rcode = 1;
+}
+
+message ResCacheRes {
+    string response = 1;
+    string error = 2;
+    string responseCode = 3;
+    string status = 4;
+    SetTaskWithWorkflowResponse data = 5;
+}
+
+message LoggerTestReq {
+    string message = 1;
+}
+
+message LoggerTestRes {
+    string message = 1;
+}

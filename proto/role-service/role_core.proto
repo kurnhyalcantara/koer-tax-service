@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package role.service.v1;
+option go_package = "./pb";
+
+enum Direction {
+    UNKNOWN_DIRECTION = 0;
+    DESC = 1;
+    ASC = 2;
+};
+
+message Pagination {
+    int32 limit = 1;
+    int32 page = 2;
+    string sort = 3;
+    Direction dir = 4;
+    uint64 total_pages = 5;
+    uint64 total_rows = 6;
+    string filter = 7;
+};
+
+message UserAuthority {
+    bool isMaker = 1;
+    bool isChecker = 2;
+    bool isSigner = 3;
+    bool isReleaser = 4;
+};

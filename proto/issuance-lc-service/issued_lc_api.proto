@@ -1,0 +1,455 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "issuance-lc-service/issued_lc_payload.proto";
+import "issuance-lc-service/issued_lc_task_payload.proto";
+import "issuance-lc-service/issued_lc_file_payload.proto";
+
+package issued.lc.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+    info: {
+        title: "Issuance LC Service"
+        version: "v1.0.0"
+        license: {
+            name: "Zeus Team APP"
+        }
+    }
+    consumes: ["application/x-www-form-urlencoded"]
+};
+
+service IssuedLcService {
+
+    //CREATE
+    rpc SaveTemplate(GlobalRequest) returns (GeneralResponse){
+        option (google.api.http) = {
+            post: "/api/issuance-lc/saveTemplate"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+//             security: { } // Disable security key
+            summary: "Save template"
+            description: "This API for save template"
+        };
+    }
+
+    rpc SaveLog(SaveTransactionLog) returns (GeneralResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/SaveTransactionLog"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Save Transaction Log Issue LC"
+            description: "This API for Save Transaction Log Issue LC"
+        };
+    }
+
+    rpc SaveIssuedLc(GlobalRequest) returns (SaveIssuanceResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/SaveIssuedLc"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Save Issued LC"
+            description: "This API for save issued lc"
+        };
+    }
+
+    //READ
+    rpc GetTemplateById(IssuedLcRequest) returns (GetTemplateResponse){
+        option (google.api.http) = {
+            get: "/api/issuance-lc/getTemplateById/{id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get template by Id"
+            description: "This API for get template by Id"
+        };
+    }
+
+    rpc GetListTemplate(GetListTemplateRequest) returns (GetListTemplateResponse){
+        option (google.api.http) = {
+            post: "/api/issuance-lc/getListTemplate"
+             body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get list template by User Id"
+            description: "This API for get List template by User Id"
+        };
+    }
+    
+    rpc GetAmountToWord(GetAmountToWordRequest) returns (GetAmountToWordResponse){
+        option (google.api.http) = {
+            get: "/api/issuance-lc/getAmountToWord"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get amount to word"
+            description: "Mengubah nominal menjadi kalimat"
+        };
+    }
+
+    rpc GetListAccount(GetListAccountWithImportLineRequest) returns (GetListAccountWithImportLineResponse){
+        option (google.api.http) = {
+            get: "/api/issuance-lc/getListAccountWithImportLine"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get list account with import line"
+            description: "Get list account with import line"
+        };
+    }
+
+    rpc GetListMasterFacility(GetMasterFacilityRequest) returns (GetMasterFacilityResponse){
+        option (google.api.http) = {
+            get: "/api/issuance-lc/getMasterFacility"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get list master facility"
+            description: "Get list master facility"
+        };
+    }
+
+    rpc GetListDataMasterByTypeId(MasterDataRequest) returns (MasterDataResponse){
+        option (google.api.http) = {
+            get: "/api/issuance-lc/getListMasterDataByTypeId"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get List Master Data By Type Id"
+            description: "Service untuk Get List Master Data By Type Id"
+        };
+    }
+
+    rpc GetSummaryLCAndCoverageAccount(SummaryLCAndCoverageAccountRequest) returns (SummaryLCAndCoverageAccountResponse){
+        option (google.api.http) = {
+            post: "/api/issuance-lc/getSummaryLCAndCoverageAccount"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get Summary LC and Coverage Account"
+            description: "Get summary LC and coverage account"
+        };
+    }
+
+    rpc GetSummaryLCAndCoverageAccountPercentage(SummaryLCAndCoverageAccountRequest) returns (SummaryLCAndCoverageAccountResponse){
+        option (google.api.http) = {
+            post: "/api/issuance-lc/getSummaryLCAndCoverageAccountPercentage"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get Summary LC and Coverage Account"
+            description: "Get summary LC and coverage account"
+        };
+    }
+
+    rpc GetNostroPriority(NostroPriorityRequest) returns (NostroPriorityResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/nostro-priority"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Nostro Priority";
+            // security: {}
+            description: "-"
+        };
+    }
+
+    rpc GetListIssuedLC(ListIssuedLCRequest) returns (ListIssuedLCResponse){
+        option (google.api.http) = {
+            post: "/api/issuance-lc/getListIssuedLc"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get List Issued LC"
+            description: "This API for Get List Issued LC From ESB"
+        };
+    }
+
+    rpc GetDetailIssuedLc(DetailsIssuedLcESBRequest) returns (GetTemplateResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/GetDetailIssuedLc"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get Detail Issued LC"
+            description: "This API for Get Details Issued LC"
+        };
+    }
+
+    rpc GetTransactionLcIssue (GetTransactionLcIssueRequest) returns (GetTransactionLcIssueResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/GetTransactionLcIssue"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get Transaction Log Issue LC"
+            description: "This API for Save Transaction Log Issue LC"
+        };
+    }
+
+    rpc GetWorkflowStatus(GetWorkflowStatusRequest) returns (GetWorkflowStatusResponse){
+        option (google.api.http) = {
+            get: "/api/issuance-lc/getWorkflow/{transactionEventId}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get workflow status"
+            description: "This API for Get workflow status"
+        };
+    }
+
+    rpc DownloadDocLC(DownloadDocLcRequest) returns (DownloadDocLcResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/downloadDocLC"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download Doc LC"
+            description: "This API for Download Doc LC"
+        };
+    }
+
+    rpc DownloadIssuanceLC(FileIssuedLCListRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/downloadIssuanceLC/{fileFormat}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download Issuance LC"
+            description: "This API for Download Issuance LC"
+        };
+    }
+
+    rpc DownloadPreviewMT(DownloadPreviewMTRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/downloadPreviewMT"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download Preview MT"
+            description: "This API for Download Preview MT"
+        };
+    }
+
+    rpc DownloadFileFromMinio(DownloadFileFromMinioRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/get-file-download"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download File From Minio"
+            description: "This API for Download File From Minio"
+        };
+    }
+
+    rpc GetFileDownloadFromMinio(GetFileDownloadFromMinioRequest) returns (GetFileDownloadFromMinioResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/get-file-download-test"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get File From Minio"
+            description: "This API for Get File From Minio"
+        };
+    }
+
+    rpc ValidateAccount(ValidateAccountRequest) returns (ValidateAccountResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/validate"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Validate account"
+            description: "This API for Validate account"
+        };
+    }
+
+    rpc ValidateAccountRPC(ValidateAccountRequest) returns (ValidateAccountResponse) {
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Validate account RPC"
+            description: "This API for Validate account RPC"
+        };
+    }
+
+    rpc GetListHSCode (GlobalRequest) returns (GetListHSCodeResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/getlisthscode"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list HS Code"
+            description: "This API for Get list HS Code"
+        };
+    }
+
+    //UPDATE
+    rpc UpdateTemplateName(UpdateTemplateNameRequest) returns (GeneralResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/updateTemplate"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Update template"
+            description: "This API for update template"
+        };
+    }
+
+    rpc ApprovalIssuedLc(ApprovalRequest) returns (GeneralResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/ApprovalIssuedLc"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Approval Issued LC"
+            description: "This API for Do Approval Issued LC like Approve, Reject or Rework"
+        };
+    }
+
+    //DELETE
+    rpc DeleteTemplate(IssuedLcRequest) returns (GeneralResponse){
+        option (google.api.http) = {
+            post: "/api/issuance-lc/deleteTemplate"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Delete template"
+            description: "Delete template by id"
+        };
+    }
+
+    //TASK
+    rpc CreateTaskIssuing(CreateTaskIssuingRequest) returns (CreateTaskIssuingResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/task"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Task"]
+            summary: "Update Or Create Task"
+            description: "This API for update or create Task"
+        };
+    }
+
+    rpc GetTaskIssuingDetail(GetTaskIssuingDetailRequest) returns (GetTaskIssuingDetailResponse) {
+        option (google.api.http) = {
+            get: "/api/issuance-lc/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Task"]
+            summary: "Task Detail"
+            description: "This API for Get Task detail"
+        };
+    };
+
+    rpc TaskAction (TaskActionRequest) returns (TaskActionResponse) {
+        option (google.api.http) = {
+            post: "/api/issuance-lc/task/action/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Task"]
+            summary: "Set action task";
+            description: "set task action. Action: 'approve', 'rework', 'reject', 'delete'"
+        };
+    }
+
+    rpc GetNotificationIssuance(GetNotificationIssuanceRequest) returns (GetNotificationIssuanceResponse){
+        option (google.api.http) = {
+            post: "/api/issuance-lc/get-notification-issuance"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get Detail Issuance LC"
+            description: "This API for Get Detail Issuance LC"
+        };
+    }
+   
+    rpc SaveBenefApplicant(SaveBenefApplicantRequest) returns (GeneralResponse){
+        option (google.api.http) = {
+            post: "/api/issuance-lc/saveBenefApplicant"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Save Benef Applicant"
+            description: "This API is for Save Benef/Applicant To Database"
+        };
+    }
+    
+    rpc GetListBenefApplicant(GlobalRequest) returns (GetListBenefApplicantResponse){
+        option (google.api.http) = {
+            post: "/api/issuance-lc/getListBenefApplicant"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get List Benef Applicant"
+            description: "This API is for Get List Benef/Applicant From Database"
+        };
+    }
+
+    rpc DeleteBenefApplicant(DeleteBenefApplicantRequest) returns (GeneralResponse){
+        option (google.api.http) = {
+            post: "/api/issuance-lc/deleteBenefApplicant"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get List Benef Applicant"
+            description: "This API is for Delete Benef/Applicant From List Database"
+        };
+    }
+    
+    rpc UpdateTemplateCreatedByUserID(GlobalRequest) returns (GeneralResponse){
+        option (google.api.http) = {
+            post: "/api/issuance-lc/updateTemplateByUser"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get List Benef Applicant"
+            description: "This API is for Delete Benef/Applicant From List Database"
+        };
+    }
+    
+}

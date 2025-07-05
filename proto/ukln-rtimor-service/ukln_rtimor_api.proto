@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package ukln_other_bank_rtimor.service.v1;
+option go_package = "./pb";
+
+import "google/api/annotations.proto";
+// import "google/api/httpbody.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "ukln-rtimor-service/ukln_rtimor_payload.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+
+    rpc HealthCheck(google.protobuf.Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/ukln-rtimor/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            tags: ["Utility"]
+            summary: "Health Check"
+            description: "This API for check server's health"
+        };
+    };   
+
+    rpc SubmitMaker(SubmitMakerRequest) returns (SubmitMakerResponse) {
+        option (google.api.http) = {
+          post: "/api/ukln-rtimor/submit-maker",
+          body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+          tags: ["Maker"]
+          summary: "Submit Maker"
+          description: "This API for Submit Maker"
+        };
+    } 
+
+    rpc CreateBeneficiaryFavourite(CreateBeneficiaryFavouriteRequest) returns (SubmitMakerResponse) {
+        option (google.api.http) = {
+          post: "/api/ukln-rtimor/beneficiary-favourite/create",
+          body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+          tags: ["Beneficiary"]
+          summary: "Create Beneficiary Favourite"
+          description: "This API for Create Beneficiary Favourite"
+        };
+    }
+
+    rpc DeleteBeneficiaryFavourite(DeleteBeneficiaryFavouriteRequest) returns (SubmitMakerResponse) {
+        option (google.api.http) = {
+          post: "/api/ukln-rtimor/beneficiary-favourite/delete",
+          body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+          tags: ["Beneficiary"]
+          summary: "Delete Beneficiary Favourite"
+          description: "This API for Delete Beneficiary Favourite"
+        };
+    }
+
+    rpc UpdateBeneficiaryFavourite(UpdateBeneficiaryFavouriteRequest) returns (SubmitMakerResponse) {
+        option (google.api.http) = {
+          post: "/api/ukln-rtimor/beneficiary-favourite/update",
+          body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+          tags: ["Beneficiary"]
+          summary: "Update Beneficiary Favourite"
+          description: "This API for Update Beneficiary Favourite"
+        };
+    }
+
+    rpc ListBeneficiaryFavourite(ListBeneficiaryFavouriteRequest) returns (ListBeneficiaryFavouriteResponse) {
+        option (google.api.http) = {
+          get: "/api/ukln-rtimor/beneficiary-favourite"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+          tags: ["Beneficiary"]
+          summary: "Get Beneficiary Favourite"
+          description: "This API for Get Beneficiary Favourite"
+        };
+    }
+};
+

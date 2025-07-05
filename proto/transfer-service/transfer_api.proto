@@ -1,0 +1,333 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// import "transfer_core.proto";
+import "transfer-service/transfer_core_payload.proto";
+import "transfer-service/transfer_payload.proto";
+
+package transfer.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+
+    rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/transfer/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            summary: "Health Check"
+            description: "This API for check health server"
+        };
+    };
+
+    rpc GetRequestResponseByTransactionID(GetRequestResponseByTransactionIDRequest) returns (GetRequestResponseByTransactionIdResponse) {}
+
+    rpc GetTaskInternalTransferSingleTemplate(GetTaskInternalTransferSingleTemplateRequest) returns (GetTaskInternalTransferSingleTemplateResponse) {
+        option (google.api.http) = {
+            get: "/api/transfer/single/template"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal Single Template"]
+            summary: "Get List Transfer Internal Single Template"
+            description: "This API for Get List Transfer Internal Single template"
+        };
+    };
+
+    rpc GetTaskInternalTransferSingleTemplateDetail(GetTaskInternalTransferSingleTemplateDetailRequest) returns (GetTaskInternalTransferSingleTemplateDetailResponse) {
+        option (google.api.http) = {
+            get: "/api/transfer/single/template/{id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal Single Template"]
+            summary: "Get Transfer Internal Single Template Detail"
+            description: "This API for Get Transfer Internal Single template Detail"
+        };
+    };
+
+    rpc CreateTaskInternalTransferSingleTemplate(CreateTaskInternalTransferSingleTemplateRequest) returns (CreateTaskInternalTransferSingleTemplateResponse) {
+        option (google.api.http) = {
+            post: "/api/transfer/single/template"
+            body: "*"
+            additional_bindings: [
+				{
+					post: "/api/transfer/single/template/{id}"
+					body: "*"
+				}
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal Single Template"]
+            summary: "Create Transfer Internal Single Template"
+            description: "This API for create Transfer Internal Single"
+        };
+    };
+
+    rpc DeleteTaskInternalTransferSingleTemplate(DeleteTaskInternalTransferSingleTemplateRequest) returns (DeleteTaskInternalTransferSingleTemplateResponse) {
+        option (google.api.http) = {
+            post: "/api/transfer/single/template/{id}/delete"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal Single Template"]
+            summary: "Delete Transfer Internal Single Template"
+            description: "This API for delete Transfer Internal Single"
+        };
+    };
+
+//    rpc GetTaskInternalTransferFile(GetTaskInternalTransferFileRequest) returns (google.api.HttpBody) {
+//        option (google.api.http) = {
+//            get: "/api/transfer/task/template/{fileFormat}"
+//        };
+//        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+//            tags: ["Transfer Internal File"]
+//            summary: "Transfer Internal Export"
+//            description: "This API for Transfer Internal export"
+//        };
+//    };
+
+    rpc GetTaskInternalTransferFileV2(GetTaskInternalTransferFileV2Request) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/transfer/task/template/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal File"]
+            summary: "Transfer Internal Export"
+            description: "This API for Transfer Internal export"
+        };
+    };
+
+    rpc GetTaskInternalTransfer(GetTaskInternalTransferRequest) returns (GetTaskInternalTransferResponse) {
+        option (google.api.http) = {
+            get: "/api/transfer/task"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Transfer Internal List"
+            description: "This API for Get Transfer Internal"
+        };
+    };
+
+    rpc GetTaskInternalTransferDetail(GetTaskInternalTransferDetailRequest) returns (GetTaskInternalTransferDetailResponse) {
+        option (google.api.http) = {
+            get: "/api/transfer/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Transfer Internal Detail"
+            description: "This API for Transfer Internal Detail"
+        };
+    };
+
+    rpc CreateInternalTransferTransaction(CreateInternalTransferTransactionRequest) returns (CreateInternalTransferTransactionResponse) {};
+
+    rpc CancelInternalTransferTransaction(CancelInternalTransferTransactionRequest) returns (CancelInternalTransferTransactionResponse) {};
+
+    rpc SetTaskInternalTransfer(SetTaskInternalTransferRequest) returns (SetTaskInternalTransferResponse) {
+        option (google.api.http) = {
+            post: "/api/transfer/task/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Set Transfer Internal with Action"
+            description: "This API for set Transfer Internal with Action"
+        };
+    };
+
+    rpc ExecInternalTransfer(ExecInternalTransferRequest) returns (ExecInternalTransferResponse) {};
+
+    rpc ExecFailedInternalTransfer(ExecFailedInternalTransferRequest) returns (ExecFailedInternalTransferResponse) {};
+
+    rpc CreateTaskInternalTransferSingle(CreateTaskInternalTransferSingleRequest) returns (CreateTaskInternalTransferSingleResponse) {};
+
+    rpc CreateTaskInternalTransferWithSignature(CreateWithSignatureRequest) returns (CreateTaskInternalTransferSingleResponse) {
+        option (google.api.http) = {
+            post: "/api/transfer/single/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    post: "/api/transfer/single/task/{taskID}"
+                    body: "*"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Create or Update Transfer Internal Single"
+            description: "This API for create or update Transfer Internal Single"
+        };
+    };
+
+    rpc CreateTaskInternalTransferSingleWithoutSession(CreateTaskInternalTransferSingleWithoutSessionRequest) returns (CreateTaskInternalTransferSingleResponse) {};
+
+    rpc CreateTaskInternalTransferMultipleWithResCache(GlobalRequestWithResCache) returns (CreateTaskInternalTransferMultipleResponse) {
+        option (google.api.http) = {
+            post: "/api/transfer/multiple/task"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal Multiple"]
+            summary: "Update Or Create Transfer Internal Multiple"
+            description: "This API for update or create Transfer Internal Multiple"
+        };
+    }
+
+    rpc CreateTaskInternalTransferMultiple(GlobalRequest) returns (CreateTaskInternalTransferMultipleResponse) {};
+
+    rpc TestTimeout(TestTimeoutReq) returns (TestTimeoutRes) {
+        option (google.api.http) = {
+            post: "/api/transfer/test-timeout"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Test timeout"
+            description: "This API for test timeout from FE"
+        };
+    };
+
+    rpc GetResCache(ResCacheReq) returns (ResCacheRes) {
+        option (google.api.http) = {
+            post: "/api/transfer/rescache"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Get Response Cache"
+            description: "This API for get rescache"
+        };
+    }
+
+    rpc IftReportTelkomsel(GetReceiptDataRequest) returns (GetReceiptDataResponse){
+        option (google.api.http) = {
+            get: "/api/transfer/getReceiptData"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal File"]
+            summary: "Report List Telkomsel"
+            description: "This API for get Report List Telkomsel"
+        };
+    }
+
+    rpc DownloadReceiptFile(DownloadReceiptRequest) returns (google.api.HttpBody) {
+//        option (google.api.http) = {
+//            get: "/api/transfer/receipt/{transaction_id}"
+//        };
+//        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+//            tags: ["Transfer Internal File"]
+//            summary: "Download Receipt online-transfer by Transaction ID"
+//            description: "This API for download receipt online-transfer by transaction id"
+//        };
+    }
+
+    rpc DownloadReceiptFileTemp(DownloadReceiptRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/transfer/receipt/{transaction_id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal File"]
+            summary: "Download Receipt online-transfer by Transaction ID"
+            description: "This API for download receipt online-transfer by transaction id"
+        };
+    }
+
+    //    receipt multiple download
+    rpc DownloadReceiptMultipleFile(DownloadMultipleReceiptRequest) returns (google.api.HttpBody) {
+//        option (google.api.http) = {
+//            get: "/api/transfer/receipt-multiple/{transactionId}"
+//        };
+//        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+//            tags: ["Transfer Internal File"]
+//            summary: "Download Receipt online-transfer by Transaction ID"
+//            description: "This API for download receipt online-transfer by transaction id"
+//        };
+    }
+
+    rpc DownloadReceiptMultipleFileTemp(DownloadMultipleReceiptRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/transfer/receipt-multiple/{transactionId}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal File"]
+            summary: "Download Receipt online-transfer by Transaction ID"
+            description: "This API for download receipt online-transfer by transaction id"
+        };
+    }
+
+    // Get Task Statuses Counter
+    rpc GetTaskStatusesCounter(GetTaskStatusesCounterRequest) returns (
+        GetTaskStatusesCounterResponse){
+        option (google.api.http) = {
+            get: "/api/transfer/statuses/counter"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Get Task Statuses Counter"
+            description: "This API is for Get task statuses counter"
+        };
+    }
+
+    rpc GetHistoryInternalTransfer(GetTaskInternalTransferV2Request) returns (GetTaskInternalTransferV2Response) {
+        option (google.api.http) = {
+            get: "/api/transfer/history"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Transfer Internal List History"
+            description: "This API for Get Transfer Internal History"
+        };
+    };
+
+    rpc GetTaskInternalTransferV2(GetTaskInternalTransferV2Request) returns (GetTaskInternalTransferV2Response) {
+        option (google.api.http) = {
+            get: "/api/transfer/task/v2"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer Internal"]
+            summary: "Transfer Internal List On Going Transaction"
+            description: "This API for Get Transfer Internal On Going Transaction"
+        };
+    }
+
+    rpc GetWorkflowTaskInternalFundTransfer(GetByTransactionIDRequest) returns (GetWorkflowTaskInternalTransferResponse) {
+        option (google.api.http) = {
+            get: "/api/transfer/workflow/{transactionID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["InternalFundTransfer"]
+            summary: "Get detail workflow task Internal Fund Transfer"
+            description: "This API for get detail workflow task Internal Fund Transfer"
+        };
+    };
+
+}
+
+message TestTimeoutReq {
+    uint64 delayTime = 1;
+}
+
+message TestTimeoutRes {
+    string response = 1;
+}

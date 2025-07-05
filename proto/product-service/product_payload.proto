@@ -1,0 +1,220 @@
+syntax = "proto3";
+
+import "product-service/product_gorm_db.proto";
+
+package product.service.v1;
+option go_package = "./pb";
+
+import "mwitkow/go-proto-validators/validator.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+
+message LoginRequest {
+    string username = 1 [(validator.field) = {msg_exists : true}];
+    string password = 2 [(validator.field) = {msg_exists : true}];
+}
+
+message LoginResponse {
+    string access_token = 1;
+}
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message Empty {}
+
+message InvalidKeyError {
+    string key = 1;
+    string message = 2;
+}
+
+message JWTTokenResponse {
+    string token = 1;
+    int64 expiredAt = 2;
+}
+
+message ListRequest {}
+
+message ListProductRequest {
+    Product product = 1;
+    int32 limit = 2;
+    int32 page = 3;
+    string sort = 4;
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6;
+    string query = 7;
+    string in = 8;
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message ListProductResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Product data = 4;
+    PaginationResponse pagination = 5;
+}
+
+// Streaming version of the ListProductResponse
+message StreamProductResponse {
+    repeated Product data = 1;
+    uint32 totalLength = 2;
+    uint32 start = 3;
+    uint32 end = 4;
+}
+
+message ListProductActiveResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Product data = 4;
+}
+
+message CreateProductRequest {
+    Product data = 1;
+    uint64 taskID = 2;
+}
+
+message CreateProductTaskRequest {
+    Product data = 1;
+    uint64 taskID = 2;
+}
+
+message CreateProductTaskBulkRequest {
+    repeated Product products = 1;
+    uint64 taskID = 2;
+}
+
+message CreateProductResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Product data = 4;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message ProductTask {
+    Product product = 1;
+    Task task = 2;
+    repeated Product products = 3;
+}
+
+message CreateProductTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    uint64 taskID = 4;
+}
+
+message ListProductTaskRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3;
+    int32 page = 4;
+    string sort = 5;
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7;
+    string query = 8;
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+}
+
+message GetProductTaskByIDRequest {
+    uint64 taskID = 1;
+
+}
+
+message ListProductTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated ProductTask data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ProductByIDRequest {
+    uint64 ProductID = 1;
+}
+
+message ProductByIDResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Product data = 4;
+}
+
+message ErrorBodyResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message GetCompanyProductsRequest {
+    repeated uint64 productIds = 1;
+}
+
+message GetCompanyProductsResponse {
+    repeated CompanyProduct listProduct = 1;
+}
+
+message CompanyProduct {
+    uint64 productId = 1;
+    string name = 2;
+    string baseHreff = 3;
+}
+
+message BiGetProductRequest {
+    repeated uint64 productIds = 1;
+}
+
+message BiGetProductResponse {
+    repeated Product listProduct = 1;
+}

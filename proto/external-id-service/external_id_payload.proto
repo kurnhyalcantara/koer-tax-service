@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package external_id.service.v1;
+option go_package = "./pb";
+
+message HealthCheckResponse {
+  string message = 1;
+}
+
+message CounterRequest {
+  string process_id = 1;
+}
+
+message CounterResponse {
+  int64 value = 1;
+  string value_padded = 2;
+}
+
+message ResetCounterRequest {
+  string process_id = 1;
+  string secret = 2;
+}

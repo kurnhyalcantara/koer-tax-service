@@ -1,0 +1,484 @@
+syntax = "proto3";
+
+import "forecasting-service/forecasting_gorm_db.proto";
+
+package forecasting.service.v1;
+option go_package = "./pb";
+
+// import "mwitkow/go-proto-validators/validator.proto";
+import "google/protobuf/timestamp.proto";
+// import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+
+}
+
+enum Direction {
+    DESC = 0;
+    ASC = 1;
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message InvalidKeyError {
+    string key = 1;
+    string message = 2;
+}
+
+message InquiryAccountStatementRequest {
+    repeated string accountNumber = 1;
+    string startDate = 2;
+    string endDate = 3;
+    string fileType = 4;
+    string company_code = 5;
+    string company_name = 6;
+    StatementType statement_type = 7;
+    repeated string account_alias = 8;
+    string company_id = 9;
+}
+
+message InquiryAccountStatementResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        string requestCode = 1;
+        string fileName = 2;
+        string status = 3;
+        string description = 4;
+    }
+
+    Response data = 4;
+}
+
+message CancelAccountStatementResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    ResponseCancelESB data = 4;
+}
+
+message ResponseCancelESB {
+    string errorCode = 1;
+    string responseCode = 2;
+    string responseMessage = 3;
+    repeated ResponseCancelESBResults results = 4;
+}
+
+message ResponseCancelESBResults {
+    string requestCode = 1;
+    string fileName = 2;
+    string status = 3;
+    string description = 4;
+}
+
+message CheckAccountStatementRequest {
+    string requestCode = 1;
+    uint64 account_statement_id = 2;
+    bool isNeedToken = 3;
+}
+
+
+message FindFileRequest {
+    uint64 id = 1;
+}
+
+message FindFileSingleResponse {
+    string fileName = 1;
+    bool status = 2;
+}
+
+message FindFileResponse {
+    repeated FindFileSingleResponse data = 1;
+}
+
+message ListAccountStatementRequest {
+    int32 page = 1;
+    int32 limit = 2;
+    string query = 3;
+    string sort = 4;
+    string dir = 5;
+}
+
+message ListAccountStatementResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated AccountStatementsResponse data = 4;
+    PaginationResponse pagination = 5;
+    repeated AccountStatements successFiles = 6;
+}
+
+message ListAccountStatementConsolidatedRequest {
+    int32 page = 1;
+    int32 limit = 2;
+    string query = 3;
+    string filter = 4;
+    string filter_or = 5;
+    string sort = 6;
+    string dir = 7;
+}
+
+// message ListAccountStatementConsolidatedResponse {
+//     bool error = 1;
+//     uint32 code = 2;
+//     string message = 3;
+//     repeated AccountStatementsConsolidatedResponse data = 4;
+//     PaginationResponse pagination = 5;
+//     repeated AccountStatements successFiles = 6;
+// }
+
+// message AccountStatementsConsolidatedResponse {
+//     uint64 id = 1;
+//     Statuses status = 2;
+//     string account_number = 3;
+//     string file_type = 4;
+//     string file_name = 5;
+//     string start_date = 6;
+//     string end_date = 7;
+//     string request_code = 8;
+//     google.protobuf.Timestamp created_at = 9;
+//     google.protobuf.Timestamp updated_at = 10;
+// }
+
+message AccountStatementsResponse {
+    uint64 id = 1;
+    uint64 userId = 2;
+    uint64 companyId = 3;
+    string accountNumber = 4;
+    Statuses status = 5;
+    string detail = 6;
+    string fileType = 7;
+    string fileName = 8;
+    string startDate = 9;
+    string endDate = 10;
+    string requestCode = 11;
+    string company_code = 12 ;
+    string company_name = 13 ;
+    google.protobuf.Timestamp createdAt = 14;
+    google.protobuf.Timestamp updatedAt = 15 ;
+    string alias_account_number = 16;
+    StatementType statement_type = 17;
+    string account_name = 18;
+}
+
+message ZipFileRequest {
+    repeated DownloadRequest request = 1;
+    string company_code = 2;
+    string account_number = 3;
+}
+
+message DownloadRequest {
+    string id = 1;
+    string fileName = 2;
+    string fileType = 3;
+}
+
+message CreateSettingAccountStatementV2Request{
+    repeated string account_number = 1;
+    string schedule_type = 2;
+    string schedule_start_date = 3;
+    string schedule_end_date = 4;
+    string schedule_day = 5;
+    string schedule_date = 6;
+    repeated string schedule_times = 7;
+    repeated string emails = 8;
+    string file_format = 9;
+    StatementType statement_type = 10;
+}
+
+message UpdateSettingAccountStatementV2Request{
+    uint64 task_id = 1;
+    string account_number = 2;
+    string schedule_type = 3;
+    string schedule_start_date = 4;
+    string schedule_end_date = 5;
+    string schedule_day = 6;
+    string schedule_date = 7;
+    repeated string schedule_times = 8;
+    repeated string emails = 9;
+    string file_format = 10;
+}
+
+message SettingAccountStatementV2Response{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated DataSetting data = 4;
+}
+
+message UpdateStatementScheduleRequest{
+    uint64 schedule_id = 1;
+    int32 retry_count = 2;
+    string request_code = 3;
+    string url_download = 4;
+    int32 status_schedule = 5;
+    string file_name = 6;
+}
+
+message DataSetting {
+    uint64 task_id = 1;
+    uint64 company_id = 2;
+    uint64 created_by_id = 3;
+    uint64 updated_by_id = 4;
+    google.protobuf.Timestamp created_at = 5;
+    google.protobuf.Timestamp updated_at = 6;
+}
+
+message GetListAccountStatementV2Request{
+    string sort = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    Direction dir = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order direction",
+	}];
+    string filter = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "search keyword",
+	}];
+}
+
+message GetListAccountStatementV2Response{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated DataTask data = 4;
+    uint64 total_data = 5;
+}
+
+message GetSettingAccountStatementByIdV2Response{
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    DataTask data = 4;
+}
+
+message DataTask{
+    uint64 task_id = 1;
+    string account_number = 2;
+    string description = 3;
+    string schedule_type = 4;
+    string schedule_start_date = 5;
+    string schedule_end_date = 6;
+    string schedule_times = 7;
+    string emails = 8;
+    string status = 9;
+    string schedule_day = 10;
+    string schedule_date = 11;
+    string file_format = 12;
+    string file_type = 13;
+    google.protobuf.Timestamp created_at = 14;
+    uint64 statement_type = 15;
+}
+
+enum ScheduleType {
+    UNKNOWN_SCHEDULE_TYPE = 0;
+    DAILY = 1;
+    WEEKLY = 2;
+    MONTHLY = 3;
+}
+
+enum StatusTask {
+    UNKNOWN_STATUS_TASK = 0;
+    ACTIVE = 1;
+    DELETED = 7;
+}
+
+message GetDetailStatementRequest{
+    uint64 task_id = 1;
+    bool error = 2;
+}
+
+message GetSettingAccountStatementByIdV2Request{
+    uint64 task_id = 1;
+}
+
+message GetDetailStatementResponse{
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    StatementTask data = 4;
+}
+
+message UpdateScheduleResponse{
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    ScheduleData data = 4;
+}
+
+message GetStatementScheduleRequest {
+    string schedule_at = 1;
+    string schedule_id = 2;
+    int32 status_schedule = 3;
+}
+
+message GetStatementScheduleByStatusRequest{
+    int32 status_schedule = 1;
+}
+
+message GetScheduleByTaskIdRequest{
+    repeated uint64 task_id = 1;
+}
+
+message GetStatementScheduleResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    repeated ScheduleData data = 4;
+}
+message ScheduleData{
+    StatementSchedule schedule = 1;
+    uint64 task_id = 2;
+    StatementType statement_type = 3;
+}
+
+enum FileFormat {
+    UNKNOWN_FILE_FORMAT = 0;
+    CSV = 1;
+    PDF = 2;
+    XLSX = 3; 
+    MT_940 = 4;
+    MT_942 = 5;
+}
+
+message DownloadListAccountStatementRequest{
+    string sort = 1;
+    Direction dir = 2;
+    string filter = 3;
+    FileFormat file_format = 4;
+}
+
+message DeleteAccountStatementRequest {
+    repeated uint64 task_id = 1; 
+}
+
+message DeleteAccountStatementResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ExecInquiryAccountStatementRequest {
+    repeated string accountNumber = 1;
+    string startDate = 2;
+    string endDate = 3;
+    string fileType = 4;
+    string fileName = 5;
+    uint64 schedule_id = 6;
+    string company_name = 7;
+    string user_id = 8;
+    StatementType statement_type = 9;
+    string consolidate_type = 10;
+    uint64 company_id = 11;
+}
+
+message ExecInquiryAccountStatementResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated StatementSchedule data = 4;
+    PaginationResponse pagination = 5;
+    repeated StatementSchedule successFiles = 6;
+}
+
+enum StatementStatusSchedule {
+    UNKNOWN_STATUS_SCHEDULE = 0;
+    AWAITING_SCHEDULE = 1;
+    ON_PROCESS = 2;
+    WAITING = 3;
+    READY_TO_SEND_EMAIL = 4;
+    FAILED = 5;
+    COMPLETED = 6;
+    DELETED_SCHEDULE = 7;
+}
+
+message ExecMtTransactionsResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    string file_name = 4;
+    string status = 5;
+}
+
+message UpdateAccountStatementResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+}
+
+message SaveTemplateAccStatementReq{
+    repeated string accountNumber = 1;
+    string listName = 2;
+    uint64 companyId = 3;
+}
+
+message DataTemplateAccStatement{
+    uint64 id = 1;
+    string listName = 2;
+    uint64 totalAccount = 3;
+    string created_at = 4;    
+}
+
+message ListAccStatementResp{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated DataTemplateAccStatement data = 4;
+}
+
+message DetailTemplateAccStatementReq{
+    uint64 templateId = 1;  
+}
+
+message DataDetailTemplateAccStatement{
+    string accountNumber = 1;
+    repeated string accountAlias = 2;
+    string accountCurrency = 3;
+    string accountName = 4;
+}
+
+message DetailTemplateAccStatementRes{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated DataDetailTemplateAccStatement data = 4;
+}
+
+message DeleteTemplateAccStatementReq{
+    repeated uint64 templateId = 1;
+}
+
+message DataDeleteTemplate{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    uint64 templateId = 4;
+}
+
+message DeleteTemplateAccStatementRes{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated DataDeleteTemplate data = 4;
+}

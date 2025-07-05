@@ -1,0 +1,339 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "bifast-service/bifast_gorm_db.proto";
+import "bifast-service/bifast_core_payload.proto";
+import "bifast-service/bifast_payload.proto";
+
+package bifast.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+
+    rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/bifast/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            summary: "Health Check"
+            description: "This API for check health server"
+        };
+    };
+
+    /*
+     * [START] External Transfer Single Template
+    */
+
+    rpc GetTaskExternalTransferSingleTemplate(GetTaskExternalTransferSingleTemplateRequest) returns (GetTaskExternalTransferSingleTemplateResponse) {
+        option (google.api.http) = {
+            get: "/api/bifast/single/template"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer External Single Template"]
+            summary: "Get Transfer External Single Template"
+            description: "This API for Get Transfer External Single template"
+        };
+    };
+
+    rpc GetTaskExternalTransferSingleTemplateDetail(GetTaskExternalTransferSingleTemplateDetailRequest) returns (GetTaskExternalTransferSingleTemplateDetailResponse) {
+        option (google.api.http) = {
+            get: "/api/bifast/single/template/{id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer External Single Template"]
+            summary: "Get Transfer External Single Template"
+            description: "This API for Get Transfer External Single template"
+        };
+    };
+
+    rpc CreateTaskExternalTransferSingleTemplate(ExternalTransferSingleTemplate) returns (CreateTaskExternalTransferSingleTemplateResponse) {
+        option (google.api.http) = {
+            post: "/api/bifast/single/template"
+            body: "*"
+            additional_bindings: [
+				{
+					post: "/api/bifast/single/template/{id}"
+					body: "*"
+				}
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer External Single Template"]
+            summary: "Create Transfer External Single Template"
+            description: "This API for create Transfer External Single"
+        };
+    };
+
+    rpc DeleteTaskExternalTransferSingleTemplate(DeleteTaskExternalTransferSingleTemplateRequest) returns (DeleteTaskExternalTransferSingleTemplateResponse) {
+        option (google.api.http) = {
+            post: "/api/bifast/single/template/{id}/delete"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer External Single Template"]
+            summary: "Delete Transfer External Single Template"
+            description: "This API for delete Transfer External Single"
+        };
+    };
+
+    /*
+     * [END] External Transfer Single Template
+    */
+
+    /*
+     * [START] External Transfer
+    */
+
+    rpc GetTaskExternalTransfer(GetTaskExternalTransferRequest) returns (GetTaskExternalTransferResponse) {
+        option (google.api.http) = {
+            get: "/api/bifast/task"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer External"]
+            summary: "Transfer External List"
+            description: "This API for Transfer External"
+        };
+    };
+
+    rpc GetTaskExternalTransferFile(GetTaskExternalTransferFileRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/bifast/task/template/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer External"]
+            summary: "Transfer External Export"
+            description: "This API for Transfer External Export"
+        };
+    };
+
+    rpc GetTaskExternalTransferDetail(GetTaskExternalTransferDetailRequest) returns (GetTaskExternalTransferDetailResponse) {
+        option (google.api.http) = {
+            get: "/api/bifast/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer External"]
+            summary: "Transfer External"
+            description: "This API for Transfer External detail"
+        };
+    };
+
+    rpc GetTaskExternalTransferDetailByReffNum(GetTaskExternalTransferDetailByReffNumRequest) returns (GetTaskExternalTransferDetailByReffNumResponse) {};
+
+    rpc CreateExternalTransferTransaction(CreateExternalTransferTransactionRequest) returns (CreateExternalTransferTransactionResponse) {};
+
+    rpc CancelExternalTransferTransaction(CancelExternalTransferTransactionRequest) returns (CancelExternalTransferTransactionResponse) {};
+
+    rpc SetTaskExternalTransfer(SetTaskExternalTransferRequest) returns (SetTaskExternalTransferResponse) {
+        option (google.api.http) = {
+            post: "/api/bifast/task/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer External"]
+            summary: "Set Transfer External with Action"
+            description: "This API for set Transfer External with Action"
+        };
+    };
+
+    rpc ExecExternalTransfer(ExecExternalTransferRequest) returns (ExecExternalTransferResponse) {};
+
+    rpc CreateTaskExternalTransferSingle(CreateTaskExternalTransferSingleRequest) returns (CreateTaskExternalTransferSingleResponse) {}
+
+    rpc CreateTaskExternalTransferSingleHttp(CreateTaskExternalTransferSingleRequest) returns (CreateTaskExternalTransferSingleResponse) {
+        option (google.api.http) = {
+            post: "/api/bifast/single/task"
+            body: "*"
+            additional_bindings: [
+				{
+					post: "/api/bifast/single/task/{taskID}"
+					body: "*"
+				}
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer External Single"]
+            summary: "Update Or Create Transfer External Single"
+            description: "This API for update or create Transfer External Single"
+        };
+    };
+
+    rpc ValidateProxy(ValidateProxyRequest) returns (ValidateProxyResponse) {
+        option (google.api.http) = {
+            post: "/api/bifast/validate/proxy"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transfer External Single"]
+            summary: "Validate Proxy External Fund Transfer"
+            description: "This API for validating proxy external fund transfer"
+        };
+    };
+
+    /*
+     * [END] External Transfer
+    */
+
+    /*
+     * [START] BI-Fast Multiple
+    */
+
+    rpc CreateTaskExternalTransferMultiple(CreateTaskExternalTransferMultipleRequest) returns (CreateTaskExternalTransferMultipleResponse) {
+        option (google.api.http) = {
+            post: "/api/bifast/multiple/task"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Task Multiple"]
+            summary: "Create Multiple Task BI-Fast"
+            description: "This API for create multiple task BI-Fast"
+        };
+    };
+
+    /*
+     * [END] Bi-Fast Multiple
+    */
+
+    
+    /*
+     * [START] Receipt Data
+    */
+
+    rpc GetReceiptData(GetReceiptDataRequest) returns (GetReceiptDataResponse) {
+        option (google.api.http) = {
+            get: "/api/bifast/getReceiptData"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Receipt Data"]
+            summary: "Get Receipt Data"
+            description: "This API for get receipt data"
+        };
+    };
+
+    /*
+     * [END] Receipt Data
+    */
+
+    /*
+     * [START] BI-Fast Download File
+    */
+
+    rpc DownloadReceiptFile(DownloadReceiptRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/bifast/receipt/{transaction_id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Receipt"]
+            summary: "Download Receipt BI-Fast by Transaction ID"
+            description: "This API for download receipt bi-fast by transaction id"
+        };
+    }
+
+    rpc SetServiceTransactionID(SetServiceTransactionIDRequest) returns (SetServiceTransactionIDResponse) {};
+    /*
+     * [END] BI-Fast Download File
+    */
+
+    // this function for check status transaction when failed ci connector
+    rpc CheckStatusTransactiont(CheckStatusTransactiontRequest) returns (CheckStatusTransactionResponse) {
+        option (google.api.http) = {
+            post: "/api/bifast/verify-transaction"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Transaction"]
+            summary: "endpoint for checking transaction suspend"
+            description: "this endpoint for checking transaction to esb by custreff"
+        };
+    }
+
+    // hitter is esb
+    rpc UpdateTransactionStatusESB(UpdateTransactionStatusESBRequest) returns (UpdateTransactionStatusESBResponse){
+        option (google.api.http) = {
+            post: "/api/bifast/transaction/update-status"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {} // Disable security key
+            tags: ["callback"]
+            summary: "Callback for transaction send to esb"
+            description: "This API for update status Transaction Bifast"
+        };
+    }
+
+    rpc DownloadBulkReceiptFile(DownloadBulkReceiptRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/bifast/receipt-multiple"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Receipt"]
+            summary: "Download Receipt BI-Fast by Transaction ID"
+            description: "This API for download receipt bi-fast with some filter, all with 250 limit max, single or multiple file"
+        };
+    }
+
+    // For Use on Get External Transaction Service
+    rpc GetListExternalTransferTransaction(GetListExternalTransferTransactionRequest) returns (GetListExternalTransferTransactionResponse);
+
+    // migrate task to existing transfer transaction
+    rpc MigrateTaskToExistingExternalTransferTransaction (MigrateTaskToExternalTransferTransactionRequest) returns (MigrateTaskToExternalTransferTransactionResponse) {
+        option (google.api.http) = {
+            get: "/api/bifast/migrate-task-to-existing-external-transfer-transaction"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "Migrate Task to Existing Transfer Transaction";
+            tags: ["Migrate"];
+            description: "This API for Migrate Task to Existing Transfer Transaction"
+        };
+    }
+
+    rpc MigrateRejectedAndCancelledTaskToExternalTransferTransaction (MigrateTaskToExternalTransferTransactionRequest) returns (MigrateTaskToExternalTransferTransactionResponse) {
+        option (google.api.http) = {
+            get: "/api/bifast/migrate-rejected-and-cancelled-task-to-external-transfer-transaction"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "Migrate Rejected and Cancelled Task to External Transfer Transaction";
+            tags: ["Migrate"];
+            description: "This API for Migrate Rejected and Cancelled Task to External Transfer Transaction"
+        };
+    }
+
+    rpc MigrateTaskParentRecurringToExternalTransferTransaction (MigrateTaskToExternalTransferTransactionRequest) returns (MigrateTaskToExternalTransferTransactionResponse) {
+        option (google.api.http) = {
+            get: "/api/bifast/migrate-task-parent-recurring-to-external-transfer-transaction"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {};
+            summary: "Migrate Task Parent Recurring to External Transfer Transaction";
+            tags: ["Migrate"];
+            description: "This API for Migrate Task Parent Recurring to External Transfer Transaction"
+        };
+    }
+
+    // get external transfer transaction by task id
+    rpc GetExternalTransferTransaction(GetExternalTransferTransactionRequest) returns (GetExternalTransferTransactionResponse) {}
+}

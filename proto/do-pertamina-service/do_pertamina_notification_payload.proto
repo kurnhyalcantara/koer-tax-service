@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package do_pertamina.service.v1;
+option go_package = "./pb";
+
+message NotificationData {
+  string order_date = 1 [json_name='ORDER_DATE'];
+  string application_id = 2 [json_name='APPLICATION_ID'];
+  string quotation_no = 3 [json_name='QUOTATION_NO'];
+  string scheduling_agreement_no = 4 [json_name='SCHEDULING_AGREEMENT_NO'];
+  string transaction_date = 5 [json_name='TRANSACTION_DATE'];
+  string module_transaction = 6 [json_name='MODULE_TRANSACTION'];
+  string debit_account_number = 7 [json_name='DEBIT_ACCOUNT_NUMBER'];
+  string debit_account_name = 8 [json_name='DEBIT_ACCOUNT_NAME'];
+  string sales_organization = 9 [json_name='SALES_ORGANIZATION'];
+  string group_product = 10 [json_name='GROUP_PRODUCT'];
+  string distribution_channel = 11 [json_name='DISTRIBUTION_CHANNEL'];
+  string ship_to = 12 [json_name='SHIP_TO'];
+  string sold_to = 13 [json_name='SOLD_TO'];
+  string depo = 14 [json_name='DEPO'];
+  string pph_tax = 15 [json_name='PPH_TAX'];
+  string gross_value = 16 [json_name='GROSS_VALUE'];
+  string debit_or_credit_note = 17 [json_name='DEBIT_OR_CREDIT_NOTE'];
+  string total_amount = 18 [json_name='TOTAL_AMOUNT'];
+  string total_qty = 19 [json_name='TOTAL_QTY'];
+  string transaction_status = 20 [json_name='TRANSACTION_STATUS'];
+  string user_maker = 21 [json_name='USER_MAKER'];
+  string so_number = 22 [json_name='SO_NUMBER'];
+  string rework_from = 23 [json_name='REWORK_FROM'];
+  string description_rework = 24 [json_name='DESCRIPTION_REWORK'];
+  string transaction_id = 25 [json_name='TRANSACTION_ID'];
+  string net_value = 26 [json_name='NET_VALUE'];
+  string ppn_tax = 27 [json_name='PPN_TAX'];
+  string reason = 28 [json_name='REASON'];
+  string pbbkb_tax = 29 [json_name='PBBKB_TAX'];
+  string reject_from = 30 [json_name='REJECT_FROM'];
+  string description_reject = 31 [json_name='DESCRIPTION_REJECT'];
+}

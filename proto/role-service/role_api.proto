@@ -1,0 +1,486 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/httpbody.proto";
+
+import "role-service/role_payload.proto";
+
+package role.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+
+    rpc HealthCheck(Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/role/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Health Check"
+            description: "This API for check health server"
+        };
+    };
+
+    rpc ListRole(ListRoleRequest) returns (ListRoleResponse){}
+
+    rpc ListRoleStream(ListRoleRequest) returns (stream StreamListRoleResponse){}
+
+    rpc ListRoleNotRelation(ListRoleRequest) returns (ListRoleResponse){}
+
+    rpc HTTPListRole(ListRoleRequest) returns (ListRoleResponse){
+        option (google.api.http) = {
+            get: "/api/role/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            //security: { } // Disable security key
+            summary: "Get list role"
+            description: "This API for get list role"
+        };
+    }
+    rpc ListProductAuthority(ListProductAuthoritiesRequest) returns (ListProductAuthoritiesResponse){
+        option (google.api.http) = {
+            get: "/api/role/product"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list role"
+            description: "This API for get list role"
+        };
+    }
+
+    rpc ListAuthorityLevel(ListAuthorityLevelRequest) returns (ListAuthorityLevelResponse){
+        option (google.api.http) = {
+            get: "/api/role/authority-level"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get authority level"
+            description: "This API for get authority level"
+        };
+    }
+
+    rpc ListRoleAuthority(ListRoleAuthorityRequest) returns (ListRoleAuthorityResponse){
+        option (google.api.http) = {
+            get: "/api/role/role-authority"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get role authority"
+            description: "This API for get role authority"
+        };
+    }
+
+    rpc ListRoleAuthorityByUser(ListRoleAuthorityByUserRequest) returns (ListRoleAuthorityByUserResponse){
+        option (google.api.http) = {
+            get: "/api/role/list-role-authority"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get role authority"
+            description: "This API for get role authority"
+        };
+    }
+
+    rpc ListUserType(ListUserTypeRequest) returns (ListUserTypeResponse){
+        option (google.api.http) = {
+            get: "/api/role/user-type"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list user type"
+            description: "This API for get list user type"
+        };
+    }
+
+    rpc ListUserRole(ListUserRoleRequest) returns (ListUserRoleResponse){
+        option (google.api.http) = {
+            get: "/api/role/user-role"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list user role"
+            description: "This API for get list user role"
+        };
+    }
+
+    rpc GetMyTasksCreatedBy(Empty) returns (ArrayString) {
+        option (google.api.http) = {
+            get: "/api/role/task/me/created-by"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list user created task"
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc GetMyTasksApprovedBy(Empty) returns (ArrayString) {
+        option (google.api.http) = {
+            get: "/api/role/task/me/approved-by"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list user reviewed tasks"
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc DeleteRole(CreateRoleRequest) returns (CreateRoleResponse);
+
+    rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse){
+        // option (google.api.http) = {
+        //     post: "/api/role"
+        //     body: "*"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     security: { } // Disable security key
+        //     summary: "Create role"
+        //     description: "This API for create role"
+        // };
+    }
+
+    rpc RequestDeleteRoleTask(RoleTaskDetailByTaskIDRequest) returns (RoleTaskDetailResponse){
+        option (google.api.http) = {
+            // delete: "/api/role/task/{taskID}"
+            post: "/api/role/task/delete/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Delete request role task"
+            description: "This API for deletes role task"
+        };
+    }
+
+    rpc CreateRoleTask(CreateRoleTaskRequest) returns (CreateRoleTaskResponse){
+        option (google.api.http) = {
+            post: "/api/role/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    // put: "/api/role/task/{taskID}"
+                    post: "/api/role/task/edit/{taskID}"
+                    body: "*"
+                }
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Create role task"
+            description: "This API for create role task"
+        };
+    }
+
+    rpc SimplifyCreateRoleTask(CreateRoleTaskSimplifyRequest) returns (CreateRoleTaskResponse){
+        option (google.api.http) = {
+            post: "/api/role/task/v2"
+            body: "*"
+            additional_bindings: [
+                {
+                    // put: "/api/role/taskv2/{taskID}"
+                    post: "/api/role/task/v2/edit/{taskID}"
+                    body: "*"
+                }
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Create role task"
+            description: "This API for create role task"
+        };
+    }
+
+//rpc DownloadListRoleTasks(DownloadListRoleTaskRequest) returns (google.api.HttpBody) {
+//    option (google.api.http) = {
+//        get: "/api/role/task/file/{fileFormat}"
+//    };
+//    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+//        security: { } // Disable security key
+//        summary: "Download list roles task"
+//        description: "This API for download list roles task"
+//    };
+//}
+
+    rpc DownloadListTaskRoleV3(DownloadListRoleV3WithTaskRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/role/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Download list roles task"
+            description: "This API for download list roles task"
+        };
+    }
+    rpc ListRoleTask(ListRoleTaskRequest) returns (ListRoleTaskResponse) {
+        // option (google.api.http) = {
+        //     get: "/api/role/task"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     security: { } // Disable security key
+        //     summary: "Get list role task"
+        //     description: "This API for get list role task"
+        // };
+    };
+
+    rpc GetRoleUserByUserID(GetRoleUserByUserIDReq) returns (GetRoleUserByUserIDRes) {
+        // option (google.api.http) = {
+        //     get: "/api/role/testget/{ID}"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     security: { } // Disable security key
+        // };
+    }
+
+    rpc AssignUserRoles(AssignUserRolesRequest) returns (errorBodyResponse);
+
+    rpc RoleTaskDetailByTaskID(RoleTaskDetailByTaskIDRequest) returns (RoleTaskDetailResponse) {
+        option (google.api.http) = {
+            get: "/api/role/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get role task by task id"
+            description: "This API for get role task by task id"
+        };
+    };
+
+    rpc RoleTaskDetailByRoleID(RoleTaskDetailByRoleIDRequest) returns (RoleTaskDetailResponse) {
+        option (google.api.http) = {
+            get: "/api/role/task/role/{roleID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get role task by role id"
+            description: "This API for get role task by role id"
+        };
+    };
+
+    rpc UserRoleCount(UserRoleCountReq) returns (UserRoleCountRes) {
+        option (google.api.http) = {
+            get: "/api/role/user-counts"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get role with user counts"
+            description: "Get role with user counts"
+        };
+    }
+
+    rpc RoleAuthorityLevels(RoleAuthorityLevelsReq) returns (RoleAuthorityLevelsRes) {
+        option (google.api.http) = {
+            get: "/api/role/role-authority-level"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get authority levels with pairing roles"
+            description: "Get authority levels with pairing roles"
+        };
+    }
+
+    rpc GetMyTasksOld(ListRoleTaskRequest) returns (ListRoleTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/role/old/task/me"
+            additional_bindings: [
+                {
+                    get: "/api/role/old/task"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my role tasks"
+            description: "This API for get list roles task"
+        };
+    };
+    
+    rpc GetMyTasks(ListRoleTaskRequest) returns (ListRoleTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/role/task/me"
+            additional_bindings: [
+                {
+                    get: "/api/role/task"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my role tasks"
+            description: "This API for get list roles task"
+        };
+    };
+
+    rpc CheckRoleAvaibility(CheckRoleAvaibilityRequest) returns (CheckRoleAvaibilityResponse) {
+        option (google.api.http) = {
+            get: "/api/role/check-role-avaibility"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Check role avaibility"
+            description: "This API for check role avaibility"
+        };
+    };
+
+    rpc GetUsersIDyRole(GetUsersIDyRoleRequest) returns (GetUsersIDyRoleResponse) {}
+
+    rpc HTTPGetUsersIDyRole(GetUsersIDyRoleRequest) returns (GetUsersIDyRoleResponse) {
+        option (google.api.http) = {
+            post: "/api/role/get-users"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc GetCountUserRole(CountUserRoleReq) returns (CountUserRoleRes) {
+        option (google.api.http) = {
+            get: "/api/role/count/role-users"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc GetCountUserRoleData(CountUserRoleReq) returns (CountUserRoleDataRes) {
+        option (google.api.http) = {
+            get: "/api/role/count/role-users/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+    rpc GetListRoleIdByUserId(GetRoleUserByUserIDReq) returns (RoleIDs);
+
+    rpc IsProductAuthority(IsProductAuthorityReq) returns (IsProductAuthorityRes) {
+        option (google.api.http) = {
+            post: "/api/role/product/authority"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc GetAllProductIDsByCompany(GetAllProductIDsByCompanyRequest) returns (GetAllProductIDsByCompanyResponse){
+        option (google.api.http) = {
+            get: "/api/role/product/company/{company_id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+        };
+    }
+
+    rpc GetUserByAuthority(GetUserByAuthorityReq) returns (GetUserByAuthorityRes) {
+        option (google.api.http) = {
+            post: "/api/role/authority/user"
+            body: "*"
+        };
+    }
+
+    rpc GetUserByAuthorityWithoutSession(GetUserByAuthorityReq) returns (GetUserByAuthorityRes) {}
+
+    rpc GetListTaskRoleV3(ListRoleV3WithTaskRequest) returns (ListRoleTaskV3Response) {
+        option (google.api.http) = {
+            get: "/api/role/v2/task/me"
+            additional_bindings: [
+                {
+                    get: "/api/role/v2/task"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my role tasks"
+            description: "This API for get list roles task"
+        };
+    };
+
+    rpc GetUsersByRoleID(GetUsersByRoleIDRequest) returns (GetUsersByRoleIDResponse) {
+        option (google.api.http) = {
+            get: "/api/role/v2/user-roles"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list user roles with username"
+            description: "This API for get list user roles with username"
+        };
+    };
+
+    rpc GetRoleApprovedAndCreated(Empty) returns (GetCreatedAndApprovedResponse) {
+        option (google.api.http) = {
+            get: "/api/role/v2/created-approved"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get username by created and approved"
+            description: "This API for get roles by username and companyID"
+        };
+    }
+
+    rpc GetRoleIdsByUserId(GetRoleIdsByUserIdRequest) returns (GetRoleIdsByUserIdResponse) {}
+
+    rpc GetRoleIDsByCompanyIDs(GetRoleIDsByCompanyIDsRequest) returns (GetRoleIDsByCompanyIDsResponse) {
+        option (google.api.http) = {
+            get: "/api/role/v2/role-ids"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get role ids by company ids"
+            description: "This API for get role ids by company ids"
+        };
+    }
+
+    rpc CreateRoleTaskAutoApprove(CreateRoleTaskAutoApproveRequest) returns (CreateRoleTaskAutoApproveResponse){}
+
+    rpc GetRoleIdsByUserRequestWithCache(GetRoleIdsByUserRequestWithCacheRequest) returns (GetRoleIdsByUserRequestWithCacheResponse){}
+    
+    rpc GetCorporateCodeAccess(GetCorporateCodeAccessRequest) returns (GetCorporateCodeAccessResponse){}
+
+
+    rpc CreateRoleTaskRPC(CreateRoleTaskRPCRequest) returns (CreateRoleTaskRPCResponse){}
+
+    rpc GetLatestRoleID(Empty) returns (GetLatestRoleIDRes){}
+
+    rpc GetUsersByRoleIDV3(GetUsersByRoleIdV3Request) returns (GetUsersByRoleIdV3Response) {
+        option (google.api.http) = {
+            post: "/api/role/v3/user-roles",
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list user roles with username"
+            description: "This API for get list user roles with username"
+        };
+    };
+
+    rpc DeleteRolesByRoleID(DeleteRoleByRoleIDReq) returns (DeleteRoleByRoleIDResponse) {};
+
+    rpc DeleteTaskRolesByTaskID(DeleteTaskRoleByTaskIDReq) returns (DeleteTaskRoleByTaskIDResponse) {};
+
+    rpc GetProductsDefaultRoleByProductIDs(GetProductsDefaultRoleByProductIDsRequest) returns (GetProductsDefaultRoleByProductIDsResponse) {};
+
+    rpc ListRolesContainApproveAuthorityByRoleIds(ListRolesContainApproveAuthorityByRoleIdsRequest) returns (ListRolesContainApproveAuthorityByRoleIdsResponse) {};
+    rpc ListUserByRoleId(ListUserByRoleIdRequest) returns (ListUserByRoleIdResponse) {};
+}
+
+message CheckRoleAvaibilityRequest {
+    string roleName = 1;
+    uint64 taskID = 2;
+    uint64 companyID = 3;
+}
+
+message CheckRoleAvaibilityResponse {
+    bool available = 1;
+    string status = 2;
+    uint64 taskID = 3;
+}

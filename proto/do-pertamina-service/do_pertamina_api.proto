@@ -1,0 +1,419 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/empty.proto";
+import "do-pertamina-service/do_pertamina_payload.proto";
+import "do-pertamina-service/do_pertamina_task_payload.proto";
+import "do-pertamina-service/do_pertamina_esb.proto";
+import "google/api/httpbody.proto";
+
+package do_pertamina.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  security_definitions: {
+    security: {
+        key: "bearer"
+        value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "Authorization"
+        description: "Authentication token, prefixed by Bearer: Bearer <token>"
+      }
+    }
+  }
+
+  security: {
+    security_requirement: {
+      key: "bearer"
+    }
+  }
+};
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service DOPertaminaService {
+  rpc GetOrderDetail(GetOrderDetailRequest) returns (GetOrderDetailResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pertamina/get-order-detail"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get order detail"
+      description: "This API for Get order detail"
+    };
+  };
+
+  rpc GetMaterialInfo(GetMaterialInfoRequest) returns (GetMaterialInfoResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pertamina/get-material-info"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get material info"
+      description: "This API for Get material info"
+    };
+  };
+
+  rpc SimulateCashCarry(SimulateCashCarryRequest) returns (SimulateCashCarryResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/simulate-cash-carry"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Simulate cash carry"
+      description: "This API for Simulate cash carry"
+    };
+  };
+
+  rpc SimulateQuotation(SimulateQuotationRequest) returns (SimulateQuotationResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/simulate-quotation"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Simulate quotation"
+      description: "This API for Simulate quotation"
+    };
+  };
+
+  rpc SimulateProductAllocation(SimulateProductAllocationRequest) returns (SimulateProductAllocationResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/simulate-product-allocation"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Simulate product allocation"
+      description: "This API for Simulate product allocation"
+    };
+  };
+
+  rpc CheckDebitAccount(CheckDebitAccountRequest) returns (CheckDebitAccountResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/check-debit-account"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get debit account"
+      description: "This API for Get debit account info"
+    };
+  };
+
+
+  rpc HealthCheck(google.protobuf.Empty) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pertamina/health-check"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Heath Check"]
+      summary: "Health Check"
+      description: "This API for Health Check"
+    };
+  };
+
+  rpc SubmitDOPertamina(SubmitDOPertaminaRequest) returns (SubmitDOPertaminaResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/task/submit"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Submit"]
+      summary: "Submit Order"
+      description: "This API for submit order"
+    };
+  };
+
+  rpc GetEditSubmitDOPertamina(GetDraftSubmitDOPertaminaRequest) returns (GetDraftSubmitDOPertaminaResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pertamina/task/edit/{transaction_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Task"]
+      summary: "Get edit data"
+      description: "This API for get data submit do pertamina"
+    };
+  };
+
+  rpc SetStatusesTaskDOPertamina(SetStatusesTaskDOPertaminaRequest) returns (SetStatusesTaskDOPertaminaResponse) {
+    option (google.api.http) = {
+        post: "/api/do-pertamina/task/action"
+        body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { }
+        tags:["Task"]
+        summary: "Update Status"
+        description: "This API for update status task do pertamina"
+    };
+  };
+
+  rpc DeleteTaskByTaskID(DeleteTaskRequest) returns (DeleteTaskResponse) {
+    option (google.api.http) = {
+        post: "/api/do-pertamina/task/delete"
+        body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Task"]
+        summary: "Delete task"
+        description: "This API for delete task by id"
+    };
+  };
+
+  rpc DownloadReceiptFile(DownloadReceiptRequest) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/history/detail/receipt"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["History"]
+      summary: "Download receipt"
+      description: "This API for download receipt"
+    };
+  };
+
+  rpc GetDetailDOPertamina(OrderDetailRequest) returns (OrderDetailResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pertamina/task/detail/{transaction_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Task"]
+      summary: "Get detail order"
+      description: "This API for get detail task do pertamina"
+    };
+  };
+
+  rpc GetDetailHistoryDOPertamina(OrderDetailRequest) returns (OrderDetailResponse) {
+    option (google.api.http) = {
+      get: "/api/do-pertamina/history/detail/{transaction_id}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["History"]
+      summary: "Get detail history task"
+      description: "This API for get detail history task do pertamina"
+    };
+  };
+
+  rpc ListTask(ListTaskRequest) returns (ListTaskResponse) {
+    option (google.api.http) = {
+        get: "/api/do-pertamina/task/list"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Task"]
+        summary: "List task"
+        description: "This API for get list"
+    };
+  };
+
+  rpc FilterList(FilterListRequest) returns (FilterListResponse) {
+    option (google.api.http) = {
+        get: "/api/do-pertamina/list/filter"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["List"]
+        summary: "List filter"
+        description: "This API for get customized filter based on field"
+    };
+  };
+
+  rpc GetStatusGroup(GetStatusGroupRequest) returns (GetStatusGroupResponse) {
+    option (google.api.http) = {
+        get: "/api/do-pertamina/status-group"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Workflow"]
+        summary: "Get workflow step count"
+        description: "This API for get workflow step count"
+    };
+  };
+
+  rpc DownloadTaskListFile(ListTaskFileRequest) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+        get: "/api/do-pertamina/task/list/download/{file_format}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        tags: ["Task"]
+        summary: "Download List Task"
+        description: "This API for download list task"
+    };
+  };
+
+  rpc GetApplicationId(GetApplicationIdRequest) returns (GetApplicationIdResponse) {
+    option (google.api.http) = {
+        get: "/api/do-pertamina/application-id"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Application ID"]
+        summary: "Get application id"
+        description: "This API for get application id"
+    };
+  };
+
+  rpc MockSimulateSA(SimulateProductAllocationRequest) returns (EsbSimulateProductAllocationResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/mock/simulate-product-allocation"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Mock Simulate product allocation"
+      description: "This API for Mock Simulate product allocation"
+    };
+  }
+
+  rpc MockSimulateQuotation(SimulateQuotationRequest) returns (EsbSimulateQuotationResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/mock/simulate-quotation"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Mock Simulate Quotation"
+      description: "This API for Mock Simulate Quotation"
+    };
+  }
+
+  rpc GetModuleType(google.protobuf.Empty) returns (ModuleTypeResponse) {
+    option (google.api.http) = {
+        get: "/api/do-pertamina/module-type"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Module Type"]
+        summary: "Get module type"
+        description: "This API for get module type"
+    };
+  };
+
+  rpc MockBrigatePaymentCashCarry(PaymentRequest) returns (EsbPaymentCashCarryResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/mock/payment-cash-carry"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Mock"]
+      summary: "Mock Brigate Payment Cash Carry"
+      description: "This API for mock Brigate Payment Cash Carry"
+    };
+  };
+
+  rpc MockBrigatePaymentQuotation(PaymentRequest) returns (EsbPaymentQuotationResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/mock/payment-quotation"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Mock"]
+      summary: "Mock Brigate Payment Quotation"
+      description: "This API for mock Brigate Payment Quotation"
+    };
+  };
+
+  rpc MockBrigatePaymentSA(PaymentRequest) returns (EsbPaymentProductAllocationResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/mock/payment-sa"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Mock"]
+      summary: "Mock Brigate Payment SA"
+      description: "This API for mock Brigate Payment SA"
+    };
+  };
+
+  rpc MockBrigatePaymentTimeout(PaymentRequest) returns (EsbPaymentTimeoutResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/mock/payment-timeout"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Mock"]
+      summary: "Mock Brigate Payment Timeout"
+      description: "This API for mock Brigate Payment Timeout"
+    };
+  };
+
+  rpc ScheduledPayment(ScheduledPaymentRequest) returns (StandardResponse) {
+    option (google.api.http) = {
+        post: "/api/do-pertamina/history/scheduled-payment"
+        body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["History"]
+        summary: "ScheduledPayment"
+        description: "This API for scheduled payment"
+    };
+  };
+
+  rpc RetryPayment(RetryPaymentRequest) returns (RetryPaymentResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pertamina/history/retry-payment"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { } // Disable security key
+      tags: ["History"]
+      summary: "Retry Payment"
+      description: "This API for retry payment"
+    };
+  };
+
+  rpc ListFavoriteAlias(ListFavoriteAliastRequest) returns (ListFavoriteAliasResponse) {
+    option (google.api.http) = {
+        get: "/api/do-pertamina/favorite-alias/list"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Favorite Alias"]
+        summary: "List Favorite Alias"
+        description: "This API for list favorite alias"
+    };
+  };
+
+  rpc UpdateFavoriteAlias(UpdateFavoriteAliasRequest) returns (StandardResponse) {
+    option (google.api.http) = {
+        post: "/api/do-pertamina/favorite-alias/update"
+        body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Favorite Alias"]
+        summary: "Update Favorite Alias"
+        description: "This API for update favorite alias"
+    };
+  };
+  
+  rpc DeleteFavoriteAlias(DeleteFavoriteAliasRequest) returns (DeleteFavoriteAliasResponse) {
+    option (google.api.http) = {
+        post: "/api/do-pertamina/favorite-alias/delete"
+        body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        security: { } // Disable security key
+        tags:["Favorite Alias"]
+        summary: "Delete Favorite Alias"
+        description: "This API for delete favorite alias"
+    };
+  };
+}

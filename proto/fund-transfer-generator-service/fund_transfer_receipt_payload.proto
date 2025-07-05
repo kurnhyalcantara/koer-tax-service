@@ -1,0 +1,395 @@
+syntax = "proto3";
+
+import "fund-transfer-generator-service/fund_transfer_receipt_core.proto";
+import "google/protobuf/timestamp.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "google/api/field_behavior.proto";
+
+package fund_transfer_generator.service.v1;
+option go_package = "./pb";
+
+
+message Pagination {
+    int32 limit = 1;
+    int32 page = 2;
+    string sort = 3;
+    Direction dir = 4;
+    uint64 total_pages = 5;
+    uint64 total_rows = 6;
+    string filter = 7;
+};
+
+message GeneralBodyResponse {
+    string process_id = 1;
+    bool error = 2;
+    uint32 code = 3;
+    string message = 4;
+};
+// #region Utils Request & Response
+
+message HealthCheckResponse {
+    string message = 1;
+};
+
+message UserAuthority {
+    bool isMaker = 1;
+    bool isChecker = 2;
+    bool isSigner = 3;
+    bool isReleaser = 4;
+};
+
+// #endregion
+
+message ModelData {
+    string key = 1;
+    string value = 2;
+    bool is_total_payment = 3;
+}
+
+message ListModelData {
+    string header_data = 1;
+    repeated ModelData model_data = 2;
+    bool is_resize_font = 3;
+}
+
+message ReceiptData {
+    string left_header = 1;
+    string right_header = 2;
+    bool is_first_header_visible = 3;
+    repeated ListModelData list_model_data = 4;
+    bool is_resize_height = 5;
+}
+
+message ReceiptFileGeneratorRequest {
+    string process_id = 1;
+    repeated ReceiptData receipt_data = 2;
+}
+
+message ReceiptFileGeneratorResponse {
+    string process_id = 1;
+    bool error = 2;
+    uint32 code = 3;
+}
+
+// report
+message ReportFileGeneratorRequest {
+    string process_id = 1;
+    repeated ReportData report_data = 2;
+}
+
+message ReportData {
+    string transactionID = 1;
+    string status = 2;
+    TransactionDetail transactionDetail = 3;
+    InformationTransaction informationTransaction = 4;
+    AdditionalInformation additionalInformation = 5;
+    repeated LogActivity logActivity = 22;
+}
+
+message AdditionalInformation {
+    string vocherCode = 1;
+    string email = 2;
+    string remark = 3;
+}
+
+message InformationTransaction {
+    string transferMethod = 1;
+    string scheduleType = 2;
+    string scheduleDate = 3;
+}
+
+message TransactionDetail {
+    string senderAccountNumber = 1;
+    string senderAccountName = 2;
+    string senderAccountAlias = 3;
+    string senderAccountCurrency = 4;
+    string receiverAccountNumber = 5;
+    string receiverAccountName = 6;
+    string receiverAccountAlias = 7;
+    string receiverAccountCurrency = 8;
+    string amount = 9;
+    string fee = 10;
+    string exchangeRate = 11;
+    string receiverAmount = 12;
+    string totalAmount = 13;
+}
+
+message LogActivity {
+    string date = 1;
+    string name = 2;
+    string role = 3;
+    string action = 4;
+    string description = 5;
+}
+
+// generate bulk
+message GenerateReportBulkRequest {
+    string process_id = 1;
+    repeated ReportData report_data = 2;
+    repeated ReceiptData receipt_data = 3;
+}
+
+message RequestIFTReports {
+    repeated TaskInternalTransferData data = 1;
+}
+
+message RequestIFTReceipts {
+    repeated TaskInternalTransferData data = 1;
+}
+
+message RequestIFTMultiple {
+    repeated TaskInternalTransferData Receipts = 1;
+    repeated TaskInternalTransferData Reports = 2;
+}
+
+message TaskInternalTransferData {
+    Task task = 1;
+    InternalTransferData data = 2;
+    ValidateWorkflowData workflow = 3;
+    GetWorkflowTaskInternalTransferResponse activity = 4;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string updatedByName = 11;
+    string reasons = 12;
+    string comment = 13;
+    uint64 companyID = 22;
+    uint64 holdingID = 23;
+    google.protobuf.Timestamp createdAt = 101;
+    google.protobuf.Timestamp updatedAt = 102;
+}
+
+message InternalTransferData {
+    string senderAccountNumber = 1;
+    string senderAccountCurrency = 2;
+    string senderAccountName = 3;
+    string senderAccountAlias = 4;
+    string senderAccountBalance = 5;
+    string receiverAccountNumber = 6;
+    string receiverAccountCurrency = 7;
+    string receiverAccountName = 8;
+    string receiverAccountAlias = 9;
+    string receiverAccountBalance = 10;
+    string dealCode = 11;
+    string bookingID = 35;
+    CurrencyType currency = 12;
+    Fee fee = 13;
+    double amount = 14 [(validator.field) = {float_gte: 0}];
+    TransactionSchedule transactionSchedule = 15;
+    string scheduledDate = 16;
+    string scheduledTime = 17;
+    double exchangeRate = 18 [(validator.field) = {float_gte: 0}];
+    double receivedAmount = 19 [(validator.field) = {float_gte: 0}];
+    string exchangeRateCurrency = 20;
+    RecurringFrequency recurringFrequency = 21;
+    string recurringPeriodStart = 22;
+    string recurringPeriodEnd = 23;
+    string recurringDay = 24;
+    string recurringDate = 25;
+    string recurringTime = 26;
+    string remark = 27;
+    string remark2 = 201;
+    string remark3 = 202;
+    string journalSquence = 28 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string status = 29;
+    string statusMessage = 30 [(google.api.field_behavior) = OUTPUT_ONLY];
+    double feeAmount = 31;
+    double feeAmountSender = 310;
+    string scheduledAt = 32;
+    repeated string notificationEmails = 33;
+    uint64 uaID = 34;
+    string transactionID = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string parentID = 102;
+    uint64 parentTaskID = 103;
+    uint64 transactionServiceID = 104 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string transactionType = 105 [(google.api.field_behavior) = OUTPUT_ONLY];
+    bool saveAsFavourite = 106 ;
+    bool isBeneficiaryFav = 107 ;
+
+    string senderAccountCIF = 120 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string senderBankCode = 121 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string senderBankName = 122 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string senderAccountType = 123 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+
+    string receiverAccountCIF = 130 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string receiverBankCode = 131 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string receiverBankName = 132 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string receiverAccountType = 133 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string receiverLoanType = 134 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+    string IsNotPoll = 135 [(google.api.field_behavior) = OUTPUT_ONLY] ;
+
+    string transactionSource = 136;
+    string isRDN = 137;
+    string bankReferenceNumber = 138;
+    bool isOutgoingPayment = 139;
+    UnderlyingData underlying = 150;
+
+}
+
+message UnderlyingData {
+    string name = 1;
+    string extension = 2;
+    uint32 size = 3;
+}
+
+enum TaskStatus {
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+    DeleteRequest = 6;
+    Deleted = 7;
+}
+
+message Participant {
+    uint64 userID = 1;
+    string userName = 2;
+    uint64 roleID = 3;
+    bool isReject = 5;
+    google.protobuf.Timestamp approvedAt = 6;
+    string step = 7;
+}
+
+message Participants {
+    int32 approvedCount = 1;
+    int32 rejectedCount = 2;
+    int32 Requirement = 3;
+    repeated Participant participants = 4;
+}
+
+message Flow {
+    uint64 workflowLogicID = 1;
+    Participants verifier = 2;
+    Participants approver = 3;
+    Participants releaser = 4;
+    bool isRejected = 5;
+    google.protobuf.Timestamp completedAt = 7;
+}
+
+message WorkflowRecords {
+    google.protobuf.Timestamp lastUpdatedAt = 1;
+    uint64 topRange = 2;
+    uint64 bottomRange = 3;
+    repeated Flow flows = 4;
+}
+
+message UserData {
+    uint64 userID = 1;
+    string username = 2;
+}
+
+message WorkflowHeader {
+    uint64 productID = 1;
+    string productName = 2;
+    uint64 currencyID = 3;
+    string currencyName = 5;
+    uint64 companyID = 6;
+    string companyName = 7;
+    uint64 transactionalNumber = 10;
+    uint64 workflowID = 11;
+    uint64 uaID = 12; // used account id
+}
+
+message WorkflowPayload {
+    WorkflowHeader header = 1;
+    WorkflowRecords records = 2;
+    UserData createdBy = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    bool isDefault = 5;
+    bool isTransactional = 6;
+    repeated uint64 currentRoleIDs = 7;
+    string currentStep = 8;
+    repeated uint64 participantUserIDs = 9;
+}
+
+message ValidateWorkflowData {
+    WorkflowPayload workflow = 1;
+    string nextStatus = 2;
+    string nextStep = 3;
+}
+
+enum CurrencyType {
+    NullCurrencyType = 0;
+    DebitCurrencyType = 1;
+    CreditCurrencyType = 2;
+}
+
+enum Fee {
+    OUR = 0;
+    BEN = 1;
+}
+
+enum TransactionSchedule {
+    NullTransactionSchedule = 0;
+    Immediate = 1;
+    Scheduled = 2;
+    Recurring = 3;
+}
+
+enum RecurringFrequency {
+    NullRecurringFrequency = 0;
+    Daily = 1;
+    Weekly = 2;
+    Monthly = 3;
+}
+
+message GetWorkflowTaskInternalTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    WorkflowTaskInternalFundTransfer data = 4;
+}
+
+message WorkflowTaskInternalFundTransfer {
+    string transactionID = 1;
+    string workflowStatus = 2;
+    string lastActivity = 3;
+    string createdAt = 4;
+    string createdBy = 5;
+
+    message Step {
+        enum StepType {
+            checker = 0;
+            signer = 1;
+            releaser = 2;
+        }
+        StepType step = 1;
+
+        enum Status {
+            pending = 0;
+            approved = 1;
+            rejected = 2;
+            returned = 3;
+        }
+        Status status = 2;
+        int32 requirement = 3;
+        int32 approvedCount = 4;
+
+        message Participant {
+            string username = 1;
+            string date = 2;
+            bool isApproved = 3;
+            bool isRejected = 4;
+            bool isReturned = 5;
+        }
+
+        repeated Participant participants = 5;
+    }
+
+    repeated Step steps = 6;
+
+    string reasons = 7;
+    string comment = 8;
+}

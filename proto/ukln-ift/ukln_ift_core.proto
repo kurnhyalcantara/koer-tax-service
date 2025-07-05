@@ -1,0 +1,163 @@
+syntax = "proto3";
+
+package ukln.service.v1;
+option go_package = "./pb";
+
+message Empty {}
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+}
+
+enum SortDirection {
+    DESC = 0;
+    ASC = 1;
+}
+
+message ErrorBodyResponse{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+// enum BatchStatus {
+//     ALL_STATUS = 0;
+//     DRAFT = 1;
+//     ON_CHECKER = 2;
+//     ON_SIGNER = 3;
+//     ON_RELEASER = 4;
+//     APPROVED = 5;
+//     REJECTED = 6;
+//     SUCCESS = 7;
+// }
+
+// enum TransactionStatus {
+//     ALL_TRANSACTION = 0;
+//     TRANSACTION_DRAFT = 1;
+//     TRANSACTION_PENDING_ACTION = 2;
+//     TRANSACTION_WAITING_SCHEDULE = 3;
+//     TRANSACTION_WAITING_PROCESS = 4;
+//     TRANSACTION_APPROVED  = 5;
+//     TRANSACTION_FAILED = 6;
+//     TRANSACTION_REJECTED = 7;
+// }
+
+enum BatchStatus {
+    ALL_STATUS = 0;
+    DRAFT = 1;
+    PENDING_ACTION = 2;
+    APPROVED  = 3;
+    FAILED = 4;
+    REJECTED = 5;
+}
+
+enum TransactionStatus {
+    ALL_TRANSACTION = 0;
+    TRANSACTION_DRAFT = 1;
+    TRANSACTION_ON_CHECKER = 2;
+    TRANSACTION_ON_SIGNER = 3;
+    TRANSACTION_ON_RELEASER = 4;
+    TRANSACTION_APPROVED  = 5;
+    TRANSACTION_REJECTED = 6;
+    TRANSACTION_SUCCESS = 7;
+    TRANSACTION_FAILED = 8;    
+    TRANSACTION_WAITING_SCHEDULE = 9;
+    TRANSACTION_WAITING_PROCESS = 10;
+}
+
+enum TransactionType {
+    ALL_TRANSACTION_TYPE = 0;
+    BRI_TO_BRI = 1;
+}
+
+
+enum ScheduleType {
+    ALL_SCHEDULE_TYPE = 0;
+    IMMEDIATE = 1;
+    SCHEDULE = 2;
+}
+
+enum ActionType {
+    ALL_ACTION_TYPE = 0;
+    ACTION_DRAFT = 1;
+    ACTION_VERIFY = 2;
+    ACTION_APPROVE = 3;
+    ACTION_RELEASE = 4;
+}
+
+enum ActionTypeV2 {
+    TRANSACTION = 0;
+}
+
+message GetTotalDataByFundTransferId{
+    uint64 no_of_transaction = 1;
+    double total_amount = 2;
+    uint64 fund_transfer_id = 3;
+}
+
+enum TransactionCurrencyType {
+    NullCurrencyType = 0;
+    DebitCurrencyType = 1;
+    CreditCurrencyType = 2;
+}
+
+message NotificationData {
+    string account_alias = 1 [json_name='ACCOUNT_ALIAS'];
+    string account_holder_name = 2 [json_name='ACCOUNT_HOLDER_NAME'];
+    string account_number = 3 [json_name='ACCOUNT_NUMBER'];
+    string bank_name = 4 [json_name='BANK_NAME'];
+    string beneficiary_account_alias = 5 [json_name='BENEFICIARY_ACCOUNT_ALIAS'];
+    string beneficiary_account_currency_name = 6 [json_name='BENEFICIARY_ACCOUNT_CURRENCY_NAME'];
+    string beneficiary_account_holder_name = 7 [json_name='BENEFICIARY_ACCOUNT_HOLDER_NAME'];
+    string beneficiary_account_number = 8 [json_name='BENEFICIARY_ACCOUNT_NUMBER'];
+    string comment = 9 [json_name='COMMENT'];
+    string company_name = 10 [json_name='COMPANY_NAME'];
+    string created_date = 11 [json_name='CREATED_DATE'];
+    string created_datetime = 12 [json_name='CREATED_DATETIME'];
+    string created_time = 13 [json_name='CREATED_TIME'];
+    string currency_name = 14 [json_name='CURRENCY_NAME'];
+    string event_date = 15 [json_name='EVENT_DATE'];
+    string event_datetime = 16 [json_name='EVENT_DATETIME'];
+    string event_time = 17 [json_name='EVENT_TIME'];
+    string exchange_rate = 18 [json_name='EXCHANGE_RATE'];
+    string exchange_rate_currency = 19 [json_name='EXCHANGE_RATE_CURRENCY'];
+    string module = 20 [json_name='MODULE'];
+    string reason = 21 [json_name='REASON'];
+    string received_amount = 22 [json_name='RECEIVED_AMOUNT'];
+    string remark = 23 [json_name='REMARK'];
+    string send_amount = 24 [json_name='SEND_AMOUNT'];
+    string status_action = 25 [json_name='STATUS_ACTION'];
+    string task_id = 26 [json_name='TASK_ID'];
+    string transaction_id = 27 [json_name='TRANSACTION_ID'];
+    string username_approver = 28 [json_name='USERNAME_APPROVER'];
+    string username_checker = 29 [json_name='USERNAME_CHECKER'];
+    string username_maker = 30 [json_name='USERNAME_MAKER'];
+    string username_rejector = 31 [json_name='USERNAME_REJECTOR'];
+    string username_releaser = 32 [json_name='USERNAME_RELEASER'];
+}
+
+enum ApiType {
+    GET_TOKEN = 0;
+    INTROSPECT = 1;
+    REFRESH_TOKEN = 2;
+    INQUIRY = 3;
+    BRIGATE_TOKEN = 4;
+}
+
+message ErrorESB {
+    string message = 1;
+}
+
+enum FormatTemplate {
+    null = 0;
+    csv = 1;
+    xls = 2;
+    pdf = 3; 
+}

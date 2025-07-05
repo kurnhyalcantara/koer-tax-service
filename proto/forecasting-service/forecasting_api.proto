@@ -1,0 +1,269 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/httpbody.proto";
+
+import "google/protobuf/empty.proto";
+
+import "forecasting-service/forecasting_payload.proto";
+
+package forecasting.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+    rpc ListAccountStatement(ListAccountStatementRequest) returns (ListAccountStatementResponse) {
+        option (google.api.http) = {
+            get: "/api/forecasting/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "List beneficiary account data"
+            description: "This API for get list account"
+        };
+    };
+
+    rpc InquiryAccountStatement(InquiryAccountStatementRequest) returns (ListAccountStatementResponse) {
+        option (google.api.http) = {
+            post: "/api/forecasting/inquiry/request"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+    rpc CheckAccountStatementHttp(CheckAccountStatementRequest) returns (InquiryAccountStatementResponse) {
+        option (google.api.http) = {
+            post: "/api/forecasting/inquiry/check"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+
+    rpc CheckAccountStatement(CheckAccountStatementRequest) returns (InquiryAccountStatementResponse) {};
+
+    rpc CancelAccountStatement(CheckAccountStatementRequest) returns (CancelAccountStatementResponse) {
+        option (google.api.http) = {
+            post: "/api/forecasting/inquiry/cancel"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+    rpc ProcessFile(FindFileRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/forecasting/file/{id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    };
+
+    rpc DownloadZipFile(ZipFileRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/forecasting/zip"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get zip file"
+            description: "get zip file"
+        };
+    };
+    
+    rpc HealthCheck(google.protobuf.Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/forecasting/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            tags: ["Utility"]
+            summary: "Health Check"
+            description: "This API for check health server",
+        };
+    }
+
+    // v2
+    rpc CreateSettingAccountStatementV2(CreateSettingAccountStatementV2Request) returns (SettingAccountStatementV2Response){
+        option (google.api.http) = {
+            post: "/api/forecasting/email/create"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["V2"]
+            summary: "Create Setting Account Statement V2"
+            description: "This API used for create setting account statement V2"
+        };
+    }
+
+    rpc GetSettingAccountStatementByIdV2(GetSettingAccountStatementByIdV2Request) returns (GetSettingAccountStatementByIdV2Response){
+        option (google.api.http) = {
+            get: "/api/forecasting/email/task/{task_id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["V2"]
+            summary: "Get Setting Account Statement By Id V2"
+            description: "This API used for get setting account statement by id V2"
+        };
+    }
+
+    rpc UpdateSettingAccountStatementV2(UpdateSettingAccountStatementV2Request) returns (SettingAccountStatementV2Response){
+        option (google.api.http) = {
+            post: "/api/forecasting/email/update/{task_id}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["V2"]
+            summary: "Update Setting Account Statement V2"
+            description: "This API used for update setting account statement V2"
+        };
+    }
+    
+    rpc GetListAccountStatementV2(GetListAccountStatementV2Request) returns (GetListAccountStatementV2Response){
+        option (google.api.http) = {
+            get: "/api/forecasting/email"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["V2"]
+            summary: "Get Setting Account Statement V2"
+            description: "This API used for get setting account statement V2"
+        };
+    }
+
+    rpc GetStatementSchedule(GetStatementScheduleRequest) returns (GetStatementScheduleResponse);
+    
+    rpc GetScheduleByTaskId(GetScheduleByTaskIdRequest) returns (GetStatementScheduleResponse);
+    
+    rpc GetStatementScheduleByStatus(GetStatementScheduleByStatusRequest) returns (GetStatementScheduleResponse);
+    
+    rpc GetDetailStatement(GetDetailStatementRequest) returns (GetDetailStatementResponse);
+
+    rpc UpdateNextSchedule(GetDetailStatementRequest) returns (UpdateScheduleResponse);
+    
+    rpc UpdateStatementSchedule(UpdateStatementScheduleRequest) returns (UpdateScheduleResponse);
+
+    rpc DownloadListAccountStatement(DownloadListAccountStatementRequest) returns (google.api.HttpBody){
+        option (google.api.http) = {
+            post: "/api/forecasting/email/download"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["V2"]
+            summary: "Download List Account Statement"
+            description: "This API used for download list account statement"
+        };
+    }
+
+
+    rpc DeleteAccountStatement(DeleteAccountStatementRequest) returns (DeleteAccountStatementResponse){
+        option (google.api.http) = {
+            post: "/api/forecasting/email/delete"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["V2"]
+            summary: "Delete Setting Account Statement V2"
+            description: "This API used for delete setting account statement V2"
+        };
+    }
+
+    rpc ExecInquiryAccountStatement(ExecInquiryAccountStatementRequest) returns (ExecInquiryAccountStatementResponse);
+
+    rpc ExecMtTransactions(ExecInquiryAccountStatementRequest) returns (ExecMtTransactionsResponse);
+
+    rpc DownloadFileMTZip(ZipFileRequest) returns (google.api.HttpBody);
+
+    rpc UpdateAccountStatement(google.protobuf.Empty) returns (UpdateAccountStatementResponse){
+        option (google.api.http) = {
+            post: "/api/forecasting/inquiry/update"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["V2"]
+            summary: "Update Account Statement"
+            description: "This API used for update account statement from rundeck"
+        };
+    }
+
+    rpc SaveTemplateAccountStatement(SaveTemplateAccStatementReq) returns (errorBodyResponse){
+        option (google.api.http) = {
+            post: "/api/forecasting/template/create"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Save Template Account Statement"
+            description: "This API used for saving template account statement"
+        };
+    }
+
+    rpc GetListTemplateAccountStatement(google.protobuf.Empty) returns (ListAccStatementResp){
+        option (google.api.http) = {
+            get: "/api/forecasting/template/list"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get List Template Account Statement"
+            description: "This API used for get template list account statement"
+        };
+    }
+
+    rpc GetDetailTemplateAccountStatement(DetailTemplateAccStatementReq) returns (DetailTemplateAccStatementRes){
+        option (google.api.http) = {
+            post: "/api/forecasting/template/detail"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Detail Template Account Statement"
+            description: "This API used for get detail template account statement"
+        };
+    }
+
+    rpc DeleteTemplateAccountStatement(DeleteTemplateAccStatementReq) returns (DeleteTemplateAccStatementRes){
+        option (google.api.http) = {
+            post: "/api/forecasting/template/delete"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete Template Account Statement"
+            description: "This API used for delete template account statement"
+        };
+    }
+
+    rpc ListAccountStatementConsolidated(ListAccountStatementConsolidatedRequest) returns (ListAccountStatementResponse) {
+        option (google.api.http) = {
+            get: "/api/forecasting/consolidate"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "List Account Statement Consolidated"
+            description: "This API for get list account statement consolidated"
+        };
+    }; 
+}

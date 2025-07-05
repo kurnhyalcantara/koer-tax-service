@@ -1,0 +1,880 @@
+syntax = "proto3";
+
+
+package transaction.service.v1;
+option go_package = "./pb";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+
+import "transaction-service/gorm_db.proto";
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+}
+
+enum SortDirection {
+    DESC = 0;
+    ASC = 1;
+}
+
+message ListTransactionRequest {
+    message Filter{
+        uint64 moduleId = 1;
+        uint64 companyId = 2;
+        uint64 holdingId = 3;
+        uint64 featureId = 4;
+        string externalId = 5;
+        string jurnalSeq = 6;
+    }
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 3;
+    SortDirection sortDir = 4;
+    Filter transaction = 5;
+    // string filter = 6;
+    // string filterOr = 7;
+    // string search = 8;
+}
+
+message ListTransactionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TransactionMessage data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ListTransactionSchedulerRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Scheduler data = 4;
+}
+
+message ExecSchedulerReq {
+    uint64 schedulerId = 1;
+}
+
+
+message ExecUnsettledSchedulerReq {
+    uint64 status = 1;
+    string dateBefore = 2;
+}
+
+message CommonResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message TransactionKeyMessage {
+    uint64 transactionId = 1 [(google.api.field_behavior) = REQUIRED, (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+}
+
+message DetailTransactionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TransactionMessage data = 4;
+}
+
+message Feature {
+    uint64 featureId = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    string featureName = 2;
+}
+
+message ScheduleOption {
+    bool isSchedule = 1;
+    string scheduledDate = 2;
+}
+
+message RetryOption {
+    bool isRetry = 1;
+    uint32 retryNumber = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+}
+
+message Debit {
+    string amount = 1;
+    string currency = 2;
+    string account = 3;
+}
+
+message Credit {
+    string amount = 1;
+    string currency = 2;
+    string account = 3;
+}
+
+message TransactionMessage {
+    uint64 transactionId = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    uint64 moduleId = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    uint64 companyId = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    uint64 holdingId = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    Feature feature = 5;
+    ScheduleOption schedule = 6;
+    RetryOption retry = 7;
+    string externalId = 8;
+    string jurnalSeq = 9;
+    string requestDetail = 10;
+    string responseDetail = 11;
+    Debit debit = 12;
+    Credit credit = 13;
+    string status = 14;
+    string feeAmount = 15;
+    string kurs = 16;
+    string kursCurrency = 17;
+    uint64 taskID = 18;
+    string createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message BulkTransactionMessage {
+    repeated TransactionMessage transactions = 1;
+}
+
+message EditTransactionReq {
+    uint64 transactionId = 1 [(google.api.field_behavior) = REQUIRED, (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    TransactionMessage data = 2;
+}
+
+message LimitSummaryMessage {
+    double available = 1;
+    double used = 2;
+    double total = 3;
+}
+
+message LimitSummaryRequest {
+    uint64 companyId = 1 [(google.api.field_behavior) = REQUIRED];
+    uint64 holdingId = 2 [(google.api.field_behavior) = REQUIRED];
+    string currencyCode = 3 [(google.api.field_behavior) = REQUIRED];
+    string date = 4;
+}
+
+message LimitSummaries {
+    LimitSummaryMessage dailyCompanyLimit = 1;
+    LimitSummaryMessage dailyCompanyGrouplimit = 2;
+    LimitSummaryMessage holdingCompanyLimit = 4;
+    LimitSummaryMessage workflowLimit = 5;
+    LimitSummaryMessage transactionLimit = 6;
+}
+
+message LimitSummaryResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    LimitSummaries data = 4;
+}
+
+message ModuleLimitRequest {
+    uint64 companyId = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message TransactionLimitRequest {
+    uint64 companyID = 1;
+    uint64 holdingID = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string customOrder = 9;
+    string companyName = 10;
+
+    string currency = 11;
+}
+
+message TransactionLimit {
+    string companyName = 1;
+    uint64 companyID = 2;
+    repeated ModuleLimit modules = 3;
+}
+
+message TransactionLimitResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TransactionLimit data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ModuleLimitResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated ModuleLimit data = 4;
+}
+
+message ModuleLimit {
+    string moduleName = 1;
+    uint64 productID = 3;
+    repeated TempLimit limit = 2;
+}
+
+message TempLimit {
+    uint64 limit = 1;
+    uint64 currencyID = 2;
+    string currency = 3;
+}
+
+message CreateTransactionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TransactionMessage data = 4;
+}
+
+message CreateBulkTransactionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TransactionMessage data = 4;
+}
+
+message HostToHostConfigMessage {
+    uint64 configId = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    string directoryUrl = 2[(google.api.field_behavior) = REQUIRED];
+    string directoryUsername = 3[(google.api.field_behavior) = REQUIRED];
+    string directoryPassword = 4[(google.api.field_behavior) = REQUIRED];
+    uint64 hostToHostUserId = 5[(google.api.field_behavior) = REQUIRED];
+    string encryption = 6;
+    string encryptionPrivateKey = 7[(google.api.field_behavior) = REQUIRED];
+    string encryptionPublicKey = 8[(google.api.field_behavior) = REQUIRED];
+}
+
+message DetailHostToHostConfigResp {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    HostToHostConfigMessage data = 4;
+}
+
+message HostToHostConfigKeyMessage {
+    uint64 configId = 1 [(google.api.field_behavior) = REQUIRED, (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+}
+
+message EditHostToHostConfigReq {
+    uint64 configId = 1 [(google.api.field_behavior) = REQUIRED, (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    HostToHostConfigMessage data = 2;
+}
+
+message BRIGateHardTokenValidationRequest {
+    string userName = 1 [json_name='userName'];
+    string passCode = 2 [json_name='passCode'];
+}
+
+message BRIGateHardTokenValidation{
+    string responseCode = 1 [json_name='responseCode'];
+    string responseMessage = 2 [json_name='responseMessage'];
+}
+
+message BRIGateHardTokenValidationResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    BRIGateHardTokenValidation data = 4;
+}
+
+message GetSchedulerDataReq {
+    uint64 transactionID = 1;
+}
+
+message GetSchedulerDataRes {
+    Transaction transaction = 1;
+    Scheduler scheduler = 2; 
+}
+
+enum CurrencyType {
+    NullCurrencyType = 0;
+    DebitCurrencyType = 1;
+    CreditCurrencyType = 2;
+}
+
+message BRIGateDealCodeReq {
+    string Code = 1;
+}
+
+message BRIGateDealCodeRes {
+    string ResponseCode = 1;
+    string ResponseMessage = 2;
+    BRIGateDealCodeResData ResponseData = 3;
+}
+
+message BRIGateDealCodeResData {
+    string DealNumber = 1;
+    string DealDate = 2;
+    string ValueDate = 3;
+    string DebitCurrency = 4;
+    string CreditCurrency = 5;
+    double DebitAmount = 6;
+    double CreditAmount = 7;
+    double DealRate = 8;
+    double BuyRate = 9;
+    double SellRate = 10;
+    double BookBuyRate = 11;
+    double BookSellRate = 12;
+    string TimeExpired = 13;
+    string Status = 14;
+    string DealType = 15;
+}
+
+message BRIGateGetPairRateRequest {
+    string senderCurrency = 1;
+    string receiverCurrency = 2;
+    double amount = 3;
+    string dealCode = 4;
+    CurrencyType currencyType = 5;
+    string trxType = 6;
+}
+
+message BRIGateGetPairRateResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Rate data = 4;
+}
+message Rate {
+    double buyAmount = 1;
+    double sellAmount = 2;
+    double totalAmount = 3;
+    string dealNumber = 4;
+    double exchangeRate = 5;
+    string exchangeRateCurrency = 6;
+}
+
+
+
+enum TaskStatus {
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+    DeleteRequest = 6;
+    Deleted = 7;
+}
+
+enum TaskStep {
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+}
+
+message Participant {
+    uint64 userID = 1;
+    string userName = 2;
+    uint64 roleID = 3;
+    bool isReject = 5;
+    google.protobuf.Timestamp approvedAt = 6;
+    string step = 7;
+}
+
+message Participants {
+    int32 approvedCount = 1;
+    int32 rejectedCount = 2;
+    int32 Requirement = 3;
+    repeated Participant participants = 4;
+}
+
+message Flow {
+    uint64 workflowLogicID = 1;
+    Participants verifier = 2;
+    Participants approver = 3;
+    Participants releaser = 4;
+    bool isRejected = 5;
+    google.protobuf.Timestamp completedAt = 7;
+}
+
+message WorkflowRecords {
+    google.protobuf.Timestamp lastUpdatedAt = 1;
+    uint64 topRange = 2;
+    uint64 bottomRange = 3;
+    repeated Flow flows = 4;
+}
+
+message UserData {
+    uint64 userID = 1;
+    string username = 2;
+}
+
+message WorkflowHeader {
+    uint64 productID = 1;
+    string productName = 2;
+    uint64 currencyID = 3;
+    string currencyName = 5;
+    uint64 companyID = 6;
+    string companyName = 7;
+    uint64 transactionalNumber = 10;
+    uint64 workflowID = 11;
+}
+
+message WorkflowPayload {
+    WorkflowHeader header = 1;
+    WorkflowRecords records = 2;
+    UserData createdBy = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    bool isDefault = 5;
+    bool isTransactional = 6;
+    repeated uint64 currentRoleIDs = 7;
+    string currentStep = 8;
+    repeated uint64 participantUserIDs = 9;
+}
+
+message ValidateWorkflowData {
+    WorkflowPayload workflow = 1;
+    string nextStatus = 2;
+    string nextStep = 3;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string updatedByName = 11;
+    string reasons = 12;
+    string comment = 13;
+    uint64 companyID = 22;
+    uint64 holdingID = 23;
+    string data = 24;
+    google.protobuf.Timestamp createdAt = 101;
+    google.protobuf.Timestamp updatedAt = 102;
+}
+
+message GetTaskExternalTransferRequest {
+    TaskStatus status = 1;
+    TaskStep step = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    SortDirection dir = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Sort DirectionEnum should be ASC or DESC",
+	}];
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string in = 10 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'IN' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' IN type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string typeTab = 11;
+}
+
+message GetTaskExternalTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TaskExternalTransferData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message TaskExternalTransferData {
+    Task task = 1;
+    ExternalTransferData data = 2;
+    ValidateWorkflowData workflow = 3;
+}
+
+message ExternalTransferData {
+    SenderData sender = 1;
+    BeneficiaryData beneficiary = 2;
+    Fee fee = 3;
+    double feeAmount = 4 [(validator.field) = {float_gte: 0}];
+    double amount = 5 [(validator.field) = {float_gte: 0}];
+    TransactionSchedule transactionSchedule = 6;
+    google.protobuf.Timestamp scheduledAt = 7;
+    RecurringFrequency recurringFrequency = 8;
+    google.protobuf.Timestamp recurringPeriodStart = 9;
+    google.protobuf.Timestamp recurringPeriodEnd = 10;
+    int64 recurringDay = 11;
+    int64 recurringDate = 12;
+    string recurringTime = 13;
+    string remark = 14;
+    repeated string notificationEmails = 15;
+    string journalSquence = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string referenceNumber = 17 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string status = 18;
+    string statusMessage = 19;
+    string transactionID = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string parentID = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string trackingNumber = 103 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string remittanceAccount = 20;
+    string dealCode = 21;
+    google.protobuf.Timestamp executedAt = 120;
+    bool isOutgoingPayment = 22;
+    string bankReferenceNumber = 23;
+    ResponseDetails responseDetails = 25;
+}
+
+
+message ResponseDetails {
+    string uetr = 1;
+    string reason = 2;
+    string tiketNo = 3;
+    string errorCode = 4;
+    string journalSeq = 5;
+    string journalSeq2 = 6;
+    string journalSeq3 = 7;
+    string journalSeq4 = 8;
+    string journalSeq5 = 9;
+    string journalSeq6 = 10;
+    string responseCode = 11;
+    string idTransaction = 12;
+    string responseMessage = 13;
+    string CheckStatusResponse = 14;
+}
+
+message SenderData {
+    string accountNumber = 1;
+    string accountName = 2;
+    string accountAlias = 3;
+    string currency = 4;
+}
+
+message BeneficiaryData {
+    string accountNumber = 1;
+    string accountName = 2;
+    string accountAlias = 3;
+    string currency = 4;
+    string bankName = 5;
+    string bankCode = 6;
+    string country = 7;
+    string accountType = 8;
+    string countryCode = 9;
+}
+
+enum Fee {
+    OUR = 0;
+    BEN = 1;
+    SHA = 2;
+}
+
+enum TransactionSchedule {
+    NullTransactionSchedule = 0;
+    Immediate = 1;
+    Scheduled = 2;
+    Recurring = 3;
+}
+
+enum RecurringFrequency {
+    NullRecurringFrequency = 0;
+    Daily = 1;
+    Weekly = 2;
+    Monthly = 3;
+}
+
+message GetTaskExternalTransferFileRequest {
+    TaskStatus status = 1;
+    TaskStep step = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    TransactionLimitRequest.direction dir = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Sort DirectionEnum should be ASC or DESC",
+	}];
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:External Fund Transfer => Where task_id = 1 AND type = 'External Fund Transfer' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:External Fund Transfer => Where task_id = 1 AND type = 'External Fund Transfer' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:External Fund Transfer => Where name = 'External Fund Transfer' OR type = 'External Fund Transfer' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    bool isTransaction = 10 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "this field for showing transaction coloumn",
+        type: BOOLEAN
+	}];
+    FormatTemplate fileFormat = 101;
+}
+
+message GetTaskExternalTransferFileResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message GetTransferOverviewSummaryRequest {
+    string feature = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "group by feature. Default value '' for get all transactions \n format: [key:value,value] \n example: feature=Deposito,Internal Fund Transfer"
+    }];
+    string filter = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+}
+
+message GetTransferOverviewSummaryRequestWithResCache {
+    string rcode = 100;
+    
+    string feature = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "group by feature. Default value '' for get all transactions \n format: [key:value,value] \n example: feature=Deposito,Internal Fund Transfer"
+    }];
+    string filter = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+}
+
+message TransferOverview {
+    uint64 total = 1;
+    uint64 successful = 2;
+    uint64 inProgress = 3;
+    uint64 unsuccessful = 4;
+    uint64 scheduled = 5;
+    uint64 total_batch = 6;
+}
+
+message GetTransferOverviewSummaryResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TransferOverview data = 4;
+}
+
+message RecentTransactionData {
+    string transactionId = 1;
+    string currency = 2;
+    double amount = 3 [(validator.field) = {float_gte: 0}];
+    string status = 4;
+    google.protobuf.Timestamp date = 5;
+}
+
+message TaskRecentTransactionData {
+    Task task = 1;
+    RecentTransactionData data = 2;
+    ValidateWorkflowData workflow = 3;
+    RecentMassTransferData dataMassTransfer = 4;
+}
+message GetTaskRecentTransferRequest {
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    SortDirection dir = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Sort DirectionEnum should be ASC or DESC",
+    }];
+    string feature = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "group by feature. Default value '' for get all transactions \n format: [key:value,value] \n example: feature=Deposito,Internal Fund Transfer"
+    }];
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+}
+
+message GetTaskRecentTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TaskRecentTransactionData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+enum FormatTemplate {
+    null = 0;
+    csv = 1;
+    xls = 2;
+    xlsx = 3;
+    pdf = 4; 
+}
+
+message ResponseDetail {
+    ResponseDetailData RESPONSE = 1;
+}
+message ResponseDetailData {
+    string RESPONSE_CODE = 1;
+    string RESPONSE_MESSAGE = 2;
+    string ERROR_CODE = 3;
+    repeated string JOURNAL_SEQUENCE = 4;
+}
+
+message RecentTransferRequest {
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    SortDirection dir = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Sort DirectionEnum should be ASC or DESC",
+    }];
+    string feature = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "group by feature. Default value '' for get all transactions \n format: [key:value,value] \n example: feature=Deposito,Internal Fund Transfer"
+    }];
+}
+
+message RecentTransferData {
+    string transactionId = 1;
+    string currency = 2;
+    double amount = 3 [(validator.field) = {float_gte: 0}];
+    string status = 4;
+    google.protobuf.Timestamp date = 5;
+}
+
+message RecentTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated RecentTransferData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message TaskSummaryAmountData {
+    double amount = 1;
+    uint64 total = 2;
+}
+
+message GetTaskSummaryAmountRequest {
+    string feature = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "group by feature. Default value '' for get all transactions \n format: [key:value,value] \n example: feature=Deposito,Internal Fund Transfer"
+    }];
+    string filter = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+}
+
+message GetTaskSummaryAmountResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskSummaryAmountData data = 4;
+}
+
+message CheckDealCodeReq {
+    string Code = 1;
+}
+
+message CheckDealCodeRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    bool is_valid = 4;
+}
+
+message UpdateStatusTransactionReq{
+    uint64 transaction_id = 1;
+    string request_detail = 2;
+    string response_detail = 3;
+    string status = 4;
+}
+
+message UpdateStatusTransactionRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+message CompareCurrencyRequest {
+    string currency1 = 1;
+    string currency2 = 2;
+}
+
+message CompareCurrencyData {
+    string stronger_currency = 1;
+    string weaker_currency = 2;
+}
+
+message CompareCurrencyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    CompareCurrencyData data = 4;
+}
+
+message BRIGateGetPairRateV2Request {
+    string senderCurrency = 1;
+    string receivedCurrency = 2;
+    double amount = 3;
+    string amountPosition = 4;
+    string dealCode = 8;
+}
+
+message BRIGateGetPairRateV2Response {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    PairRateDataV2 data = 4;
+}
+
+message PairRateDataV2 {
+    double exchangeRate = 1;
+    string senderCurrency = 2;
+    string receivedCurrency = 3;
+    double senderAmount = 4;
+    double receivedAmount = 5;
+    string exchangeRateCurrency = 6;
+    double totalAmount = 7;
+    double buyRate = 8;
+    double sellRate = 9;
+    string bookingID = 10;
+}
+
+message RecentMassTransferData {
+    string transactionId = 1;
+    string currency = 2;
+    double amount = 3 [(validator.field) = {float_gte: 0}];
+    string status = 4;
+    google.protobuf.Timestamp date = 5;
+    string customerReffNumber = 6;
+    string batchReffNumber = 7;
+    uint64 id = 8;
+}

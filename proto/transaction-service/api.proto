@@ -1,0 +1,402 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "transaction-service/payload.proto";
+
+package transaction.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Transaction Service";
+        version: "0.1";
+    };
+    
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+
+    // tags: [
+    //     {
+    //         name: "All"
+    //         description: "All operations"
+    //     }
+    //     {
+    //         name: "Task"
+    //         descirption: "Task operations"
+    //     }
+    //     {
+    //         name: "Data"
+    //         descirption: "Data operations"
+    //     }
+    //     {
+    //         name: "External"
+    //         descirption: "External API"
+    //     }
+    //     {
+    //         name: "ESB"
+    //         descirption: "API operations for ESB"
+    //     }
+    // ]
+
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+
+    schemes: HTTP;
+    // schemes: HTTPS;
+    consumes: "application/json";
+    produces: "application/json";
+};
+
+service TransactionService {
+
+    rpc ListTransaction (ListTransactionRequest) returns (ListTransactionResponse) {
+        option (google.api.http) = {
+            get: "/api/transaction"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get data list";
+            tags: ["Read"];
+            // security: {}
+            description: "get transaction data list"
+        };
+    }
+
+    rpc GetTransactionLimit(TransactionLimitRequest) returns (TransactionLimitResponse) {
+        option (google.api.http) = {
+            get: "/api/transaction/limit/list"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list transaction limit";
+            tags: ["Read"];
+            // security: {}
+            description: "Get list transaction limit"
+        };
+    }
+
+    rpc LimitSummary (LimitSummaryRequest) returns (LimitSummaryResponse) {}
+
+    rpc LimitSummaryHTTP (LimitSummaryRequest) returns (LimitSummaryResponse) {
+        option (google.api.http) = {
+            post: "/api/transaction/limit/summary"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get limit summary";
+            tags: ["Read"];
+            // security: {}
+            description: "Get transaction limit summary"
+        };
+    }
+
+    rpc GetModuleLimit(ModuleLimitRequest) returns (ModuleLimitResponse) {
+        option (google.api.http) = {
+            get: "/api/transaction/limit/module"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get module limit";
+            tags: ["Read"];
+            // security: {}
+            description: "Get module limit"
+        };
+    }
+
+    rpc DetailTransaction (TransactionKeyMessage) returns (DetailTransactionResponse) {
+        option (google.api.http) = {
+            get: "/api/transaction/{transactionId}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Data detail";
+            tags: ["Read"];
+            // security: {}
+            description: "Get transaction data detail"
+        };
+    }
+
+    rpc DeleteTransaction (TransactionKeyMessage) returns (CommonResponse) {
+        option (google.api.http) = {
+            delete: "/api/transaction/{transactionId}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete transaction";
+            tags: ["Delete"];
+            // security: {}
+            description: "Delete transaction data"
+        };
+    }
+
+    rpc CancelTransaction (TransactionKeyMessage) returns (CommonResponse) {
+        option (google.api.http) = {
+            post: "/api/transaction/cancel/{transactionId}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Cancel transaction";
+            tags: ["Cancel"];
+            // security: {}
+            description: "Cancel transaction data"
+        };
+    }
+    
+    rpc CreateTransaction (TransactionMessage) returns (CreateTransactionResponse) {
+        option (google.api.http) = {
+            post: "/api/transaction"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create transaction";
+            tags: ["Create"];
+            // security: {}
+            description: "Create new transaction",
+        };
+    }
+
+    rpc CreateBulkTransaction (BulkTransactionMessage) returns (CreateBulkTransactionResponse) {
+        option (google.api.http) = {
+            post: "/api/transaction-bulk"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create transaction bulk";
+            tags: ["Create"];
+            // security: {}
+            description: "Create new multiple transaction at once",
+        };
+    }
+
+    rpc UpdateTransaction (EditTransactionReq) returns (DetailTransactionResponse) {
+        option (google.api.http) = {
+            put: "/api/transaction"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Update transaction";
+            tags: ["Update"];
+            // security: {}
+            description: "Update transaction",
+        };
+    }
+
+    rpc UpdateStatusTransaction (UpdateStatusTransactionReq) returns (UpdateStatusTransactionRes);
+
+    rpc CreateHostToHostConfig (HostToHostConfigMessage) returns (DetailHostToHostConfigResp);
+    rpc EditHostToHostConfig (EditHostToHostConfigReq) returns (DetailHostToHostConfigResp);
+    rpc DetailHostToHostConfig (HostToHostConfigKeyMessage) returns (DetailHostToHostConfigResp);
+    rpc DeleteHostToHostConfig (HostToHostConfigKeyMessage) returns (DetailHostToHostConfigResp);
+
+    rpc ListTransactionScheduler (Empty) returns (ListTransactionSchedulerRes) {
+        option (google.api.http) = {
+            get: "/api/transaction/scheduler"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get data list of transaction scheduler";
+            tags: ["Read"];
+            // security: {}
+            description: "get transaction scheduler data list"
+        };
+    }
+
+    rpc ExecScheduler (ExecSchedulerReq) returns (CommonResponse) {
+        option (google.api.http) = {
+            post: "/api/transaction/scheduler"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Execute Scheduler immediately";
+            tags: ["Create"];
+            // security: {}
+            description: "Execute Scheduler immediately",
+        };
+    }
+
+    rpc ExecUnsettledScheduler (ExecUnsettledSchedulerReq) returns (CommonResponse) {
+        option (google.api.http) = {
+            get: "/scheduler/transaction/unsettled-scheduler"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Execute Unsettled Scheduler immediately";
+            tags: ["Create"];
+            // security: {}
+            description: "Unsettled scheduler has status = 0 (pending) or status = 2 (failed/error)",
+        };
+    }
+
+    rpc GetTaskExternalTransfer (GetTaskExternalTransferRequest) returns (GetTaskExternalTransferResponse) {
+        option (google.api.http) = {
+            get: "/api/transaction/external-transfer"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get External Transfer Task";
+            tags: ["Read"];
+            // security: {}
+            description: "Get External Transfer Task",
+        };
+    }
+
+    rpc GetResCache(ResCacheReq) returns (ResCacheRes) {
+        option (google.api.http) = {
+            post: "/api/transaction/rescache"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Response Cache"]
+            summary: "Get Response Cache"
+            description: "This API for get response cache"
+        };
+      }
+
+    rpc GetTaskExternalTransferFile(GetTaskExternalTransferFileRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/transaction/external-transfer/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Read"]
+            summary: "Get External Transfer Export"
+            description: "This API for External Transfer Export"
+        };
+    };
+
+    rpc BRIGateHardTokenValidation(BRIGateHardTokenValidationRequest) returns (BRIGateHardTokenValidationResponse) {
+        option (google.api.http) = {
+            post: "/api/transaction/hard-token-validation"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "BRIGATE HARD TOKEN VALIDATION";
+            tags: ["All","External","BRIGate"];
+            security: {}
+            description: "-"
+        };
+    }
+
+    rpc BRIGateGetPairRateDealCodeChecker(BRIGateDealCodeReq) returns (BRIGateDealCodeRes) {}
+    rpc CheckDealCode(CheckDealCodeReq) returns (CheckDealCodeRes) {}
+
+    rpc BRIGateGetPairRate(BRIGateGetPairRateRequest) returns (BRIGateGetPairRateResponse) {};
+    rpc BRIGateGetPairRateHttp(BRIGateGetPairRateRequest) returns (BRIGateGetPairRateResponse) {
+        option (google.api.http) = {
+            get: "/api/transaction/rate"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: {}
+            tags: ["All","External","BRIGate"]
+            summary: "BRIGATE GET PAIR RATE"
+            description: "-"
+        };
+    };
+
+    rpc GetSchedulerData(GetSchedulerDataReq) returns (GetSchedulerDataRes);
+
+    rpc GetTransferOverviewSummary(GetTransferOverviewSummaryRequest) returns (GetTransferOverviewSummaryResponse) {
+        //    option (google.api.http) = {
+        //    get: '/api/transaction/summary'
+        //   };
+        //    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //        tags: ["Read"]
+        //        summary: "Get Transfer Overview Summary"
+        //        description: "Get Transfer Overview Summary"
+        //   };
+    };
+    rpc GetTransferOverviewSummaryWithResCache(GetTransferOverviewSummaryRequestWithResCache) returns (GetTransferOverviewSummaryResponse) {
+        option (google.api.http) = {
+            get: '/api/transaction/summary'
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Read"]
+            summary: "Get Transfer Overview Summary"
+            description: "Get Transfer Overview Summary"
+        };
+    };
+
+    rpc GetTaskRecentTransfer (GetTaskRecentTransferRequest) returns (GetTaskRecentTransferResponse) {
+        option (google.api.http) = {
+            get: '/api/transaction/recent-transfer'
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Read"]
+            summary: "Get Task Recent Transfer"
+            description: "Get Task Recent Transfer"
+        };
+    }
+
+    rpc GetTaskSummaryAmount (GetTaskSummaryAmountRequest) returns (GetTaskSummaryAmountResponse) {
+        option (google.api.http) = {
+            get: '/api/transaction/amount-transfer'
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Read"]
+            summary: "Get Task Summary Amount Transaction"
+            description: "Get Task Summary Amount Transaction"
+        };
+    }
+
+
+    rpc PublishCunsumer1 (GetTaskSummaryAmountRequest) returns (GetTaskSummaryAmountResponse) {
+        option (google.api.http) = {
+            get: '/api/transaction/ps1'
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Read"]
+            summary: "Get Task Summary Amount Transaction"
+            description: "Get Task Summary Amount Transaction"
+        };
+    }
+
+    rpc CompareCurrencies (CompareCurrencyRequest) returns (CompareCurrencyResponse) {
+        option (google.api.http) = {
+            post: '/api/transaction/compare-currencies'
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Read"]
+            summary: "Compare Currencies"
+            description: "Compare Currencies"
+        };
+    }
+
+    rpc BRIGateGetPairRateV2(BRIGateGetPairRateV2Request) returns (BRIGateGetPairRateV2Response) {
+        option (google.api.http) = {
+            post: "/api/transaction/calculator-valas"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Calculate your Transaction with Calculator Valas"
+            description: "This API for Calculate transaction multi currency"
+        };
+    }
+
+}
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ResCacheReq {
+    string rcode = 1;
+  }
+  
+  message ResCacheRes {
+    string response = 1;
+    string error = 2;
+    string responseCode = 3;
+    string status = 4;
+    GetTransferOverviewSummaryResponse data = 5;
+  }
+  
+message Empty{}

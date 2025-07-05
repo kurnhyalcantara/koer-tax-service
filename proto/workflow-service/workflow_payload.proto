@@ -1,0 +1,757 @@
+syntax = "proto3";
+
+import "workflow-service/workflow_gorm_db.proto";
+
+package workflow.service.v1;
+option go_package = "./pb";
+
+import "mwitkow/go-proto-validators/validator.proto";
+import "google/protobuf/timestamp.proto";
+// import "google/protobuf/any.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "workflow-service/workflow_core.proto";
+
+// request response workflow v2 download
+message  ListWorkflowV2FileRequest {
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+    Formats fileFormat = 1;
+
+
+    TaskWorkflowCompany filter = 2;
+    string query = 3;
+    int32  limit = 4;
+    int32  page = 5;
+
+    enum Sort {
+        workflowCode = 0;
+        workflowDescription = 1;
+        companyID = 2;
+        companyCode = 3;
+        companyName = 4;
+        countryCode = 5;
+        countryName = 6;
+        createdAt = 7;
+        createdByName = 8;
+        updatedAt = 9 ;
+        reviewedByName = 10;
+        status = 11;
+    }
+
+    Sort sort = 6;
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+    direction dir = 7;
+}
+
+// list user created approved
+message ListCreatedApprovedResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    createdApprove data = 4;
+}
+
+message createdApprove {
+    repeated string created = 1;
+    repeated string approved = 2;
+}
+
+// request response list workflow v2
+message ListWorkflowV2Request {
+
+    TaskWorkflowCompany filter = 2;
+    string query = 3;
+    int32  limit = 4;
+    int32  page = 5;
+
+    enum Sort {
+        workflowCode = 0;
+        workflowDescription = 1;
+        companyID = 2;
+        companyCode = 3;
+        companyName = 4;
+        countryCode = 5;
+        countryName = 6;
+        createdAt = 7;
+        createdByName = 8;
+        updatedAt = 9 ;
+        reviewedByName = 10;
+        status = 11;
+    }
+
+    Sort sort = 6;
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+    direction dir = 7;
+}
+
+message ListWorkflowV2Response {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated LisWorkflowV2 data = 4;
+    PaginationResponse pagination = 5;
+
+}
+
+message  LisWorkflowV2 {
+    TaskWorkflowCompany workflow = 1 ;
+    Task task = 2;
+    Company company = 3;
+}
+
+message LoginRequest {
+    string username = 1 [(validator.field) = {msg_exists : true}];
+    string password = 2 [(validator.field) = {msg_exists : true}];
+}
+
+message LoginResponse {
+    string access_token = 1;
+}
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message Empty {}
+
+message InvalidKeyError {
+    string key = 1;
+    string message = 2;
+}
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message JWTTokenResponse {
+    string token = 1;
+    int64 expiredAt = 2;
+}
+
+message ListRequest {}
+
+message ListWorkflowRequest {
+    Workflow workflow = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6;
+    string query = 7;
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message ListWorkflowResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Workflow data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message CreateWorkflowRequest {
+    // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+	// 	example: "{\"data\":{\"userTypeID\":0,\"name\":\"string\",\"description\":\"string\",\"companyID\":0,\"createdByID\":0,\"updatedByID\":0,\"deletedByID\":0,\"userWorkflows\":[{\"userID\":0,\"createdByID\":0,\"updatedByID\":0}],\"workflowAuthorities\":[{\"productID\":0,\"authorityLevelID\":0,\"createdByID\":0,\"updatedByID\":0}]}}"
+    // };
+
+    Workflow data = 1;
+    uint64 taskID = 2;
+}
+
+message CreateWorkflowTaskRequest {
+    // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+	// 	example: "{\"isDraft\":true,\"data\":{\"workflowCode\":\"WF-00001-AAA\",\"description\":\"string\",\"moduleID\":0,\"companyID\":0,\"currencyID\":0,\"logics\":[{\"bottomRange\":0,\"topRange\":0,\"requirements\":[{\"step\":\"string\",\"roleID\":0,\"priority\":0,\"minimumNumber\":0}]}]}}"
+    // };
+
+    WorkflowWrite data = 1;
+    uint64 taskID = 2;
+    bool isDraft = 3;
+}
+
+message WorkflowWrite {
+    uint64 workflowID = 1  ;
+    repeated uint64 moduleID = 2  ;
+    uint64 companyID = 3 ;
+    uint64 currencyID = 4  ;
+    string currencyName = 5  ;
+    string workflowCode = 6  ;
+    string description = 7  ;
+    google.protobuf.Timestamp createdAt = 16;
+    google.protobuf.Timestamp updatedAt = 17;
+    google.protobuf.Timestamp deletedAt = 18;
+    bool isCreatedInputAccount = 21;
+    bool isCustomInputAccount = 22;
+    repeated WorkflowLogic logics = 20;
+    uint64 createdByID = 25;
+    uint64 updatedByID = 26;
+    bool isStp = 27;
+}
+
+message CreateWorkflowResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    WorkflowWrite data = 4;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string updatedByName = 11;
+    string reasons = 12;
+    string comment = 13;
+    string createdByID = 14;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message WorkflowTask {
+    WorkflowWrite workflow = 1;
+    Task task = 2;
+    Company company = 3;
+    Currency currency = 4;
+    repeated Product module = 5;
+}
+
+message Company {
+    string companyID = 1;
+    string companyName = 2;
+    uint64 holdingID = 3;
+    string groupName = 4;
+    string holdingCompanyName = 5;
+    string subsidiaries = 6;
+    string companyCode = 7;
+    string countryCode = 8;
+    string countryName = 9;
+}
+
+message Currency {
+    uint64 currencyID = 1;
+    string currencyName = 2;
+    string currencyCode = 3;
+}
+
+message Account {
+    uint64 accountID = 1;
+    string accountNumber = 2;
+    string accountAlias = 3;
+    string accountName = 4;
+    string accountType = 5;
+    string accountStatus = 6;
+    string accountCurrency = 7;
+    string accessLevel = 8;
+}
+
+message Product {
+    
+    uint64 productID = 1;
+    string name = 2;
+    bool is3rdParty = 3;
+    bool IsTransactional = 4;   
+    uint64 currencyID = 5;
+}
+
+message CreateWorkflowTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    uint64 taskID = 4;
+    uint64 workflowID = 5;
+}
+
+message ListWorkflowTaskFilter{
+    enum statuses{
+        NullStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+    string module  = 1;
+    string company = 2;
+    string currencyName = 3;
+    string workflowCode = 4;
+    string description = 5;
+    string createdBy = 6;
+    string createdAt = 7;
+    string updatedBy = 8;
+    string updatedAt = 9;
+    statuses status = 10;
+
+    uint64 companyID =  21;
+    string companyName = 22;
+    string companyCode = 23;
+    string countryCode = 24;
+    string countryName = 25;
+}
+
+message GetWorkflowTaskRequest{
+    uint64 taskID = 1;
+}
+
+message GetWorkflowTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    WorkflowTask data = 4;
+}
+
+message ListWorkflowTaskRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+
+    enum SortOption {
+        none = 0;
+        code = 1;
+        companyName = 2;
+        subsidiary = 3;
+        createdBy = 4;
+        taskStatus = 5;
+        description = 6;
+    }
+
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    // string filter = 7;
+    // string query = 8;
+
+    ListWorkflowTaskFilter filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Search filter",
+	}];
+
+    string search = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Search by module  or company or account  name",
+	}];
+
+    bool myTaskOnly = 9;
+}
+
+message DownloadListWorkflowTaskRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    
+    enum SortOption {
+        none = 0;
+        code = 1;
+        companyName = 2;
+        subsidiary = 3;
+        createdBy = 4;
+        taskStatus = 5;
+        description = 6;
+    }
+
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    // string filter = 7;
+    // string query = 8;
+
+    ListWorkflowTaskFilter filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Search filter",
+	}];
+
+    string search = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Search by module  or company or account  name",
+	}];
+
+    bool myTaskOnly = 9;
+
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 15;
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+}
+
+message GetWorkflowTaskByIDRequest {
+    uint64 taskID = 1;
+
+}
+
+message ListWorkflowTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated WorkflowTask data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ListCompanyWorkflowRequest {
+    CompanyWorkflows workflow = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6;
+    string query = 7;
+}
+
+message ListCompanyWorkflowResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated CompanyWorkflows data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message GetCompanyWorkflowRequest {
+    uint64 companyID = 1;
+}
+
+message GetCompanyWorkflowResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    CompanyWorkflows data = 4;
+}
+
+message CreateCompanyWorkflowRequest {
+    // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+	// 	example: "{\"data\":{\"userTypeID\":0,\"name\":\"string\",\"description\":\"string\",\"companyID\":0,\"createdByID\":0,\"updatedByID\":0,\"deletedByID\":0,\"userWorkflows\":[{\"userID\":0,\"createdByID\":0,\"updatedByID\":0}],\"workflowAuthorities\":[{\"productID\":0,\"authorityLevelID\":0,\"createdByID\":0,\"updatedByID\":0}]}}"
+    // };
+
+    CompanyWorkflows data = 1;
+    uint64 taskID = 2;
+}
+
+message CreateCompanyWorkflowResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    CompanyWorkflows data = 4;
+}
+
+message GetAvailableCurrencyRequest {
+    uint64 companyID = 1;
+    repeated uint64 moduleID = 2;
+}
+
+message GetAvailableCurrencyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Currency data = 4;
+}
+
+message DeleteRequirementRequest {
+    repeated uint64 requirementID = 1;
+    uint64 companyID = 2;
+    repeated string assignedSteps = 3;
+}
+
+message WorkflowLogicMinMax {
+    uint64 min = 1;
+    uint64 max = 2;
+    uint64 id = 3;
+}
+
+// Task mass transfer request
+message WorkflowMassTransfer {
+    string workflow = 1; // JSON stringify workflow
+    string err_message = 2;
+}
+message UserMassTransferData {
+  uint64 user_id = 1;
+  string user_name = 2;
+  uint64 company_id = 3;
+  repeated uint64 role_ids = 4;
+}
+
+message Transaction {
+    uint64 transactionalNumber = 1;
+    uint64 massTransferTransactionID = 2;
+    WorkflowMassTransfer workflows = 3;
+}
+message TransactionList {
+    repeated Transaction transactions = 1;
+}
+message ProductData {
+    map<string, TransactionList> currency = 1;
+}
+message Data {
+    UserMassTransferData user = 1;
+    map<string, ProductData> product_id = 2;
+}
+
+message GenerateWorkflowTaskMassTransferRequest {
+  Data data = 1;
+}
+
+message GenerateWorkflowTaskMassTransferResponse {
+    GenerateWorkflowTaskMassTransferRequest resp = 1;
+}
+
+message DeleteWorkflowsRequest {
+    string interface = 1;
+    uint64 id = 2;
+}
+
+message DeleteWorkflowsRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    DeleteWorkflowsRequest data = 4;
+}
+
+message GenerateWorkfloWithoutSessionRequest {
+    uint64 CompanyID = 1;
+    uint64 ProductID = 2;
+    uint64 transactionalNumber = 3;
+    bool isTransactional = 4;
+    string currency = 5;
+    uint64 selectedAccountID = 6;
+    UserWorkflow user = 7;
+}
+
+message ValidateWorkflowResponse {
+    bool isValid = 1;
+    string message = 2;
+    ValidateWorkflowData data = 3;
+}
+
+message GenerateWorkflowTemplateWithoutSessionRequest {
+    uint64 CompanyID = 1;
+    uint64 ProductID = 2;
+    bool isTransactional = 3;
+    string currency = 4;
+    UserWorkflow user = 5;
+    uint64 workflow_id = 6;
+    uint64 currency_id = 7;
+    repeated uint64 workflow_logic_id = 8;
+    uint64 tier = 9;
+}
+
+message ValidateAccountRegisterWorkflowResp {
+    bool isValid = 1;
+    string message = 2;
+    ValidateWorkflowAccountRegisterData data = 3;
+}
+
+/* Example request
+{
+    "data": {
+      "user": {
+        "user_id": 0,
+        "user_name": "",
+        "company_id": "",
+        "role_ids": [""]
+      },
+      "product_id": {
+        "123": {
+          "currency": {
+            "USD": {
+              "transactions": [
+                {
+                  "transactionalNumber": 0,
+                  "massTransferTransactionID": 0
+                },
+                {
+                  "transactionalNumber": 0,
+                  "massTransferTransactionID": 0
+                }
+              ]
+            },
+            "IDR": {
+              "transactions": [
+                {
+                  "transactionalNumber": 0,
+                  "massTransferTransactionID": 0
+                },
+                {
+                  "transactionalNumber": 0,
+                  "massTransferTransactionID": 0
+                }
+              ]
+            }
+          }
+        },
+        "124": {
+          "currency": {
+            "EUR": {
+              "transactions": [
+                {
+                  "transactionalNumber": 0,
+                  "massTransferTransactionID": 0
+                },
+                {
+                  "transactionalNumber": 0,
+                  "massTransferTransactionID": 0
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+  */
+
+message GetWorkflowTierRequest {
+    uint64 amount = 1; 
+    uint64 company_id = 2;
+    string currency = 3;
+    uint64 product_id = 4;
+}
+
+message GetWorkflowTierResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    GetWorkflowTierResponseData data = 4;
+}
+
+message GetWorkflowTierResponseData {
+    uint64 tier = 1;
+    uint64 workflow_id = 2;
+    repeated uint64 workflow_logic_id = 3;
+    uint64 currency_id = 4;
+    string currency_name = 5;
+}
+
+message WorkflowTier {
+    uint64 tier = 1;
+    uint64 workflow_id = 2;
+    repeated uint64 workflow_logic_id = 3;
+}
+
+message RollbackWorkflowByWorkflowCodeRequest {
+    string workflowCode = 1;
+}
+
+message CreateWorkflowTaskWithoutSessionRequest {
+    WorkflowWrite data = 1;
+    uint64 taskID = 2;
+    bool isDraft = 3;
+    repeated string currencyAvailable = 4;
+}

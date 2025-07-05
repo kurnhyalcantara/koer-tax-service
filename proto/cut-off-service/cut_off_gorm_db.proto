@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package cut.off.service.v1;
+option go_package = "./pb";
+
+message CutOff {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "cut_off",
+    };
+
+    uint64 scheduleID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+
+   // string DEBIT_ACCOUNT = 2 [(gorm.field).tag = {type: 'varchar(100)'}]; // "DEBIT_ACCOUNT":"001901000162530",
+    string scheduleName = 2 [(gorm.field).tag = {not_null: true}, (validator.field) = {msg_exists : true}];
+    string scheduleDescription = 3 [(gorm.field).tag = {not_null: true}, (validator.field) = {msg_exists : true}];
+    string modules = 19 [(gorm.field).tag = {type: "jsonb"}];
+    string scheduleTime = 4 [(gorm.field).tag = {type: "jsonb" not_null: true}, (validator.field) = {msg_exists : true}];
+    string repeatOn = 5 [(gorm.field).tag = {type: "jsonb" not_null: true}, (validator.field) = {msg_exists : true}];
+    string repeatPattern = 6 [(gorm.field).tag = {not_null: true}, (validator.field) = {msg_exists : true}];
+    bool saved = 7 [(gorm.field).tag = {not_null: true}, (validator.field) = {msg_exists : true}];
+    string status = 8 [(gorm.field).tag = {not_null: true}, (validator.field) = {msg_exists : true}];
+
+    uint64 createdByID = 15 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {column: "created_by_id"}];
+    uint64 lastApprovedByID = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {column: "created_at"}];
+    uint64 lastRejectedByID = 17 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {column: "created_at"}];
+    
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deletedAt = 53 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+    
+}
+
+message Holiday {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "holiday",
+    };
+
+    uint64 scheduleID = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {primary_key: true not_null: true},
+        (validator.field) = {msg_exists : true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    string scheduleName = 2 [
+        (gorm.field).tag = {not_null: true},
+        (validator.field) = {msg_exists : true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: STRING}
+    ];
+    string scheduleDescription = 3 [
+        (gorm.field).tag = {not_null: true},
+        (validator.field) = {msg_exists : true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: STRING}
+    ];
+    string module = 4 [(gorm.field).tag = { type: "jsonb" }];
+    string scheduleDate = 5 [(gorm.field).tag = { type: "jsonb" }];
+
+    bool saved = 6 [
+        (gorm.field).tag = {not_null: true},
+        (validator.field) = {msg_exists : true}
+    ];
+    string status = 7 [
+        (gorm.field).tag = {not_null: true},
+        (validator.field) = {msg_exists : true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: STRING}
+    ];
+    uint64 taskID = 8;
+
+    uint64 createdByID = 15 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {column: "created_by_id"}];
+    uint64 lastApprovedByID = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {column: "created_at"}];
+    uint64 lastRejectedByID = 17 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {column: "created_at"}];
+    
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deletedAt = 53 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string countryCode = 54;
+}
+
+message Calendar {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "calendar",
+    };
+    
+    uint64 id = 1 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {primary_key: true not_null: true},
+        (validator.field) = {msg_exists : true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    google.protobuf.Timestamp date = 2 [
+        (gorm.field).tag = {not_null: true},
+        (validator.field) = {msg_exists : true}
+    ];
+    string day = 3 [
+        (gorm.field).tag = {not_null: true},
+        (validator.field) = {msg_exists : true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: STRING}
+    ];
+    bool isHoliday = 4 [
+        (gorm.field).tag = {not_null: true},
+        (validator.field) = {msg_exists : true}
+    ];
+    string notes = 5 [
+        (validator.field) = {msg_exists : true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: STRING}
+    ];
+
+    uint64 createdByID = 15 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {column: "created_by_id"}];
+    uint64 lastApprovedByID = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {column: "created_at"}];
+    uint64 lastRejectedByID = 17 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {column: "created_at"}];
+    
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp deletedAt = 53 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+}

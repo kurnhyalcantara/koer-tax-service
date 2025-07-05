@@ -1,0 +1,312 @@
+syntax = "proto3";
+
+package do_pertamina_transmitter.service.v1;
+
+option go_package = "./pb";
+
+message EsbPaymentCashCarryRequest {
+  EsbPaymentCashCarryRequestData request = 1;
+}
+
+message EsbPaymentCashCarryRequestData {
+  string external_id = 1 [json_name = "externalId"];
+  string channel_id = 2 [json_name = "channelId"];
+  string service_id = 3 [json_name = "serviceId"];
+  string teller_id = 4 [json_name = "tellerId"];
+  EsbPaymentCashCarryRequestHeader header = 5;
+  repeated EsbPaymentCashCarryRequestProductDetail product_detail = 6;
+  EsbPaymentCashCarryRequestDescriptionMessage description_message = 7;
+}
+
+message EsbPaymentCashCarryRequestHeader {
+  string application_no = 1 [json_name = "applicationNo"];
+  string sales_organization = 2 [json_name = "salesOrganization"];
+  string group_product = 3 [json_name = "groupProduct"];
+  string ship_to = 4 [json_name = "shipto"];
+  string plant = 5;
+  string sold_to = 6 [json_name = "soldto"];
+  string distribution_channel = 7 [json_name = "distributionChannel"];
+  string debet_or_credit_note = 8 [json_name = "debetOrCreditNote"];
+}
+
+message EsbPaymentCashCarryRequestProductDetail {
+  string material = 1 [json_name = "material"];
+  string trip = 2 [json_name = "trip"];
+  string qty_per_trip = 3 [json_name = "qtyPerTrip"];
+  string requested_delivery_date = 4 [json_name = "requestedDeliveryDate"];
+  string transporter = 5 [json_name = "transporter"];
+}
+
+message EsbPaymentCashCarryRequestDescriptionMessage {
+  string dari_rekening = 1 [json_name = "dariRekening"];
+  string credit_card_no = 2 [json_name = "creditCardNo"];
+  string exp_date = 3 [json_name = "expDate"];
+  string fee_transaksi = 4 [json_name = "feeTransaksi"];
+}
+
+message EsbPaymentQuotationRequest {
+  EsbPaymentQuotationRequestData request = 1;
+}
+
+message EsbPaymentQuotationRequestData {
+  string external_id = 1 [json_name = "externalId"];
+  string channel_id = 2 [json_name = "channelId"];
+  string service_id = 3 [json_name = "serviceId"];
+  string teller_id = 4 [json_name = "tellerId"];
+  EsbPaymentQuotationRequestHeader header = 5;
+  EsbPaymentQuotationRequestDescriptionMessage description_message = 6 [json_name = "descriptionMessage"];
+}
+
+message EsbPaymentQuotationRequestHeader {
+  string cabang = 1;
+  string application_no = 2 [json_name = "applicationNo"];
+  string quotation_number = 3 [json_name = "quotationNumber"];
+  string valid_from = 4 [json_name = "validFrom"];
+  string valid_to = 5 [json_name = "validTo"];
+  string sales_organization = 6 [json_name = "salesOrganization"];
+  string group_product = 7 [json_name = "groupProduct"];
+  string plant = 8;
+  string sold_to = 9 [json_name = "soldTo"];
+  string ship_to = 10 [json_name = "shipTo"];
+  string payer = 11;
+  string sales_office = 12 [json_name = "salesOffice"];
+  string sales_group = 13 [json_name = "salesGroup"];
+  string distribution_channel = 14 [json_name = "distributionChannel"];
+  string debet_or_credit_note = 15 [json_name = "debetOrCreditNote"];
+}
+
+message EsbPaymentQuotationRequestDescriptionMessage {
+  string dari_rekening = 1 [json_name = "dariRekening"];
+  string credit_card_no = 2 [json_name = "creditCardNo"];
+  string fee_transaksi = 3 [json_name = "feeTransaksi"];
+}
+
+message EsbPaymentProductAllocationRequest {
+  EsbPaymentProductAllocationRequestData request = 1;
+}
+
+message EsbPaymentProductAllocationRequestData {
+  string external_id = 1 [json_name = "externalId"];
+  string channel_id = 2 [json_name = "channelId"];
+  string service_id = 3 [json_name = "serviceId"];
+  string teller_id = 4 [json_name = "tellerId"];
+  string supervisor_id = 5 [json_name = "supervisorId"];
+  EsbPaymentProductAllocationRequestHeader header = 6;
+  repeated EsbPaymentProductAllocationRequestProductDetail product_detail = 7 [json_name = "productDetail"];
+  EsbPaymentProductAllocationRequestDescriptionMessage description_message = 8 [json_name = "descriptionMessage"];
+}
+
+message EsbPaymentProductAllocationRequestHeader {
+  string scheduling_agreement_number = 1 [json_name = "schedulingAgreementNumber"];
+  string sales_organization = 2 [json_name = "salesOrganization"];
+  string product = 3;
+  string ship_to = 4 [json_name = "shipto"];
+  string plant = 5;
+  string sold_to = 6 [json_name = "soldto"];
+  string distribution_channel = 7 [json_name = "distributionChannel"];
+  string debet_or_credit_note = 8 [json_name = "debetOrCreditNote"];
+  string application_no = 9 [json_name = "applicationNo"];
+}
+
+message EsbPaymentProductAllocationRequestProductDetail {
+  string material = 1;
+  string trip = 2;
+  string qty_per_trip = 3 [json_name = "qtyPerTrip"];
+  string UOM = 4;
+  string transporter = 5;
+  string confirm_delivery_date = 6 [json_name = "confirmDeliveryDate"];
+  string confirmed_qty = 7 [json_name = "confirmedQty"];
+}
+
+message EsbPaymentProductAllocationRequestDescriptionMessage {
+  string dari_rekening = 1 [json_name = "dariRekening"];
+  string credit_card_no = 2 [json_name = "creditCardNo"];
+  string exp_date = 3 [json_name = "expDate"];
+  string fee_transaksi = 4 [json_name = "feeTransaksi"];
+}
+
+message EsbPaymentCashCarryResponse {
+  EsbPaymentCashCarryResponseData response = 1;
+}
+
+message EsbPaymentCashCarryResponseData {
+  string journal_sequence = 1 [json_name = "journalSequence"];
+  string fee_amount = 2 [json_name = "feeAmount"];
+  string total_amount = 3 [json_name = "totalAmount"];
+  string response_code = 4 [json_name = "responseCode"];
+  string response_message = 5 [json_name = "responseMessage"];
+  EsbPaymentCashCarryResponseHeader header = 6;
+  EsbPaymentCashCarryResponseDescriptionMessage description_message = 7;
+  repeated EsbPaymentCashCarryResponseProductDetail product_detail = 8;
+  EsbPaymentCashCarryResponseSummarizedResults summarized_results = 9;
+  EsbPaymentCashCarryResponseMessage message = 10;
+}
+
+message EsbPaymentCashCarryResponseHeader {
+  string cabang = 1;
+  string application_no = 2 [json_name = "applicationNo"];
+  string sales_organization = 3 [json_name = "salesorganization"];
+  string group_product = 4 [json_name = "groupProduct"];
+  string ship_to = 5 [json_name = "shipTo"];
+  string plant = 6;
+  string sold_to = 7 [json_name = "soldTo"];
+  string payer = 8;
+  string sales_office = 9 [json_name = "salesOffice"];
+  string sales_group = 10 [json_name = "salesGroup"];
+  string distribution_channel = 11 [json_name = "distributionChannel"];
+  string so_number = 12 [json_name = "soNumber"];
+  string do_block = 13 [json_name = "doBlock"];
+}
+
+message EsbPaymentCashCarryResponseDescriptionMessage {
+  string bank_code = 1 [json_name = "bankCode"];
+  string bank_branch = 2 [json_name = "bankBranch"];
+  string teller_id = 3 [json_name = "tellerId"];
+  string no_transaction = 4 [json_name = "noTransaction"];
+  string date_of_transaction = 5 [json_name = "dateOfTransaction"];
+  string dari_rekening = 6 [json_name = "dariRekening"];
+  string ke_rekening = 7 [json_name = "keRekening"];
+}
+
+message EsbPaymentCashCarryResponseProductDetail {
+  string material = 1;
+  string trip = 2;
+  string qty_per_trip = 3 [json_name = "qtyPerTrip"];
+  string uom = 4;
+  string requested_delivery_date = 5 [json_name = "requestedDeliveryDate"];
+  string transporter = 6;
+  string confirmed_qty = 7 [json_name = "confirmedQty"];
+  string confirm_delivery_date = 8 [json_name = "confirmDeliveryDate"];
+}
+
+message EsbPaymentCashCarryResponseSummarizedResults {
+  string so_credit_value = 1 [json_name = "soCreditValue"];
+  string net_value = 2 [json_name = "netvalue"];
+  string ppntax = 3;
+  string pphtax = 4;
+  string pbbkbtax = 5;
+  string gross_value = 6 [json_name = "grossvalue"];
+  string currency = 7;
+  string debetor_credit_note_value = 8 [json_name = "debetorcreditnotevalue"];
+}
+
+message EsbPaymentCashCarryResponseMessage {
+  string type = 1;
+  string code = 2;
+  string desc_msg = 3 [json_name = "descMsg"];
+}
+
+message EsbPaymentQuotationResponse {
+  EsbPaymentQuotationResponseData response = 1;
+}
+
+message EsbPaymentQuotationResponseData {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  string journal_seq = 3 [json_name = "journalSeq"];
+  string fee_amount = 4 [json_name = "feeAmount"];
+  string total_amount = 5 [json_name = "totalAmount"];
+  EsbPaymentQuotationResponseHeader header = 6;
+  EsbPaymentQuotationResponseDescriptionMessage description_message = 7;
+  repeated EsbPaymentQuotationResponseProductDetail product_detail = 8;
+  EsbPaymentQuotationResponseSummarizedResults summarized_results = 9;
+  EsbPaymentQuotationResponseMessage message = 10;
+}
+
+message EsbPaymentQuotationResponseHeader {
+  string cabang = 1;
+  string quotation_number = 2 [json_name = "quotationNumber"];
+  string application_no = 3 [json_name = "applicationNo"];
+  string DOblock = 4 [json_name = "DOblock"];
+  string SOnumber = 5 [json_name = "SOnumber"];
+  string distribution_channel = 6 [json_name = "distributionChannel"];
+  string sales_group = 7 [json_name = "salesGroup"];
+  string sales_office = 8 [json_name = "salesOffice"];
+  string payer = 9;
+  string ship_to = 10 [json_name = "shipTo"];
+  string sold_to = 11 [json_name = "soldTo"];
+  string plant = 12;
+  string group_product = 13 [json_name = "groupProduct"];
+  string sales_organization = 14 [json_name = "salesOrganization"];
+}
+
+message EsbPaymentQuotationResponseDescriptionMessage {
+  string bank_code = 1 [json_name = "bankCode"];
+  string bank_branch = 2 [json_name = "bankBranch"];
+  string teller_id = 3 [json_name = "tellerId"];
+  string no_transaction = 4 [json_name = "noTransaction"];
+  string date_of_transaction = 5 [json_name = "dateOfTransaction"];
+  string dari_rekening = 6 [json_name = "dariRekening"];
+  string ke_rekening = 7 [json_name = "keRekening"];
+}
+
+message EsbPaymentQuotationResponseProductDetail {
+  string material = 1;
+  string trip = 2;
+  string qty_per_trip = 3 [json_name = "qtyPerTrip"];
+  string uom = 4 [json_name = "UOM"];
+  string requested_delivery_date = 5 [json_name = "requestedDeliveryDate"];
+  string transporter = 6;
+  string confirmed_qty = 7 [json_name = "confirmedQty"];
+  string confirm_delivery_date = 8 [json_name = "confirmDeliveryDate"];
+}
+
+message EsbPaymentQuotationResponseSummarizedResults {
+  string so_credit_value = 1 [json_name = "SOCreditValue"];
+  string net_value = 2 [json_name = "netValue"];
+  string ppn_tax = 3 [json_name = "PPNTax"];
+  string pphtax = 4 [json_name = "PPHTax"];
+  string pbbkb_tax = 5 [json_name = "PBBKBTax"];
+  string gross_value = 6 [json_name = "grossValue"];
+  string currency = 7;
+  string debet_or_credit_note_value = 8 [json_name = "debetOrCreditNoteValue"];
+}
+
+message EsbPaymentQuotationResponseMessage {
+  string type = 1;
+  string code = 2;
+  string desc_msg = 3 [json_name = "descMsg"];
+}
+
+message EsbPaymentProductAllocationResponse {
+  EsbPaymentProductAllocationResponseData response = 1 [json_name = "response"];
+}
+
+message EsbPaymentProductAllocationResponseData {
+  string response_code = 1 [json_name = "responseCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  string journal_seq = 3 [json_name = "journalSeq"];
+  string fee_amount = 4 [json_name = "feeAmount"];
+  string total_amount = 5 [json_name = "totalAmount"];
+  repeated EsbPaymentProductAllocationResponseHeader header = 6 [json_name = "header"];
+  repeated EsbPaymentProductAllocationResponseMessage message = 7 [json_name = "message"];
+}
+
+message EsbPaymentProductAllocationResponseHeader {
+  string material = 1 [json_name = "material"];
+  string qty_per_trip = 2 [json_name = "qtyPerTrip"];
+  string UOM = 3 [json_name = "UOM"];
+  string confirm_qty = 4 [json_name = "confirmQty"];
+  string confirm_delivery_date = 5 [json_name = "confirmDeliveryDate"];
+  string delivery_numbers = 6 [json_name = "deliveryNumbers"];
+  string debet_or_credit_note_value = 7 [json_name = "debetOrCreditNoteValue"];
+}
+
+message EsbPaymentProductAllocationResponseMessage {
+  string type = 1 [json_name = "type"];
+  string code = 2 [json_name = "code"];
+  string desc_msg = 3 [json_name = "descMsg"];
+}
+
+message EsbPaymentTimeoutResponse {
+  string status = 1;
+  string code = 2;
+  string message = 3;
+  EsbPaymentTimeoutResponseDetails details = 4;
+}
+
+message EsbPaymentTimeoutResponseDetails {
+  string description = 1;
+  string timeout = 2;
+  string suggestion = 3;
+}

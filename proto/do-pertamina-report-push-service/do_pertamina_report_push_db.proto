@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package do_pertamina_report_push.service.v1;
+
+import "google/protobuf/timestamp.proto";
+import "do-pertamina-report-push-service/do_pertamina_report_push_core.proto";
+
+option go_package = "./pb";
+
+message Orders {
+  uint64 order_id = 1;
+  uint64 task_id = 2;
+  string transaction_id = 3;
+  uint64 company_id = 4;
+  ModuleTypes module_type = 5;
+  string application_id = 6;
+  string quotation_number = 7;
+  string scheduling_agreement_number = 8;
+  string debit_account = 9;
+  string debit_account_name = 10;
+  string product_group_id = 11;
+  string product_group_name = 12;
+  string sales_organization_id = 13;
+  string sales_organization_name = 14;
+  string ship_to = 15;
+  string distribution_channel = 16;
+  string sold_to = 17;
+  string debit_credit_note = 18;
+  Status status = 19;
+  uint32 total_quantity = 20;
+  string created_by_name = 51;
+  uint64 created_by_id = 52;
+  google.protobuf.Timestamp created_at = 53;
+  string updated_by_name = 54;
+  uint64 updated_by_id = 55;
+  google.protobuf.Timestamp updated_at = 56;
+};
+
+message PurchaseDetails {
+  uint64 purchase_detail_id = 1;
+  uint64 order_id = 2;
+  double total_amount = 3;
+  double debit_credit_value = 4;
+  double fee = 5;
+  double gross_value = 6;
+  double pph_tax = 7;
+  double pbbkb_tax = 8;
+  double ppn_tax = 9;
+  double net_value = 10;
+  google.protobuf.Timestamp created_at = 53;
+  google.protobuf.Timestamp updated_at = 54;
+}
+
+message DeliveryDetails {
+  uint64 delivery_detail_id = 1;
+  uint64 order_id = 2;
+  string material_id = 3;
+  string material_description = 4;
+  string delivery_date = 5;
+  string transporter = 6;
+  string trip = 7;
+  uint32 quantity = 8;
+  google.protobuf.Timestamp created_at = 53;
+  google.protobuf.Timestamp updated_at = 56;
+}
+
+message Result {
+  uint64 result_id = 1;
+  uint64 order_id = 2;
+  uint32 http_status_code = 3;
+  ModuleTypes module_type = 4;
+  string response_code = 5;
+  string response_message = 6;
+  string external_id = 7;
+  string request_data = 8;
+  string response_data = 9;
+  google.protobuf.Timestamp date_hit = 10;
+  google.protobuf.Timestamp date_response = 11;
+  string created_by = 12;
+  google.protobuf.Timestamp created_at = 13;
+  string updated_by = 14;
+  google.protobuf.Timestamp updated_at = 15;
+}
+
+message Tasks {
+  uint64 task_id = 1;
+  uint64 company_id = 2;
+  uint64 holding_id = 3;
+  uint64 parents_id = 4;
+  string comment = 5;
+  string data = 6;
+  uint32 status = 7;
+  uint32 step = 8;
+  string type = 9;
+  uint64 feature_id = 10;
+  uint64 parent_id = 11;
+  bool is_parent_active = 12;
+  string reasons = 13;
+  string data_bak = 14;
+  string child_bak = 15;
+  string workflow_doc = 16;
+  google.protobuf.Timestamp approved_at = 17;
+  uint64 last_approved_by_id = 18;
+  string last_approved_by_name = 19;
+  google.protobuf.Timestamp rejected_at = 20;
+  uint64 last_rejected_by_id = 21;
+  string last_rejected_by_name = 22;
+  google.protobuf.Timestamp created_at = 23;
+  uint64 created_by_id = 24;
+  string created_by_name = 25;
+  google.protobuf.Timestamp updated_at = 26;
+  uint64 updated_by_id = 27;
+  string updated_by_name = 28;
+  google.protobuf.Timestamp deleted_at = 29;
+};

@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "mwitkow/go-proto-validators/validator.proto"; 
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "ukln-ift/ukln_ift_core.proto";
+
+package ukln.service.v1;
+option go_package = "./pb";
+
+message UklnFundTransfers {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "ukln_fund_transfers",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string batch_reff_no = 2 [(gorm.field).tag = {index: ',option:CONCURRENTLY' type: "varchar(100)"}];
+    BatchStatus status = 3 [(gorm.field).tag = {index: ',option:CONCURRENTLY' default: "0" not_null: true }];
+    TransactionType transaction_type = 4 [(gorm.field).tag = {index: ',option:CONCURRENTLY' default: "0" not_null: true}];
+    repeated UklnTransferTransactions ukln_transfer_transactions = 5;
+
+    uint64 task_id = 6 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: false}
+    ];    
+    TransactionCurrencyType transaction_currency = 7;
+    google.protobuf.Timestamp transaction_date = 8 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true}
+    ];
+    uint64 company_id = 9;
+    string sender_currency = 10 [(gorm.field).tag = { type: "varchar(3)" }];
+    uint64 created_by_id = 11 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {not_null: true, default: "0"}];
+    
+    ScheduleType schedule_type = 12 [(gorm.field).tag = {index: ',option:CONCURRENTLY' default: "0" not_null: true}];
+
+    string rejection_reason = 13 [(gorm.field).tag = { type: "text" }];
+    string workflow_doc = 14 [(gorm.field).tag = {type: "jsonb"}];
+    uint64 number_of_transaction = 15 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}, (gorm.field).tag = {not_null: true, default: "0"}];
+    double total_amount = 16;
+
+    google.protobuf.Timestamp created_at = 51 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true}
+    ];
+    
+    google.protobuf.Timestamp updated_at = 52 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {not_null: true}
+    ];
+
+}
+
+message UklnTransferTransactions {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "ukln_transfer_transactions",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    UklnFundTransfers ukln_fund_transfer = 2 [(gorm.field).belongs_to = {}];
+    double amount = 3 [(gorm.field).tag = {type: "float8"}];
+    string deal_code = 4 [(gorm.field).tag = { type: "varchar(10)" }];
+    string remark = 5 [(gorm.field).tag = { type: "varchar(255)" }];
+    // sender
+    string sender_email = 6 [(gorm.field).tag = { type: "varchar(100)" }];
+    string sender_phone_number = 7 [(gorm.field).tag = { type: "varchar(60)" }];
+    string sender_address = 8 [(gorm.field).tag = { type: "varchar(255)" }];
+    string sender_account_number = 9 [(gorm.field).tag = { type: "varchar(30)" }];
+    string sender_account_name = 10 [(gorm.field).tag = { type: "varchar(255)" }];
+
+    // beneficiary
+    string beneficiary_account_number = 11 [(gorm.field).tag = { type: "varchar(30)" }];
+    string beneficiary_account_name = 12 [(gorm.field).tag = { type: "varchar(255)" }];
+    string beneficiary_alias_name = 13 [(gorm.field).tag = { type: "varchar(255)" }];
+    string beneficiary_address = 14 [(gorm.field).tag = { type: "text" }];
+    string beneficiary_phone_number = 15 [(gorm.field).tag = { type: "text" }];
+    string beneficiary_email = 16 [(gorm.field).tag = { type: "varchar(255)" }];
+    string beneficiary_currency = 17 [(gorm.field).tag = { type: "varchar(3)" }];
+    double fee_amount = 18 [(gorm.field).tag = {type: "float8"}];
+    TransactionStatus status = 19 [(gorm.field).tag = {index: ',option:CONCURRENTLY' default: "0" not_null: true }];
+    string customer_reff_number = 20 [(gorm.field).tag = {index: ',option:CONCURRENTLY' type: "varchar(20)"}];
+    int64 transaction_id = 21 [(gorm.field).tag = {type: "int8"}];
+    string transaction_reason = 22 [(gorm.field).tag = { type: "varchar(255)" }];
+
+    string country_code = 23 [(gorm.field).tag = { type: "varchar(5)" }];
+    bool exe = 24;
+
+    google.protobuf.Timestamp created_at = 60 [
+        (google.api.field_behavior) = OUTPUT_ONLY,
+        (gorm.field).tag = {not_null: true}
+    ];
+    google.protobuf.Timestamp updated_at = 61 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {not_null: true}
+    ];
+}
+
+message BeneficiaryAccount {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "beneficiary_bank_accounts",
+    };
+    
+    uint64 beneficiaryAccountID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "BeneficiaryAccountID" primary_key: true not_null: true auto_increment: true}];
+    uint64 companyID = 2 [(gorm.field).tag = {column: "CompanyID" not_null: true}, (validator.field) = {msg_exists : true}];
+    string country = 17 [(gorm.field).tag = {column: "Country"}, (validator.field) = {msg_exists : true}];
+    string bic = 18 [(gorm.field).tag = {column: "Bic"}, (validator.field) = {msg_exists : true}];
+    string masterBankID = 16 [(gorm.field).tag = {column: "MasterBankID" }, (validator.field) = {msg_exists : true}];
+    string accountNumber = 3 [(gorm.field).tag = {column: "AccountNumber" not_null: true}, (validator.field) = {msg_exists : true}];
+    string accountAlias = 4 [(gorm.field).tag  = {column: "AccountAlias" not_null: true }, (validator.field) = {msg_exists : true}];
+    string accountName = 5 [(gorm.field).tag = {column: "AccountName"}, (validator.field) = {msg_exists : true}];
+    string accountType = 6 [(gorm.field).tag = {column: "AccountType"}, (validator.field) = {msg_exists : true}];
+    string accountStatus = 7 [(gorm.field).tag = {column: "AccountStatus"}, (validator.field) = {msg_exists : true}];
+    string accountCurrency = 8 [(gorm.field).tag = {column: "AccountCurrency"}, (validator.field) = {msg_exists : true}];
+    string accessLevel = 9 [(gorm.field).tag = {column: "AccessLevel"}, (validator.field) = {msg_exists : true}];
+    string isOwnedByCompany = 10 [(gorm.field).tag = {column: "IsOwnedByCompany"}, (validator.field) = {msg_exists : true}];
+    uint64 createdByID = 11 [(gorm.field).tag = {column: "CreatedByID" not_null: true}, (validator.field) = {msg_exists : true}];
+    uint64 updatedByID = 12 [(gorm.field).tag = {column: "UpdatedByID" not_null: true}, (validator.field) = {msg_exists : true}];
+    uint64 deletedByID = 13 [(gorm.field).tag = {column: "DeletedByID"}, (validator.field) = {msg_exists : true}];
+    string companyName = 14 [(gorm.field).tag = {column: "CompanyName" not_null: true}, (validator.field) = {msg_exists : true}];
+    string masterBankName = 15 [(gorm.field).tag = {column: "MasterBankName"}, (validator.field) = {msg_exists : true}];
+    //uint64 roleID = 19 [(gorm.field).tag = {column: "RoleID"}];
+    bool disabled = 20 [(gorm.field).tag = {column: "Disabled"}];
+    google.protobuf.Timestamp createdAt = 51 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "CreatedAt"}];
+    google.protobuf.Timestamp updatedAt = 52 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "UpdatedAt"}];
+    google.protobuf.Timestamp deletedAt = 53 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {column: "DeletedAt"}];
+}

@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+// import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+package forecasting_generate_email.service.v1;
+option go_package = "./pb";
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message ErrorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ScheduleNotificationResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+}
+
+message ScheduleMetadata {
+    uint64 task_id = 1;
+    uint64 schedule_id = 2;
+    string type = 3;
+}
+
+message ExecNotificationRequest {
+    uint64 task_id = 1;
+    uint64 schedule_id = 2;
+}
+
+message ExecNotificationResponse {
+    bool error = 1;
+    bool retry = 2;
+    uint32 retry_attempt = 3;
+}
+
+message RetryFileDownloadResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message Notification {
+    string statement_taskid = 1 [json_name='STATEMENT_TASKID'];
+    string company_name = 2 [json_name='COMPANY_NAME'];
+    string created_date = 3 [json_name='CREATED_DATE'];
+    string created_datetime = 4 [json_name='CREATED_DATETIME'];
+    string created_time = 5 [json_name='CREATED_TIME'];
+    string event_date = 6 [json_name='EVENT_DATE'];
+    string event_datetime = 7 [json_name='EVENT_DATETIME'];
+    string event_time = 8 [json_name='EVENT_TIME'];
+    string url_download = 9 [json_name='URL_DOWNLOAD'];
+    string module = 10 [json_name='MODULE'];
+    string account_number = 11 [json_name='ACCOUNT_NUMBER'];
+    string file_type = 12 [json_name='FILE_TYPE'];
+    string statement_type = 13 [json_name='STATEMENT_TYPE'];
+}
+
+message ResendNotificationRequest {
+    repeated string task_id = 1;
+}
+
+message ResponseDataResend {
+    uint64 task_id = 1;
+    bool error = 2;
+    uint64 code = 3;
+    string message = 4;
+}
+
+message ResendNotificationResponse {
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    uint64 total_success = 4;
+    repeated ResponseDataResend data = 5;
+}
+
+message SendNotification {
+    uint64 company_id = 1;
+    string company_name = 2;
+    string action = 3;
+    uint64 task_id = 4;
+    repeated string email = 5;
+    string url_download = 6;
+    google.protobuf.Timestamp create_timestamp = 7;
+    string account_number = 8;
+    string file_type = 9;
+    uint64 statement_type = 10;
+}
+
+message ReportForecastingRequest {
+    string process_id = 1;
+    uint64 schedule_id = 2;
+    uint64 task_id = 3;
+    string process_name = 4;
+}
+
+message ReportForecastingResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+};

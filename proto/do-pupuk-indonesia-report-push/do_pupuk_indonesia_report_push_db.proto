@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package do_pupuk_indonesia_report_push.service.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pb";
+
+message Tasks {
+  uint64 task_id = 1;
+  uint64 company_id = 2;
+  uint64 holding_id = 3;
+  uint64 parents_id = 4;
+  string comment = 5;
+  string data = 6;
+  uint32 status = 7;
+  uint32 step = 8;
+  string type = 9;
+  uint64 feature_id = 10;
+  uint64 parent_id = 11;
+  bool is_parent_active = 12;
+  string reasons = 13;
+  string data_bak = 14;
+  string child_bak = 15;
+  string workflow_doc = 16;
+  google.protobuf.Timestamp approved_at = 17;
+  uint64 last_approved_by_id = 18;
+  string last_approved_by_name = 19;
+  google.protobuf.Timestamp rejected_at = 20;
+  uint64 last_rejected_by_id = 21;
+  string last_rejected_by_name = 22;
+  google.protobuf.Timestamp created_at = 23;
+  uint64 created_by_id = 24;
+  string created_by_name = 25;
+  google.protobuf.Timestamp updated_at = 26;
+  uint64 updated_by_id = 27;
+  string updated_by_name = 28;
+  google.protobuf.Timestamp deleted_at = 29;
+};

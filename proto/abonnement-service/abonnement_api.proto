@@ -1,0 +1,320 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "abonnement-service/abonnement_payload.proto";
+
+package abonnement.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+
+    rpc HealthCheck(Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/abonnement/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Health Check"
+            description: "This API for check health server"
+        };
+    };
+
+    rpc ListAbonnement(ListAbonnementRequest) returns (ListAbonnementResponse){
+        option (google.api.http) = {
+            get: "/api/abonnement/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list abonnement"
+            description: "This API for get list abonnement"
+        };
+    }
+
+    rpc DeleteAbonnement(CreateAbonnementRequest) returns (CreateAbonnementResponse);
+
+    rpc CreateAbonnement(CreateAbonnementRequest) returns (CreateAbonnementResponse){
+        option (google.api.http) = {
+            post: "/api/abonnement/data"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Create abonnement"
+            description: "This API for create abonnement"
+        };
+    }
+
+    rpc RequestDeleteAbonnementTask(AbonnementTaskDetailRequest) returns (AbonnementTaskDetailResponse){
+        option (google.api.http) = {
+            post: "/api/abonnement/task/delete/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete request abonnement task"
+            description: "This API for deletes abonnement task"
+        };
+    }
+
+    rpc CreateAbonnementTask(CreateAbonnementTaskRequest) returns (CreateAbonnementTaskResponse){
+        option (google.api.http) = {
+            post: "/api/abonnement/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    post: "/api/abonnement/task/edit/{taskID}"
+                    body: "*"
+                }
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create abonnement task"
+            description: "This API for create abonnement task"
+        };
+    }
+
+    rpc DownloadListAbonnementTasks(DownloadListAbonnementTaskRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/abonnement/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+           // security: { } // Disable security key
+            summary: "Download list abonnements task"
+            description: "This API for download list abonnements task"
+        };
+    }
+
+
+    rpc ListAbonnementTask(ListAbonnementTaskRequest) returns (ListAbonnementTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/abonnement/task"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list abonnement task"
+            description: "This API for get list abonnement task"
+        };
+    };
+
+    rpc DownloadListAbonnementInvoice(DownloadListAbonnementInvoiceRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/abonnement/invoice/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Download list abonnements task"
+            description: "This API for download list abonnements task"
+        };
+    }
+
+    rpc AbonnementTaskDetail(AbonnementTaskDetailRequest) returns (AbonnementTaskDetailResponse) {
+        option (google.api.http) = {
+            get: "/api/abonnement/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get abonnement task by task id"
+            description: "This API for get abonnement task by task id"
+        };
+    };
+
+    rpc ListAbonnementInvoice(ListAbonnementInvoiceRequest) returns (ListAbonnementInvoiceResponse) {
+        option (google.api.http) = {
+            get: "/api/abonnement/invoice"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list abonnement invoice"
+            description: "This API for get list abonnement invoice"
+        };
+    };
+
+    rpc ListPendingAbonnementInvoice(ListPendingAbonnementInvoiceRequest) returns (ListPendingAbonnementInvoiceResponse) {
+        option (google.api.http) = {
+            get: "/api/abonnement/invoice-pending"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list pending abonnement invoice"
+            description: "This API for get list pending abonnement invoice"
+        };
+    };
+
+    rpc CreateAbonnementInvoice(CreateAbonnementInvoiceRequest) returns (CreateAbonnementInvoiceResponse){
+        option (google.api.http) = {
+            post: "/api/abonnement/invoice"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create abonnement invoice"
+            description: "This API for create abonnement invoice"
+        };
+    }
+
+    rpc UpdateAbonnementInvoice(UpdateAbonnementInvoiceRequest) returns (UpdateAbonnementInvoiceResponse){
+        option (google.api.http) = {
+            post: "/api/abonnement/invoice/{invoiceID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Update abonnement invoice"
+            description: "This API for update abonnement invoice"
+        };
+    }
+
+    rpc CekAvaibility(CekAvaibilityReq) returns (CekAvaibilityRes) {
+        option (google.api.http) = {
+            post: "/api/abonnement/available"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Validate Company"
+            description: "This API for Validate Company"
+        };
+    };
+
+    rpc ChargeCompanies(Empty) returns (ChargeRes) {
+        option (google.api.http) = {
+            get: "/api/abonnement/charge"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Charge Company"
+            description: "This API for Charge Single Company"
+        };
+    };
+
+    rpc ChargeCompany(ChargeCompanyRequest) returns (ChargeRes) {
+        option (google.api.http) = {
+            get: "/api/abonnement/charge/{companyID}/{invoiceID}"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Charge Company"
+            description: "This API for Charge Single Company"
+        };
+    };
+
+    rpc GenerateBulkInvoice(BulkInvoiceRequest) returns (GenerateBulkInvoiceRes) {
+        option (google.api.http) = {
+            get: "/api/abonnement/invoice-generate-bulk"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Generate Bulk Invoice"
+            description: "This API for Generate Bulk Invoice"
+        };
+    };
+
+    rpc GenerateSingleInvoice(GenerateSingleInvoiceReq) returns (GenerateSingleInvoiceRes) {
+        option (google.api.http) = {
+            get: "/api/abonnement/invoice-generate/{companyID}/{deadlineDate}"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Generate Single Invoice"
+            description: "This API for Generate Single Invoice"
+        };
+    };
+
+    // rpc AbonnementInvoiceDetail(AbonnementInvoiceDetailRequest) returns (AbonnementTaskDetailResponse) {
+    //     option (google.api.http) = {
+    //         get: "/api/abonnement/task/{taskID}"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { } // Disable security key
+    //         summary: "Get abonnement task by task id"
+    //         description: "This API for get abonnement task by task id"
+    //     };
+    // };
+
+
+    rpc GetTasksCreatedBy(Empty) returns (ArrayString) {
+        option (google.api.http) = {
+            get: "/api/abonnement/task/me/created-by"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my user tasks"
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc GetTasksApprovedBy(Empty) returns (ArrayString) {
+        option (google.api.http) = {
+            get: "/api/abonnement/task/me/approved-by"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my user tasks"
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc CompanyStatus(CekAvaibilityReq) returns (CekAvaibilityRes) {
+        option (google.api.http) = {
+            get: "/api/abonnement/company-status/{companyID}"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { }
+            summary: "Get Company Status"
+            description: "This API for Get Company Status"
+        };
+    };
+
+    // rpc RabbitPost(Empty) returns (ArrayString) {
+    //     option (google.api.http) = {
+    //         post: "/api/abonnement/amqp/publish"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { } // Disable security key
+    //         summary: "Get list my user tasks"
+    //         description: "This API for get list users task"
+    //     };
+    // };
+
+    rpc CreateAbonnementTaskWithoutSession(CreateAbonnementTaskRequest) returns (CreateAbonnementTaskResponse){
+        option (google.api.http) = {
+            post: "/api/abonnement/task/without-session"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create abonnement task Without Session"
+            description: "This API for create abonnement task Without Session"
+        };
+    }
+
+    rpc DeleteAbonnementByCompanyIdRPC(DeleteAbonnementByCompanyIdRequest) returns (CreateAbonnementTaskResponse){
+        option (google.api.http) = {
+            post: "/api/abonnement/task/delete-by-company-id"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete abonnement by company id"
+            description: "This API for Delete abonnement by company id"
+        };
+    }
+
+    rpc CreateAbonnementTaskCompanyUI(CreateAbonnementTaskRequest) returns (CreateAbonnementTaskResponse){}
+}

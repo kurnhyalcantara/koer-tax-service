@@ -1,0 +1,623 @@
+syntax = "proto3";
+
+import "abonnement-service/abonnement_gorm_db.proto";
+
+package abonnement.service.v1;
+option go_package = "./pb";
+
+import "mwitkow/go-proto-validators/validator.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/struct.proto";
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    google.protobuf.NullValue data = 4;
+}
+
+message LoginRequest {
+    string username = 1 [(validator.field) = {msg_exists : true}];
+    string password = 2 [(validator.field) = {msg_exists : true}];
+}
+
+message LoginResponse {
+    string access_token = 1;
+}
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message Empty {}
+
+message InvalidKeyError {
+    string key = 1;
+    string message = 2;
+}
+
+message JWTTokenResponse {
+    string token = 1;
+    int64 expiredAt = 2;
+}
+
+message ListRequest {}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string updatedByName = 11;
+    string reasons = 12;
+    string comment = 13;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+}
+
+
+message ListAbonnementRequest {
+    Abonnement abonnement = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6;
+    string query = 7;
+}
+
+message ListAbonnementResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Abonnement data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message CreateAbonnementRequest {
+    // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    //     example: "{\"data\":{\"userTypeID\":0,\"name\":\"string\",\"description\":\"string\",\"companyID\":0,\"createdByID\":0,\"updatedByID\":0,\"deletedByID\":0,\"userAbonnements\":[{\"userID\":0,\"createdByID\":0,\"updatedByID\":0}],\"abonnementAuthorities\":[{\"productID\":0,\"authorityLevelID\":0,\"createdByID\":0,\"updatedByID\":0}]}}"
+    // };
+
+    CreateAbonnementTaskReq data = 1;
+    uint64 taskID = 2;
+    string companyName = 3;
+}
+
+message CreateAbonnementTaskRequest {
+    // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    //     example: "{\"data\":{\"amount\":0,\"period\":\"string\",\"companyID\":0,\"deadlineDate\":\"2000-01-01\",\"MechanismTrasaction\":[{\"value\":0,\"amount\":0}],\"abonnementAccounts\":[{\"order\":0,\"accountID\":0}]}, \"isDraft\":true}"
+    // };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        example: "{\"data\":{\"amount\":0,\"period\":\"string\",\"companyID\":0,\"deadlineDate\":\"2000-01-01\",\"MechanismTransaction\":[{\"Value\":0,\"Amount\":0}],\"MechanismFrequency\":[{\"Value\":0,\"Amount\":0}],\"MechanismBalance\":[{\"Value\":0,\"Amount\":0}],\"abonnementAccounts\":[{\"order\":0,\"accountID\":0}]},\"isDraft\":true}"
+    };
+
+    CreateAbonnementTaskReq data = 1;
+    uint64 taskID = 2;
+    bool isDraft = 3;
+}
+
+message CreateAbonnementResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Abonnement data = 4;
+}
+
+message AbonnementTask {
+    ListTaskAbonnementRes abonnement = 1;
+    Task task = 2;
+    // repeated Abonnement abonnements = 3;
+    CompanyData company = 5;
+}
+
+message CompanyData {
+    uint64 companyID = 1;
+    string companyCode = 2;
+    string companyName  = 3;
+    string countryCode = 4;
+    string countryName = 5;
+}
+
+message CreateAbonnementTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    uint64 taskID = 4;
+}
+
+message ListFilterAbannoment{
+    enum statuses{
+        NullStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+//    string company = 1;
+    string plan = 2;
+    string startDateCreated = 3;
+    string endDateCreated = 4;
+    string startDateModified = 5;
+    string endDateModified = 6;
+    string createdBy = 7;
+    string reviewBy = 8;
+    string startDateApproved = 9;
+    string endDateApproved = 10;
+    string billingStatus = 11;
+    statuses status = 12;
+
+    // company Info
+    uint64 companyID =  13;
+    string companyName = 14;
+    string companyCode = 15;
+    string countryCode = 16;
+    string countryName = 17;
+}
+
+message ListAbonnementTaskRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3;
+    int32 page = 4;
+    string sort = 5;
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    ListFilterAbannoment filter = 7;
+    string search = 8;
+}
+
+message ListAbonnementTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated AbonnementTask data = 4;
+    PaginationResponse pagination = 5;
+}
+message DownloadListAbonnementTaskRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3;
+    int32 page = 4;
+    string sort = 5;
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    ListFilterAbannoment filter = 7;
+    string search= 8;
+
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 15;
+}
+
+message AbonnementTaskDetailRequest {
+    uint64 taskID = 1;
+}
+
+message AbonnementTaskDetailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    AbonnementTask data = 4;
+}
+
+message CreateAbonnementTaskReq {
+    uint64 id = 1;
+    uint64 companyID = 2;
+    string amount = 3;
+    string deadlineDate = 4;
+    string period = 5;
+    // string mechanismType = 6;
+    // string mechanismValue = 7;
+    // uint64 mechanismAccountID = 8;
+    repeated mechanism  MechanismTransaction = 6;
+    repeated mechanism  MechanismFrequency = 7;
+    repeated mechanism  MechanismBalance = 8;
+    // mechanism Mechanism = 9;
+    string billingStatus = 11;
+    CompanyCreateTask company = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
+    repeated AbonnementAccountCreateTask abonnementAccounts = 12;
+    repeated AbonnementRetry abonnementRetries = 13;
+    repeated AbonnementInvoice abonnementInvoices = 14;
+    repeated CustomAbonnementCreateTask customAbonnements = 15;
+    bool isCustom = 16;
+    bool isStp = 17;
+    bool isSkipToApproved = 18;
+}
+
+message DetailTaskAbonnementRes {
+    uint64 abonnementID = 1;
+    uint64 companyID = 2;
+    string amount = 3;
+    google.protobuf.Timestamp deadlineDate = 4;
+    string period = 5;
+    // string mechanismType = 6;
+    // string mechanismValue = 7;
+    // uint64 mechanismAccountID = 8;
+    string billingStatus = 9;
+    uint64 createdByID = 10;
+    uint64 updatedByID = 11;
+    CompanyListTask company = 13;
+    repeated AbonnmentAccountRes abonnementAccounts = 12;
+    google.protobuf.Timestamp createdAt = 101;
+    google.protobuf.Timestamp updatedAt = 102;
+    TaskListTask task = 15;
+}
+
+message mechanism {
+    string Value= 1;
+    string Amount =2;
+}
+
+message ListTaskAbonnementRes {
+    uint64 id = 1;
+    uint64 companyID = 2;
+    string amount = 3;
+    string deadlineDate = 4;
+    string period = 5;
+    // string mechanismType = 6;
+    // uint64 mechanismValue = 7;
+    // uint64 mechanismAccountID = 8;
+    repeated mechanism  MechanismTransaction = 6;
+    repeated mechanism  MechanismFrequency = 7;
+    repeated mechanism  MechanismBalance = 8;
+    mechanism Mechanism = 9;
+    string billingStatus = 10;
+    uint64 createdByID = 11;
+    uint64 updatedByID = 12;
+    CompanyListTask company = 13;
+    repeated AbonnmentAccountRes abonnementAccounts = 14;
+    repeated AbonnementRetry abonnementRetries = 16;
+    repeated AbonnementInvoice abonnementInvoices = 17;
+    google.protobuf.Timestamp createdAt = 101;
+    google.protobuf.Timestamp updatedAt = 102;
+    bool isCustom = 18;
+}
+
+message TaskListTask {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 createdByID = 10;
+    string createdByName = 11;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string reasons = 12;
+    string comment = 13;
+    google.protobuf.Timestamp createdAt = 101;
+    google.protobuf.Timestamp updatedAt = 102;
+}
+
+message AbonnmentAccountRes {
+    uint64 abonnementAccountID = 1;
+    uint64 abonnementID = 2;
+    string abonnement = 3;
+    uint64 accountID = 4;
+    string accountAlias = 5;
+    string accountNumber = 9;
+    string accountCurrency = 10;
+    uint64 order = 6;
+    uint64 createdByID = 7;
+    uint64 updatedByID = 8;
+    google.protobuf.Timestamp createdAt = 101;
+    google.protobuf.Timestamp updatedAt = 102;
+}
+
+message AbonnementAccountCreateTask {
+    uint64 accountID = 1;
+    string accountAlias = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string accountNumber = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+    string accountCurrency = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+    uint64 order = 4;
+}
+
+message CustomAbonnementCreateTask {
+    string type = 1;
+    string value = 2;
+    string amount = 3;
+}
+
+message CompanyCreateTask {
+    uint64 companyID = 1;
+    string name = 2;
+}
+message CompanyListTask {
+    uint64 companyID = 1;
+    string name = 2;
+}
+
+message ListFilterAbannomentInvoice{
+    string code = 1;
+    string startDate = 2;
+    string endDate = 3;
+    string amount = 4;
+    string status = 5;
+    string accountNumber = 7;
+    string accountCurrency = 8;
+    string abonnementID = 6;
+    string esbResponseMessage = 9;
+    string deadlineDate = 10;
+}
+
+message ListAbonnementInvoiceRequest {
+
+    // AbonnementInvoice invoice = 1;
+   // string status = 2;
+
+    int32 limit = 3;
+    int32 page = 4;
+    string sort = 5;
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    ListFilterAbannomentInvoice filter = 7;
+    string search = 8;
+}
+
+message DownloadListAbonnementInvoiceRequest{
+
+    // AbonnementInvoice invoice = 1;
+    //string status = 2;
+
+    int32 limit = 3;
+    int32 page = 4;
+    string sort = 5;
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    ListFilterAbannomentInvoice filter = 7;
+    string search = 8;
+
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 15;
+}
+
+message ListAbonnementInvoiceResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated AbonnementInvoice data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message AbonnementInvoiceDetailRequest {
+    uint64 abonnementID = 1;
+}
+
+message CekAvaibilityReq {
+    string companyID = 1;
+}
+
+message CekAvaibilityRes {
+    bool available = 1;
+    string status = 2;
+}
+
+message ChargeCompaniesReq {
+    uint64 companyID = 1;
+}
+
+message ChargeCompaniesRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated ChargeCompanyResponse data = 4;
+    PaginationResponse pagination = 5;
+    bool available = 6;
+    string status = 7;
+    uint64 companyID = 8;
+}
+
+message ChargeCompanyResponse {
+    uint64 abonnementID = 1;
+    uint64 companyID = 2;
+}
+
+enum PeriodCodeEnum {
+    monthly = 0;
+    quarter = 1;
+    semester = 2;
+    year = 3;
+}
+
+message ListPendingAbonnementInvoiceRequest {}
+
+message ListPendingAbonnementInvoiceResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated AbonnementInvoice data = 4;
+}
+
+message CreateAbonnementInvoiceRequest {
+    uint64 abonnementID = 1;
+    uint64 accountID = 2;
+    PeriodCodeEnum periodCode = 3;
+    string amount = 4;
+    string creditAmount = 7;
+    google.protobuf.Timestamp deadlineDate = 5;
+    string  accountCurrency = 6;
+    string  status = 8;
+    string  esbResponseMessage = 9;
+    string  esbResponseCode = 10;
+}
+
+message CreateAbonnementInvoiceResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    AbonnementInvoice data = 4;
+}
+
+message UpdateAbonnementInvoiceRequest {
+    uint64 invoiceID = 1;
+    string status = 2;
+}
+
+message UpdateAbonnementInvoiceResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    AbonnementInvoice data = 4;
+}
+
+message GenerateBulkInvoiceReq {
+    string deadlineDate = 1;
+}
+
+message GenerateBulkInvoiceRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Abonnement successData = 4;
+    repeated Abonnement failedData = 5;
+}
+
+message GenerateSingleInvoiceReq {
+    string deadlineDate = 1;
+    uint64 companyID = 2;
+}
+
+message GenerateSingleInvoiceRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Abonnement successData = 4;
+    Abonnement failedData = 5;
+}
+message ChargeRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated AbonnementInvoice successData = 4;
+    repeated AbonnementInvoice failedData = 5;
+}
+
+message ArrayString {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated string data = 4;
+}
+
+message ChargeCompanyRequest {
+    uint64 invoiceID = 1;
+    uint64 companyID = 2;
+}
+
+message BulkInvoiceRequest {
+    string key = 1;
+}
+
+message DeleteAbonnementByCompanyIdRequest {
+    uint64 company_id = 1;
+}

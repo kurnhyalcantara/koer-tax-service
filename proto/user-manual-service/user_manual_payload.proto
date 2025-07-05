@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+import "user-manual-service/user_manual_core.proto";
+import "user-manual-service/user_manual_db.proto";
+import "google/protobuf/timestamp.proto";
+
+package user_manual.service.v1;
+option go_package = "./pb";
+    
+// #region General Request and Reuseable
+
+message Pagination {
+    int32 limit = 1;
+    int32 page = 2;
+    string sort = 3;
+    Direction dir = 4;
+    uint64 total_pages = 5;
+    uint64 total_rows = 6;
+    string filter = 7;
+};
+ 
+message GeneralBodyResponse {
+    string process_id = 1;
+    bool error = 2;
+    uint32 code = 3;
+    string message = 4;
+};
+
+// #endregion
+
+message HealthCheckResponse {
+    string message = 1;
+};
+
+message ListUserManualRequest {
+    string type = 1;
+    bool is_ukln = 2;
+}
+
+message ListUserManualResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated UserManuals data = 4;
+}
+
+message CreateTaskUserManualRequest {
+    string request_type = 1;
+    string user_type = 2;
+    string change_log = 3;
+    repeated UserManual data = 4;
+}
+
+message UserManual {
+    uint64 id = 1;
+    string module_name = 2;
+    string description = 3;
+    uint64 product_id = 4;
+    uint64 parent_id = 5;
+    string order_number = 6;
+    string file_name = 7;
+    bool is_default_manual = 8;
+    string url_preview = 9;
+}
+
+message DataTask {
+    uint64 task_id = 1;
+    string status = 2;
+    string user_type = 3;
+    string request_type = 4;
+    string created_by_name = 5;
+    google.protobuf.Timestamp createdAt = 6;
+}
+
+message CreateTaskUserManualResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    string task_id = 4;
+}
+
+message GetDetailUserManualRequest {
+    uint64 taskId = 1;
+}
+
+message GetDetailUserManualResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    string request_type = 4;
+    string user_type = 5;
+    string created_by_name = 6;
+    repeated UserManual data = 7;
+}
+
+message GetPendingTaskUserManualRequest {
+    Direction dir = 1;
+}
+
+message GetPendingTaskUserManualResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated DataTask data = 4;
+}
+
+message ActionUserManualRequest {
+    string otp = 1;
+    string reason = 2;
+    string comment = 3;
+    string action = 4; 
+    string task_id = 5;
+}
+
+message ActionUserManualResponse {
+    bool error = 1;
+    int32 code = 2;
+    string message = 3;
+    string task_id = 4;
+}

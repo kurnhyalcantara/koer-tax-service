@@ -1,0 +1,4 @@
+syntax = "proto3";
+
+package fund_transfer_generator.service.v1;
+option go_package = "./pb";

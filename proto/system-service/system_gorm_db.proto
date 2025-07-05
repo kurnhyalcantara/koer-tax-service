@@ -1,0 +1,308 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "google/api/field_behavior.proto";
+package system.service.v1;
+option go_package = "./pb";
+
+message User {
+    uint64 id = 1;
+    string username = 2;
+    string password = 3; 
+    google.protobuf.Timestamp created_at = 4 ;
+    google.protobuf.Timestamp updated_at = 5 ;
+    google.protobuf.Timestamp deleted_at = 6 ;
+}
+
+message SystemSchemes {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "system_params",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string productID = 2 [(gorm.field).tag = {not_null: true}];
+    string key = 3 [(gorm.field).tag = {not_null: true}];
+    string value = 4 [(gorm.field).tag = {not_null: true}];
+    string type = 5 [(gorm.field).tag = {not_null: true}];
+    string description = 10 [(gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp createdAt = 6 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    uint64 createdByID = 7 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp updatedAt = 8 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+    uint64 updatedByID = 9 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: true}];
+}
+
+message ResponseMapping {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "response_mapping",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 productId = 2;
+    string responseCode = 3 [(gorm.field).tag = {type: "varchar(5)"}];
+    string responseDescription = 4 [(gorm.field).tag = {type: "varchar(200)"}];
+    string statusCode = 5 [(gorm.field).tag = {type: "varchar(5)"}];
+    string statusAddons = 6 [(gorm.field).tag = {type: "varchar(30)"}];
+}
+
+message MdBankKliring {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_bankkliring",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "ID"}];
+    string code = 2 [(gorm.field).tag = { column: "CODE" }];
+    string kodeInduk = 3 [(gorm.field).tag = { column: "KODEINDUK" }];
+    string entityId = 4 [(gorm.field).tag = { column: "ENTITYID" }];
+    string nama = 5 [(gorm.field).tag = { column: "NAMA" }];
+    string address1 = 6 [(gorm.field).tag = { column: "ADDRESS1" }];
+    string address2 = 7 [(gorm.field).tag = { column: "ADDRESS2" }];
+    string address3 = 8 [(gorm.field).tag = { column: "ADDRESS3" }];
+    string bankCode = 9 [(gorm.field).tag = { column: "BANKCODE" }];
+    string sandiKota = 10 [(gorm.field).tag = { column: "SANDIKOTA" }];
+    string sandiPropinsi = 11 [(gorm.field).tag = { column: "SANDIPROPINSI" }];
+    string lastUpdate = 12 [(gorm.field).tag = { column: "LASTUPDATE" }];
+    string jenisUsaha = 13 [(gorm.field).tag = { column: "JENISUSAHA" }];
+    bool isBiFast = 14 [(gorm.field).tag = { column: "ISBIFAST" }];
+    bool isOnlineTrf = 15 [(gorm.field).tag = { column: "ISONLINETRF" }];
+    bool isRtgs = 16 [(gorm.field).tag = { column: "ISRTGS" }];
+    bool isBifastSuspend = 17 [(gorm.field).tag = { column: "ISBIFASTSUSPEND" }];
+    // menambahkan 2 response
+    string fixAccountNumber = 18 [(gorm.field).tag = { column: "FIXACCOUNTNUMBER" }];
+    string fixAccountName = 19 [(gorm.field).tag = { column: "FIXACCOUNTNAME" }];
+}
+
+message MdBiccc {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_biccc",
+    };
+
+    string bic = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string institution = 2 [(gorm.field).tag = { column: "institution" }];
+    string country = 3 [(gorm.field).tag = { column: "country" }];
+    string city = 4 [(gorm.field).tag = { column: "city" }];
+    string address = 5 [(gorm.field).tag = { column: "address" }];
+    string location = 6 [(gorm.field).tag = { column: "LOCATION" }];
+    string address1 = 7 [(gorm.field).tag = { column: "address_1" }];
+    string address2 = 8 [(gorm.field).tag = { column: "address_2" }];
+    string address3 = 9 [(gorm.field).tag = { column: "address_3" }];
+    string countrycode = 10 [(gorm.field).tag = { column: "countrycode" }];
+    int32 gpiMember = 11 [(gorm.field).tag = { column: "gpi_member" }];
+    bool isrma = 12 [(gorm.field).tag = { column: "is_rma" not_null: true default: "false" }];
+    string bankCode = 13 [(gorm.field).tag = { column: "bank_code" }];
+    uint64 id = 14 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+}
+
+message MdBenefType {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_benef_type",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    string description = 2 [(gorm.field).tag = { column: "description" }];
+    string translate = 3 [(gorm.field).tag = { column: "TRANSLATE" }];
+}
+
+message MdCountry {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_country",
+    };
+
+    uint64 idCountry = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id_country"}];
+    string countryCode = 2 [(gorm.field).tag = { column: "country_code" }];
+    string countryCode3 = 3 [(gorm.field).tag = { column: "country_code3" }];
+    string description = 4 [(gorm.field).tag = { column: "description" }];
+    string phoneCode = 5 [(gorm.field).tag = { column: "phone_code" }];
+    string currencyCode = 6 [(gorm.field).tag = { column: "curr_code" }];
+    string currencyName = 7 [(gorm.field).tag = { column: "curr_name" }];
+    bool isUKLN = 8 [(gorm.field).tag = { column: "is_ukln" }];
+}
+
+message MdEmploymentIndustry {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_employment_industry",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    string description = 2 [(gorm.field).tag = { column: "description" }];
+    string translate = 3 [(gorm.field).tag = { column: "TRANSLATE" }];
+}
+
+message MdEmploymentPosition {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_employment_position",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    string description = 2 [(gorm.field).tag = { column: "description" }];
+    string translate = 3 [(gorm.field).tag = { column: "TRANSLATE" }];
+}
+
+message MdEmploymentStatus {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_employment_status",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    string description = 2 [(gorm.field).tag = { column: "description" }];
+    string translate = 3 [(gorm.field).tag = { column: "TRANSLATE" }];
+}
+
+message MdGender {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_gender",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    string description = 2 [(gorm.field).tag = { column: "description" }];
+    string translate = 3 [(gorm.field).tag = { column: "TRANSLATE" }];
+}
+
+
+message MdIdType {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_idtype",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    string description = 2 [(gorm.field).tag = { column: "description" }];
+    string translate = 3 [(gorm.field).tag = { column: "TRANSLATE" }];
+}
+
+message MdKota {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_kota",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    string name = 2 [(gorm.field).tag = { column: "name" }];
+    uint64 provinceCode = 3 [(gorm.field).tag = { column: "province_code" }];
+}
+
+message MdProvince {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_province",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    string name = 2 [(gorm.field).tag = { column: "name" }];
+    uint64 countryCode = 3 [(gorm.field).tag = { column: "country_code" }];
+}
+
+message MdPurpose {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_purpose",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    string description = 2 [(gorm.field).tag = { column: "description" }];
+    string translate = 3 [(gorm.field).tag = { column: "TRANSLATE" }];
+}
+
+message MdPurposeIntended {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_purpose_intended",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    string description = 2 [(gorm.field).tag = { column: "description" }];
+    string translate = 3 [(gorm.field).tag = { column: "TRANSLATE" }];
+}
+
+message MdRelationToSender {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_relation_to_sender",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    string description = 2 [(gorm.field).tag = { column: "description" }];
+    string translate = 3 [(gorm.field).tag = { column: "TRANSLATE" }];
+}
+
+message MdBranch {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "md_branches",
+    };
+    string id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string unit = 2 [(gorm.field).tag = {not_null: true}];
+    string description = 3 [(gorm.field).tag = {not_null: true}];
+    string bibr = 4 [(gorm.field).tag = {not_null: true}];
+    string alamat = 5;
+    string provinsi = 6;
+    string kabupaten = 7;
+    string kecamatan = 8;
+    string kelurahan = 9;
+    uint64 kodepos = 10;
+    string negara = 11;
+}
+
+message MdBranchUkln {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "md_branches_ukln",
+    };
+    string id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string unit = 2 [(gorm.field).tag = {not_null: true}];
+    string description = 3 [(gorm.field).tag = {not_null: true}];
+    string bibr = 4 [(gorm.field).tag = {not_null: true}];
+    string alamat = 5;
+    string provinsi = 6;
+    string kabupaten = 7;
+    string kecamatan = 8;
+    string kelurahan = 9;
+    uint64 kodepos = 10;
+}
+
+message MdJhrate {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_jhrate",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id"}];
+    uint64 rate_id = 2 [(gorm.field).tag = { column: "rate_id" }];
+    string rate_curr = 3 [(gorm.field).tag = { column: "rate_curr" }];
+    string rate_val = 4 [(gorm.field).tag = { column: "rate_val" }];
+    string rate_desc = 5 [(gorm.field).tag = { column: "rate_desc" }];
+}
+
+
+message MdRemarkToBankBenef{
+    option (gorm.opts) = {
+        ormable:true,
+        table: "md_remark_to_bank_benef",
+    };
+
+    uint64 id_remark = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id_country"}];
+    string currency = 2 [(gorm.field).tag = { column: "currency" }];
+    string code = 3 [(gorm.field).tag = { column: "code" }];
+    string description = 4 [(gorm.field).tag = { column: "description" }];
+}
+
+message MappingCurrencyForCrossBorderTransfer {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "mapping_currency_for_cross_border_transfer",
+    };
+
+    uint64 idCountry = 1 [(gorm.field).tag = {primary_key: true not_null: true column: "id_country"}];
+    string countryCode = 2 [(gorm.field).tag = { column: "country_code" }];
+    string countryCode3 = 3 [(gorm.field).tag = { column: "country_code3" }];
+    string description = 4 [(gorm.field).tag = { column: "description" }];
+    string currency = 5 [(gorm.field).tag = { column: "currency" }];
+}

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "do-pupuk-indonesia-transmitter/do_pupuk_indonesia_transmitter_payload.proto";
+
+package do_pupuk_indonesia_transmitter.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "BRICaMS ADDONS GRPC DO Pupuk Indonesia Transmitter Service";
+    version: "1.0";
+  }
+
+  schemes: HTTP;
+  // schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service DOPertaminaTransmitterService {
+  rpc ProcessPayment(PaymentRequest) returns (PaymentResponse) {
+    option (google.api.http) = {
+      post: "/api/do-pupuk-indonesia/transmitter/process-payment"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Transmitter"]
+      summary: "Process Transaction"
+      description: "This API for process transaction"
+    };
+  };
+}

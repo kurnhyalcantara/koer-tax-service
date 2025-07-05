@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+// import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+// import "mwitkow/go-proto-validators/validator.proto";
+// import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+package forecasting_mt.service.v1;
+option go_package = "./pb";
+
+// Example User
+
+
+message AccountStatements {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "qcash_account_statement.account_statements",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 userId = 2;
+    uint64 companyId = 3;
+    string accountNumber = 4 [(gorm.field).tag = {type: "jsonb"}];
+    Statuses status = 5;
+    string detail = 6;
+    string fileType = 7;
+    string fileName = 8;
+    string startDate = 9;
+    string endDate = 10;
+    string requestCode = 11;
+    string company_code = 12 [(gorm.field).tag = {type: "varchar"}];
+    string company_name = 13 [(gorm.field).tag = {type: "varchar(255)"}];
+    google.protobuf.Timestamp createdAt = 14 [(gorm.field).tag = {default: "NOW()"}];
+    google.protobuf.Timestamp updatedAt = 15 [(gorm.field).tag = {default: "NOW()"}];
+    string alias_account_number = 16 [(gorm.field).tag = {type: "jsonb" default: "{}"}];
+    StatementType statement_type = 17;
+}
+
+    enum StatementType {
+        UNKNOWN_STATEMENT_TYPE = 0;
+        SINGLE_STATEMENT_TYPE = 1;
+        CONSOLIDATE_STATEMENT_TYPE = 2;
+    }
+
+    enum Statuses {
+        Queue = 0;
+        Process = 1;
+        Success = 2;
+        Failed = 3;
+        Cancelled = 5;
+    }
+
+message StatementSchedule {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "qcash_account_statement.statement_schedule",
+    };
+    uint64 schedule_id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string file_name = 2 [(gorm.field).tag = {type: "varchar(255)"}];
+    string schedule_type = 3 [(gorm.field).tag = {type: "varchar(100)"}];
+    google.protobuf.Timestamp start_date = 4;
+    google.protobuf.Timestamp next_schedule_time = 5;
+    int32 status_schedule = 6;
+    int32 retry_count = 7;
+    string url_download = 8;
+    string request_code = 9;
+    string previous_file_name = 10 [(gorm.field).tag = {type: "varchar(255)"}];
+    google.protobuf.Timestamp updatedAt = 11 [(gorm.field).tag = {default: "NOW()"}];
+}

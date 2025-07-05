@@ -1,0 +1,610 @@
+syntax = "proto3";
+
+import "notification-service/notification_gorm_db.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+package notification.service.v1;
+option go_package = "./pb";
+
+import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+message LoginRequest {
+    string username = 1 [(validator.field) = {msg_exists : true}];
+    string password = 2 [(validator.field) = {msg_exists : true}];
+}
+
+message LoginResponse {
+    string access_token = 1;
+}
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message Empty {}
+
+message InvalidKeyError {
+    string key = 1;
+    string message = 2;
+}
+
+message JWTTokenResponse {
+    string token = 1;
+    int64 expiredAt = 2;
+}
+
+message ListRequest {
+ string countryName = 1;
+}
+
+message NotificationFilter {
+    uint64 notificationID = 1;
+    string code = 4;
+    string description = 5;
+}
+
+message GetNotificationsReq {
+    NotificationFilter notification = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+    }];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+
+    int64 userID = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Find by user ID",
+    }];
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message ListNotificationRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Notification data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ListNotificationFCMRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated NotificationFCM data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    google.protobuf.NullValue data = 4;
+}
+
+message CreateNotificationRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		example: "{\"notification\": {\"code\": \"string\",\"description\": \"string\"},\"eventID\": \"string\",\"notificationEmail\": {\"produk\": \"string\",\"emailTo\": \"string\",\"emailCc\": \"string\",\"subject\": \"string\",\"body\": \"string\"},\"notificationSMS\": {\"rekening\": \"string\",\"produk\": \"string\",\"phoneNumber\": \"string\",\"content\": \"string\"},\"company\": [{\"companyID\": \"string\"}],\"all_company\": \"true\",\"startAt\": \"string\",\"endAt\": \"string\"}"
+    };
+
+    Notification notification = 1;
+    repeated NotificationCompany company = 8;
+    uint64 eventID = 2;
+    string startAt = 11;
+    bool all_company = 12;
+    string endAt = 9;
+    NotificationEmail notificationEmail = 3;
+    NotificationSMS notificationSMS = 4;
+    uint64 taskID = 5;
+    ModuleEvent event = 6;
+    TempClient client = 7;
+    uint64 notificationID = 13;
+    string countryName = 14;
+}
+
+message CreateNotificationTaskRequest {
+    uint64 taskID = 1;
+    CreateNotificationRequest data = 2;
+    bool isDraft = 3;
+    bool isDeactivate = 4;
+}
+
+message SendPushNotificationRequest {
+    string title = 1;
+    string content = 2;
+    repeated string token = 3;
+}
+
+message CommonResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message CreateNotificationTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    CreateNotificationTaskResponseData data = 4;
+}
+
+message CreateNotificationTaskResponseData {
+    uint64 taskID = 1;
+}
+
+message GetNotificationTaskByIDRequest{
+    uint64 taskID = 1;
+}
+
+message GetNotificationTaskRequest{
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+}
+
+message GetNotificationTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated CreateNotificationTask data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message GetDetailNotificationTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    CreateNotificationTask data = 4;
+}
+
+message CreateNotificationTask {
+    CreateNotificationRequest notification= 1;
+    NotificationTaskDto task = 3;
+}
+
+message NotificationTaskDto {
+    uint64 taskID = 1;
+    uint64 featureID = 5;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    string reasons = 10;
+    string comment = 11;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message ListNotificationModuleResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated NotificationModule data = 4;
+}
+
+message ListModuleEventResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated ModuleEvent data = 4;
+}
+
+
+message TempGenToken {
+    enum Role {
+        bankadmin = 0;
+        notificationadmin = 1;
+        notificationuser = 2;
+    }
+    Role role = 1;
+}
+
+message SendEmailRequest {
+    string produk = 1;
+    string emailTo = 2;
+    string emailCc = 3;
+    string subjek = 4;
+    string pesan = 5;
+    string attachment = 6;
+    string sendTime =7;
+}
+
+message SendSmsRequest{
+    string rekening = 1;
+    string produk = 2;
+    string phoneNumber = 3;
+    string pesan = 4;
+    string pesanWa = 5;
+    string sendTime = 6;
+}
+
+message BRIGateResponseDetail {
+    string status = 1;
+    string header = 2;
+    string body = 3;
+}
+
+message BRIGateNotificationResponse {
+    string ResponseCode = 1;
+    string ResponseMessage = 2;
+    BRIGateResponseDetail Detail = 3;
+}
+
+message FileListNotificationTaskRequest {
+    
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 1;
+    
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status =2;
+    steps step = 3;
+
+    int32 limit = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 7;
+    string filter = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+}
+
+message SendNotificationRequest{
+    string featureName = 1;
+    uint64 companyID = 3;
+    repeated uint64 roleID = 2;
+    string eventName = 4;
+    uint64 taskID = 6;
+    string data = 5;
+}
+
+message SendNotificationResponse{
+    bool success = 1;
+}
+
+message HistoryNotificationRequest{
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    uint64 userID = 3;
+}
+
+message HistoryNotificationResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated HistoryNotificationDetail data = 4;
+    PaginationHistory pagination = 5;
+}
+
+message PaginationHistory {
+    int32 limit = 1;
+    int32 page = 2;
+    int32 totalRows = 3;   
+    int32 totalPages = 4;   
+    int32 recordsOnPage = 5;
+}
+message HistoryNotificationDetail{
+    string LogID = 1;
+    string Module = 2;
+    uint64 TaskID = 3;
+    bool Read = 4;
+    string Title = 5;
+    string Message = 6;
+    string Data = 7;
+    string createdAt = 8;
+}
+message UpdateLogHistoryNotifiationRequest{
+    repeated string ID = 1;
+}
+
+message UpdateLogHistoryNotifiationResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ModuleVarMessage {
+    message Module {
+        uint64 moduleID = 1;
+        string name = 2;
+    }
+
+    uint64 variableID = 1;
+    string name = 2;
+    Module module = 3;
+}
+
+message ListModuleVariableReq {
+    uint64 moduleId = 1;
+}
+
+message ListModuleVariableResp {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated ModuleVarMessage data = 4;
+}
+
+message SendNotificationWorkflowRequest {
+    uint64 moduleID = 1;
+    uint64 eventID = 2;
+    string moduleName = 3;
+    string eventName = 4;
+    string data = 5;
+    repeated uint64 roleIDs = 6;
+    string step = 7;
+    uint64 companyID = 8;
+    repeated uint64 userID = 9;
+    repeated string customEmail = 10;
+    string attachment = 11;
+    string emailCC = 12;
+    string accountNo = 13;
+}
+
+
+message NotificationKey {
+    string notificationKey = 1;
+}
+
+message NotificationKeyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    NotificationEmailTemplate data = 4;
+}
+
+
+message ProcessDataSftpRequest {
+    bytes data = 1;
+    string path = 2;
+}
+
+message ProcessDataSftpResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    string path = 4;
+}
+
+message ListNotificationTaskV2Request {
+
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+
+    enum Sort {
+        taskID = 0;
+        notificationCode = 1;
+        module = 2;
+        notificationDescription = 3;
+        event = 4;
+        startDate = 5;
+        endDate = 6;
+        countryName = 7;
+        status = 8;
+        createdByName = 9;
+        reviewedByName = 10;
+        createdAt = 11;
+        updatedAt = 12;
+        userTypeID = 13;
+    }
+
+    Sort sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    ViewTaskNotifications filter = 7;
+    string query = 8;
+    string filterOr = 9;
+}
+
+message ListNotificationTaskV2Response {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated NotificationTaskDataV2 data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message NotificationTaskDataV2 {
+    ViewTaskNotifications notification= 1;
+    Task task = 3;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string comment = 11;
+    string reasons = 12;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message FileListNotificationTaskV2Request {
+
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 1;
+
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+
+    enum Sort {
+        taskID = 0;
+        notificationCode = 1;
+        module = 2;
+        notificationDescription = 3;
+        event = 4;
+        startDate = 5;
+        endDate = 6;
+        countryName = 7;
+        status = 8;
+        createdByName = 9;
+        reviewedByName = 10;
+        createdAt = 11;
+        updatedAt = 12;
+        userTypeID = 13;
+    }
+
+    Sort sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    ViewTaskNotifications filter = 7;
+    string query = 8;
+    string filterOr = 9;
+}
+
+message DeactivateRequest {
+    uint64 taskID = 1;
+}
+
+message DefaultResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}

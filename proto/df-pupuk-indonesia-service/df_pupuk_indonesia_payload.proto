@@ -1,0 +1,597 @@
+syntax = "proto3";
+
+package df_pupuk_indonesia.service.v1;
+
+import "df-pupuk-indonesia-service/df_pupuk_indonesia_core.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pb";
+
+/* #region esb payload */
+message EsbGetCompanyRequest {
+  EsbGetCompanyRequests request = 1 [json_name="REQUEST"];
+}
+
+message EsbGetCompanyRequests {
+  string company_name = 1 [json_name="COMPANY_NAME"];
+}
+
+message EsbGetCompanyResponse {
+  EsbGetCompanyResponses response = 1 [json_name="RESPONSE"];
+}
+
+message EsbGetCompanyResponses {
+  string response_code = 1 [json_name="RESPONSE_CODE"];
+  string error_code = 2 [json_name="ERROR_CODE"];
+  string response_message = 3 [json_name="RESPONSE_MESSAGE"];
+  repeated EsbGetCompanyResponseData data = 4 [json_name="DATA"];
+}
+
+message EsbGetCompanyResponseData {
+  string company_code = 1 [json_name="COMPANY_CODE"];
+  string company_name = 2 [json_name="COMPANY_NAME"];
+  string company_account_no = 3 [json_name="COMPANY_ACCOUNT_NO"];
+}
+
+message EsbGetDfListRequest {
+  string customer_no = 1 [json_name="customerNo"];
+}
+
+message EsbGetDfListResponseSuccess {
+  string response_code = 1 [json_name="responseCode"];
+  string response_message = 2 [json_name="responseMessage"];
+  repeated EsbGetDfListResponseSuccessData data = 3 [json_name="data"];
+}
+
+message EsbGetDfListResponseSuccessData {
+  string company_code = 1 [json_name="companyCode"];
+  string customer_no = 2 [json_name="customerNo"];
+  string document_no = 3 [json_name="documentNo"];
+  string amount = 4 [json_name="amount"];
+  string due_date = 5 [json_name="dueDate"];
+}
+
+message EsbGetDfListResponse {
+  string response_code = 1 [json_name="responseCode"];
+  string response_message = 2 [json_name="responseMessage"];
+}
+
+/* #end region esb payload */
+
+/* #region standard Payload */
+message HealthCheckResponse{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message ErrorBodyResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message OrderRequest {
+  string df_invoice_number = 1 [(validator.field) = {string_not_empty: true}];
+  string due_date = 2 [(validator.field) = {string_not_empty: true}];
+  double amount = 3;
+  string company_code = 4 [(validator.field) = {string_not_empty:true}];
+}
+
+message SubmitDFPupukIndonesiaRequest {
+  bool is_draft = 1;
+  string debit_account = 2 [(validator.field) = {string_not_empty: true}];
+  repeated OrderRequest order_request = 3 [(validator.field) = {repeated_count_min: 1}];
+}
+
+message SubmitDFPupukIndonesiaResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated SubmitDFPupukIndonesiaResponseData data = 4;
+}
+
+message SubmitDFPupukIndonesiaResponseData {
+  string df_invoice_number = 1;
+  string due_date = 2;
+  double fee = 3;
+  double total_amount = 4;
+  string status = 5;
+  string message = 6;
+}
+
+message Pagination {
+  int32 limit = 1;
+  int32 page = 2;
+  int32 total_rows = 3;
+  int32 total_pages = 4;
+}
+
+message Sort {
+  string column = 1;
+  string direction = 2;
+}
+
+message ListModelData {
+  string header_data = 1;
+  repeated ModelData model_data = 2;
+  bool is_table = 3;
+  bool new_page = 4;
+  TableSpec table_spec = 5;
+  bool fill_page = 6;
+}
+
+message TableSpec {
+  repeated uint32 column_width = 1; 
+  repeated TableData table_data = 5;
+}
+
+message TableData {
+  repeated string data = 2;
+}
+
+message ModelData {
+  string key = 1;
+  string value = 2;
+  int32 len_char = 3;
+  int32 height = 4;
+  bool cut_dot = 5;
+  bool is_total_payment = 6;
+}
+
+message GetFeeFromMenuLicenseResponse {
+  double fee_menu_license = 1;
+}
+
+message CheckDebitAccountRequest {
+  string account_number = 1;
+}
+
+message CheckDebitAccountResponse {
+  string available_bal = 1;
+  string account_type = 2;
+  string account_name = 3;
+}
+
+message TaskDataDFPupukIndonesia {
+  uint64 order_id = 1;
+  string transaction_id = 2;
+  Status status = 3;
+  string df_invoice_number = 4;
+  string debit_account = 5;
+  string debit_account_name = 6;
+  string debit_account_type = 7;
+  uint64 company_id = 8;
+  string company_name = 9;
+  string description_message = 10;
+  double fee = 11;
+  double amount = 12;
+  double total_amount =  13;
+  string due_date = 14;
+  string company_code = 15;
+}
+
+message SaveTaskDFPupukIndonesiaResponse {
+  uint64 task_id = 1;
+  string transaction_id = 2;
+  Status status = 3;
+}
+
+message NotificationData {
+  string creation_date = 1 [json_name='CREATION_DATE'];
+  string transaction_id = 2 [json_name='TRANSACTION_ID'];
+  string df_invoice_number = 3 [json_name='INVOICE_NUMBER'];
+  string company_name = 4 [json_name='COMPANY_NAME'];
+  string debit_account_number = 5 [json_name='DEBIT_ACCOUNT_NUMBER'];
+  string debit_account_name = 6 [json_name='DEBIT_ACCOUNT_NAME'];
+  string total_amount = 7 [json_name='TOTAL_AMOUNT'];
+  string transaction_status = 8 [json_name='TRANSACTION_STATUS'];
+  string user_maker = 9 [json_name='USER_MAKER'];
+  string user_checker = 10 [json_name='USER_CHECKER'];
+  string user_signer = 11 [json_name='USER_SIGNER'];
+  string user_releaser = 12 [json_name='USER_RELEASER'];
+  string reason = 13 [json_name='REASON'];
+  string description_rework = 14 [json_name='DESCRIPTION_REWORK'];
+  string rework_from = 15 [json_name='REWORK_FROM'];
+  string description_reject = 16 [json_name='DESCRIPTION_REJECT'];
+  string reject_from = 17 [json_name='REJECT_FROM'];
+}
+
+message UpdateDFPupukIndonesiaRequest {
+  bool is_draft = 1;
+  uint64 task_id = 2;
+  DetailOrderUpdate order_request = 3;
+}
+
+message DetailOrderUpdate {
+  string debit_account = 1 [(validator.field) = {string_not_empty: true}];
+  string df_invoice_number = 2 [(validator.field) = {string_not_empty: true}];
+  string due_date = 3 [(validator.field) = {string_not_empty: true}];
+  double amount = 4;
+  string company_code = 5 [(validator.field) = {string_not_empty:true}];
+}
+
+message UpdateDFPupukIndonesiaResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message OrderDetailRequest {
+  string transaction_id = 1;
+}
+
+message OrderDetailResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  OrderDataDetail data = 4;
+}
+
+message OrderDataDetail {
+  OrderDataTransactionInformationResponse transaction_information = 1;
+  TaskDetailResponse task = 2;
+  string workflow_doc = 3;
+}
+
+message OrderDataTransactionInformationResponse {
+  string transaction_id = 1;
+  string df_invoice_number = 2;
+  string debit_account = 3;
+  string debit_account_name = 4;
+  double total_amount = 5;
+  double fee = 6;
+  string description_message = 7;
+  double amount = 9;
+  Status status = 10;
+  string due_date = 11;
+  string company_code = 12;
+}
+
+message TaskDetailResponse {
+  uint64 task_id = 1;
+  string status = 2;
+  string reasons = 3;
+  string last_approved_by_name = 4;
+  string last_rejected_by_name = 5;
+  string updated_by_name = 6;
+  string created_by_name = 7;
+  string type = 8;
+  string comment = 9;
+  string created_at = 101;
+  string updated_at = 102;
+  string approved_at = 104;
+  string rejected_at = 105;
+}
+
+message DeleteTaskRequest {
+  repeated uint64 task_ids = 1 [(validator.field) = {repeated_count_min: 1}];
+  string typeTab = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Action: 'transaction', 'history'"
+      }
+  ];
+}
+
+message DeleteTaskResponse {
+  bool error = 1;
+  uint32 code = 2;    
+  string message = 3;
+  int32 total_successful = 4;
+  int32 total_failed = 5;
+  repeated DeleteTaskResponses data = 6;
+}
+
+message DeleteTaskResponses {
+  bool error = 1;
+  string message = 2;
+  DeletedTask task = 3;
+}
+
+message DeletedTask {
+  uint64 task_id = 1;
+}
+
+message SetStatusesTaskRequest {
+  repeated uint64 task_ids = 1 [(validator.field) = {repeated_count_min: 1}];
+  string action = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Action: 'approve', 'reject', 'rework"
+    },
+    (validator.field) = {string_not_empty: true}
+  ];
+  string comment = 3 [(validator.field) = {length_lt:101}];
+  string reasons = 4 [(validator.field) = {length_lt:101}];
+  string pass_code = 5;
+}
+
+message SetStatusesTaskResponse {
+  bool error = 1;
+  int32 code = 2;
+  string message = 3;
+  int32 total_successful = 4;
+  int32 total_failed = 5;
+  repeated TaskStatusResponse data = 6;
+}
+
+message TaskStatusResponse {
+  bool error = 1;
+  string message = 2;
+  TaskActionResponse task = 3;
+}
+
+message TaskActionResponse {
+  uint64 task_id = 1;
+}
+
+message DownloadReceiptFileRequest {
+  repeated string transaction_id = 1;
+}
+message PaginationRequest {
+  int32 limit = 1;
+  int32 page = 2;
+  string search = 3;
+}
+
+message PaginationResponse {
+  int32 limit = 1;
+  int32 page = 2;
+  int32 total_rows = 3;
+  int32 total_pages = 4;
+}
+
+message StandardResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+/* #end region standard Payload */
+ 
+
+message CreateMappingAccountRequest {
+  bool is_draft = 1;
+  string customer_number = 2 [(validator.field) = {string_not_empty: true}];
+  uint64 company_id = 3;
+  repeated CreateMappingAccountRequestData data = 4;
+}
+
+message CreateMappingAccountRequestData {
+  string company_code_pupuk = 1 [(validator.field) = {string_not_empty: true}];
+  string company_code_pupuk_name = 2 [(validator.field) = {string_not_empty: true}];
+  string loan_account = 3 [(validator.field) = {string_not_empty: true}];
+}
+
+message UpdateMappingAccountRequest {
+  bool is_draft = 1;
+  uint64 task_id = 2;
+  string customer_number = 3 [(validator.field) = {string_not_empty: true}];
+  uint64 company_id = 4;
+  repeated UpdateMappingAccountRequestData data = 5;
+  string type_tab = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Action: 'transaction', 'history'"
+      }
+  ];
+}
+
+message UpdateMappingAccountRequestData {
+  string company_code_pupuk = 1 [(validator.field) = {string_not_empty: true}];
+  string company_code_pupuk_name = 2 [(validator.field) = {string_not_empty: true}];
+  string loan_account = 3 [(validator.field) = {string_not_empty: true}];
+}
+
+message TaskDataMappingAccount {
+  string transaction_id = 1;
+  StatusMappingAccount status = 2;
+  uint64 company_id = 3;
+  string company_name = 4;
+  string customer_number = 5;
+  string description_message = 6;
+  uint64 mapping_account_id = 7;
+  bool is_task_edited = 8;
+}
+
+message GetDetailMappingAccountRequest {
+  string transaction_id = 1;
+  int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Page number to get data. Default value '-1' for disable page",
+  }];
+  int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Limit data per page. Default value '-1' for disable limit",
+  }];
+  string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Sort data by column name",
+  }];
+  Direction dir = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Sort DirectionEnum should be ASC or DESC",
+  }];
+  string type_tab = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Action: 'transaction', 'history'"
+      }
+  ];
+}
+
+message GetDetailMappingAccountResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  GetDetailMappingAccountResponseData data = 4;
+}
+
+message GetDetailMappingAccountResponseData {
+  MappingAccountTransactionInformationResponse transaction_information = 1;
+  ListLoanAccounts loan_account_data = 2;
+  TaskDetailResponse task = 3;
+}
+
+message ListLoanAccounts {
+  repeated GetDetailMappingAccountLoanAccount loan_accounts = 1;
+  PaginationResponse pagination = 2;
+}
+
+message GetDetailMappingAccountLoanAccount {
+  string company_code_pupuk = 1;
+  string company_code_pupuk_name = 2;
+  string loan_account_number = 3;
+  string loan_account_name = 4;
+}
+
+message MappingAccountTransactionInformationResponse {
+  string transaction_id = 1;
+  string customer_number = 2;
+  string company_name_qlola = 3;
+  uint64 company_id = 4;
+  StatusMappingAccount status = 5;
+
+}
+
+message ValidateMappingAccountCompanyRequest {
+  uint64 company_id = 1;
+}
+
+message ListRequest {
+  string status = 1;
+  string filter = 2;
+  string search = 3;
+  int32 page = 4;
+  int32 limit = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Order data by column name",
+    }];
+  Direction dir = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Sort Direction enum should be ASC or DESC",
+    }];
+  string filter_or = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=created_at:>=2023-10-17,created_at:<=2023-10-18  => Where created_at >= 2023-10-17 AND created_at <= 2023-10-17 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=status:3,status:4 => Where status = 3 OR status = 4 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string typeTab = 10 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Action: 'transaction', 'history'"
+      }
+  ];
+}
+
+message ListResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated Task data = 4;
+  PaginationResponse pagination = 5;
+  repeated SummaryTask summary = 6;
+}
+
+message Task {
+  uint64 task_id = 1;
+  string type = 2;
+  string status = 3;
+  string step = 4;
+  uint64 created_by_id = 5;
+  uint64 last_approved_by_id = 6;
+  uint64 last_rejected_by_id = 7;
+  string data = 8;
+  string comment = 9;
+  uint64 feature_id = 10;
+  repeated Task childs = 11;
+  bool is_parent_active = 12;
+  string reasons = 13;
+  string last_approved_by_name = 14;
+  string last_rejected_by_name = 15;
+  uint64 updated_by_id = 16;
+  string updated_by_name = 17;
+  string created_by_name = 18;
+  string data_bak = 19;
+  string child_bak = 20;
+  string workflow_doc = 21;
+  uint64 company_id = 22;
+  uint64 holding_id = 23;
+  google.protobuf.Timestamp created_at = 101;
+  google.protobuf.Timestamp updated_at = 102;
+  google.protobuf.Timestamp deleted_at = 103;
+  google.protobuf.Timestamp approved_at = 104;
+  google.protobuf.Timestamp rejected_at = 105;
+}
+
+message SummaryTask{
+  string status = 1;
+  int32 count = 2;
+}
+
+message GetCompanyCodePupukResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated GetCompanyCodePupukResponseData data = 4;
+}
+
+message GetCompanyCodePupukResponseData {
+  string company_code_pupuk = 1;
+  string company_name = 2;
+}
+
+message GetDfListResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated GetDfListResponseData data = 4;
+}
+
+message GetDfListResponseData {
+  string df_number = 1;
+  string due_date_payment = 2;
+  double amount = 3;
+  string company_code = 4;
+}
+
+message ScheduledPaymentRequest {
+  string app_key = 1;
+}
+
+message FailedPaymentScheduledRequest {
+  uint64 task_id = 1;
+  Status status = 2;
+  string description_message = 3;
+}
+
+message ListFileRequest {
+  string status = 1;
+  string filter = 2;
+  string search = 3;
+  int32 page = 4;
+  int32 limit = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Order data by column name",
+    }];
+  Direction dir = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Sort Direction enum should be ASC or DESC",
+    }];
+  string filter_or = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=created_at:>=2023-10-17,created_at:<=2023-10-18  => Where created_at >= 2023-10-17 AND created_at <= 2023-10-17 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=status:3,status:4 => Where status = 3 OR status = 4 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string typeTab = 10 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Action: 'transaction', 'history'"
+      }
+  ];
+  string file_format = 11;
+}
+
+
+// task_information field on mapping account master
+message TaskInformation {
+  uint32 status = 1;
+  string comment = 2;
+  string reasons = 3;
+}

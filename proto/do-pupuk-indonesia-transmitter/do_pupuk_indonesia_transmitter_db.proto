@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package do_pupuk_indonesia_transmitter.service.v1;
+option go_package = "./pb";
+
+message Result {
+  uint64 result_id = 1;
+  uint64 order_id = 2;
+  uint32 http_status_code = 3;
+  string response_code = 4;
+  string response_message = 5;
+  string external_id = 6;
+  string request_data = 7;
+  string response_data = 8;
+  google.protobuf.Timestamp date_hit = 9;
+  google.protobuf.Timestamp date_response = 11;
+  string created_by = 12;
+  google.protobuf.Timestamp created_dt = 13;
+  string updated_by = 14;
+  google.protobuf.Timestamp updated_dt = 15;
+}

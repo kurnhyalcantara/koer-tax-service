@@ -1,0 +1,790 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "user-service/user_payload.proto";
+
+package user.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+
+    rpc HealthCheck(Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/user/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Health Check"
+            description: "This API for check health server"
+        };
+    };
+
+    rpc GetUsers(CommonRequest) returns (ListUserResponse) {
+//        option (google.api.http) = {
+//            get: "/api/user"
+//        };
+//        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+//            // security: { } // Disable security key
+//            summary: "Get list users"
+//            description: "This API for get list users"
+//        };
+    };
+
+    rpc ValidateUserByNIKHttp(ValidateUserByNIKRequest) returns (ValidateUserByNIKResponse) {
+        // option (google.api.http) = {
+        //     post: "/api/user/validate-nik"
+        //     body: "*"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     security: { }
+        //     summary: "Validate user by NIK"
+        //     description: "This API for Validate user by NIK"
+        // };
+    };
+
+    rpc DownloadUsers(CommonRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/user/download"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list users"
+            description: "This API for get list users"
+        };
+    };
+
+    rpc GetUserTasks(ListUserWithTaskRequest) returns (ListUserWithTaskResponse) {
+        // option (google.api.http) = {
+        //     get: "/api/user/task"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     security: { } // Disable security key
+        //     summary: "Get list users task"
+        //     description: "This API for get list users task"
+        // };
+    };
+
+    rpc DownloadListUserTasks(DownloadListUserWithTaskRequest) returns (google.api.HttpBody) { 
+        option (google.api.http) = {
+            get: "/api/user/v1/task/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list users task"
+            description: "This API for download list users task"
+        };
+    }
+
+
+    rpc GetUserTaskByID(GetTaskByIDReq) returns (GetUserWithTaskRes) {
+        option (google.api.http) = {
+            get: "/api/user/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+           // security: { } // Disable security key
+            summary: "Get list users task"
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc GetMyTasks(ListUserWithTaskRequest) returns (ListUserWithTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/user/task/me"
+            additional_bindings: [
+                {
+                    get: "/api/user/task"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my user tasks"
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc GetMyTasksCreatedBy(Empty) returns (ArrayString) {
+        option (google.api.http) = {
+            get: "/api/user/task/me/created-by"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my user tasks"
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc GetMyTasksApprovedBy(Empty) returns (ArrayString) {
+        option (google.api.http) = {
+            get: "/api/user/task/me/approved-by"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my user tasks"
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+    rpc CreateUserV2(CreateUserRequest) returns (CreateUserResponse);
+    rpc CreateUserWithoutSessions(CreateUserRequest) returns (CreateUserResponse);
+
+    rpc CreateUserTask(CreateUserTaskRequest) returns (CommonResponse) {
+        option (google.api.http) = {
+            post: "/api/user/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    post: "/api/user/task/{taskID}"
+                    body: "*"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Save users task"
+            description: "This API for save users task"
+        };
+    };
+
+    rpc DeleteUser(DeleteUserReq) returns (DeleteUserRes);
+
+    rpc DeleteUserByCompanyID(DeleteUserByCompanyIDReq) returns (DeleteUserRes);
+
+    rpc DeleteUserByUserID(DeleteUserByUsersIDReq) returns (DeleteUserRes);
+
+    rpc DeleteUserRoleByUserID(DeleteUserRolesByUserID) returns (DeleteUserRes);
+
+    rpc SendForDeleteUserTask(GetTaskByIDReq) returns (GetUserWithTaskRes) {
+        option (google.api.http) = {
+            // delete: "/api/user/task/{taskID}"
+            post: "/api/user/task/delete/{taskID}"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list users task"
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc ListUserGroup(ListUserReq) returns (ListUserRes) {
+        option (google.api.http) = {
+            get: "/api/user/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get list users data"
+            description: "This API for get list users data"
+        };
+    };
+
+    rpc ListUserGroupForLogin(ListUserReqLogin) returns (ListUserResLogin); 
+    // {
+    //     option (google.api.http) = {
+    //         get: "/api/user/login"
+    //     };
+    //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //         security: { } // Disable security key
+    //         summary: "Get list users data"
+    //         description: "This API for get list users data"
+    //     };
+    // };
+
+    rpc BRICaMSgetCustomer(bricamsGetCustomerReq) returns (bricamsGetCustomerRes) {
+        option (google.api.http) = {
+            get: "/api/user/bricams/customer"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list users BRICA"
+            description: "This API for get list users BRICA"
+        };
+    }
+
+    rpc BRICamsGetAllUser(BricamsGetAddonsUserReq) returns (BricamsGetAddonsUserRes) {
+        option (google.api.http) = {
+            get: "/api/user/bricams/all-users"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list users addons from BRICams"
+            description: "This API for get list users addons from BRICams"
+        };
+    }
+
+    rpc BRICamsGetUserByUsername(BricamsGetAddonsUserByUsernameReq) returns (BricamsGetAddonsUserByUsernameRes) {
+        option (google.api.http) = {
+            get: "/api/user/bricams/detail/{username}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list users addons from BRICams by username"
+            description: "This API for get list users addons from BRICams by username"
+        };
+    };
+
+    rpc BRICaMSsvcGetUserList(BricamsGetAddonsUserReq) returns (BRICaMSSvcUserListRes) {}
+
+    rpc HTTPBRICaMSsvcGetUserList(BricamsGetAddonsUserReq) returns (BRICaMSSvcUserListRes) {
+        option (google.api.http) = {
+            get: "/api/user/bricams-svc/all-users"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list users addons from BRICams"
+            description: "This API for get list users addons from BRICams"
+        };
+    }
+
+    rpc HTTPBRICaMSsvcGetUserByUsernameV2(BricamsGetAddonsUserByUsernameReq) returns (BRICaMSSvcUserRes){
+        option (google.api.http) = {
+            post: "/api/user/bricams-svc/detailv2"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list users addons from BRICams by username"
+            description: "This API for get list users addons from BRICams by username"
+        };
+    }
+    
+
+    rpc BRICaMSsvcGetUserByUsername(BricamsGetAddonsUserByUsernameReq) returns (BRICaMSSvcUserRes) {}
+
+    rpc HTTPBRICaMSsvcGetUserByUsername(BricamsGetAddonsUserByUsernameReq) returns (CheckUserNameRes) {
+        option (google.api.http) = {
+            post: "/api/user/bricams-svc/detail"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list users addons from BRICams by username"
+            description: "This API for get list users addons from BRICams by username"
+        };
+    }
+
+    rpc BRICaMSsvcGetUserByUserID(BricamsGetAddonsUserByUserIDReq) returns (BRICaMSSvcUserRes) {}
+
+    rpc HTTPBRICaMSsvcGetUserByID(BricamsGetAddonsUserByUserIDReq) returns (CheckUserNameRes) {
+        option (google.api.http) = {
+            post: "/api/user/bricams-svc/detail-userid"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list users addons from BRICams by userID"
+            description: "This API for get list users addons from BRICams by userID"
+        };
+    }
+
+    rpc BRICaMSsvcGetUserByUsernameAndCompanyID(BricamsGetAddonsUserByUsernameAndCompanyIDReq) returns (BRICaMSSvcUserRes) {}
+
+    rpc HTTPBRICaMSsvcGetUserByUsernameAndCompanyID(BricamsGetAddonsUserByUsernameAndCompanyIDReq) returns (CheckUserNameRes) {
+        option (google.api.http) = {
+            post: "/api/user/bricams-svc/detail-user"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get list users addons from BRICams by username"
+            description: "This API for get list users addons from BRICams by username and companyID"
+        };
+    }
+
+    rpc CekUsernameAvaibility(CekUsernameAvaibilityReq) returns (CekUsernameAvaibilityRes) {
+        option (google.api.http) = {
+            get: "/api/user/task/avaibility/{username}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Check Username avaibility"
+            description: "Check if username avaibel to create/update task"
+        };
+    }
+
+
+    rpc GetUserByUserID(GetUserIDArrayRequest) returns (GetUserIDArrayResponse) {
+        option (google.api.http) = {
+            post: "/api/user/user-id"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get user by userid array"
+            description: "This API for Get user by userid array"
+        };
+    };
+
+    rpc UpdateUsersTokenFCM(UpdateUsersTokenFCMRequest) returns (UpdateUsersTokenFCMResponse) {
+        option (google.api.http) = {
+            // put: "/api/user/token-fcm"
+            post: "/api/user/token-fcm"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Update token fcm"
+            description: "This API for Update token fcm"
+        };
+    };
+
+    rpc BlockUserByUserID(GetUserIDRequest) returns (UpdateUsersBlockedResponse); 
+
+    rpc DetailUsers(UserParams) returns (DetailUserRes);
+
+    rpc GetUserByCompanyIDAndAuthority(GetUserByCompanyIDAndAuthorityRequest) returns (GetUserByCompanyIDAndAuthorityResponse) {};
+
+    // ====================== v2
+    
+    rpc DownloadListUserTasksHistory(DownloadListUserWithTaskRequest) returns (google.api.HttpBody) { 
+        option (google.api.http) = {
+            get: "/api/user/task/approved/file/{fileFormat}"
+            additional_bindings: [
+                {
+                    get: "/api/user/v2/task/approved/file/{fileFormat}"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list users task"
+            tags: ["V2","New"];
+            description: "This API for download list users stask"
+        };
+    }
+
+    rpc DownloadListUserTasksv2(DownloadListUserWithTaskRequest) returns (google.api.HttpBody) { 
+        option (google.api.http) = {
+            get: "/api/user/task/file/{fileFormat}"
+            additional_bindings: [
+                {
+                    get: "/api/user/v2/task/file/{fileFormat}"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list users task"
+            tags: ["V2","New"];
+            description: "This API for download list users stask"
+        };
+    }
+
+    rpc GetMyTasksHold(ListUserWithTaskRequest) returns (ListUserWithTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/user/task/hold"
+            additional_bindings: [
+                {
+                    get: "/api/user/v2/task/hold"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["V2","New"];
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc GetMyTasksHoldV3(ListUserV3WithTaskRequest) returns (ListUserTaskV3WithCompanyResponse) {
+        option (google.api.http) = {
+            get: "/api/user/v3/task/hold"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["V3","New"];
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc GetMyTasksHistrory(ListUserWithTaskRequest) returns (ListUserWithTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/user/task/history"
+            additional_bindings: [
+                {
+                    get: "/api/user/v2/task/history"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my user tasks"
+            tags: ["V2","New"];
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc GetMyTasksHistoryV3(ListUserV3WithTaskRequest) returns (ListUserV3WithTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/user/v3/task/history"
+
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my user tasks"
+            tags: ["V3","New"];
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc ListUserRPCV3(ListUserV3WithTaskRequest) returns (ListUserV3WithTaskResponse);
+
+    rpc TaskActionV2(TaskActionV2Request) returns (TaskActionV2Response) {
+        option (google.api.http) = {
+            post: "/api/user/v2/task/action/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set status task by action"
+            tags: ["V2","New"];
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject \n - delete \n - cancel"
+        };
+    };
+    
+    rpc CreateUserTaskV2(CreateUserTaskRequest) returns (CommonResponse) {
+        option (google.api.http) = {
+            post: "/api/user/v2/task"
+            body: "*"
+            additional_bindings: [
+                {
+                    post: "/api/user/v2/task/{taskID}"
+                    body: "*"
+                }
+            ]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Save users task"
+            tags: ["V2"];
+            description: "This API for save users task"
+        };
+    };
+
+    rpc GetUserTaskByIDV2(GetTaskByIDReq) returns (GetUserWithTaskRes) {
+        option (google.api.http) = {
+            get: "/api/user/v2/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+           // security: { } // Disable security key
+            summary: "Get list users task"
+            tags: ["V2"];
+            description: "This API for get list users task"
+        };
+    };
+
+    rpc SetStatusUser(SetStatusUserReq) returns (SetStatusUserRes) {
+        option (google.api.http) = {
+            post: "/api/user/v2/status/{username}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+           // security: { } // Disable security key
+            summary: "set status user"
+            tags: ["V2"];
+            description: "This API for get list users task"
+        };
+    };
+    
+    rpc GetMyTasksCreatedOrUpdatedByV2(ListUserWithTaskRequest) returns (ArrayString) {
+        option (google.api.http) = {
+            get: "/api/user/v2/task/me/created-or-updated-by"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my user tasks"
+            tags: ["V2"];
+            description: "This API for get list users who created or updated task"
+        };
+    };
+    
+    rpc GetCompanyUserLimit(Empty) returns (UserCompanyLimitRes) {
+        option (google.api.http) = {
+            get: "/api/user/v2/limit/me"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get User Company Limit"
+            tags: ["V2"];
+            description: "This API for get user company limit"
+        };
+    };
+
+    rpc UserResetPassword(UserPasswordResetRequest) returns (UserPasswordResetRes) {
+        option (google.api.http) = {
+            post: "/api/user/v2/reset-password"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get User Company Limit"
+            tags: ["V2"];
+            description: "This API for get user company limit"
+        };
+    };
+    rpc GetProfileV2ById(UserParams) returns (CreateUserResponse) {};
+
+    rpc GetProfileV2(Empty) returns (CreateUserResponse) {
+        option (google.api.http) = {
+            get: "/api/user/v2/profile"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get User Profile"
+            tags: ["V2"];
+            description: "This User ProfileAPI"
+        };
+    };
+
+    rpc UpdateProfileV2(UpdateProfileReq) returns (CreateUserResponse) {
+        option (google.api.http) = {
+            post: "/api/user/v2/profile"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Update User Profile"
+            tags: ["V2"];
+            description: "This User Profile API"
+        };
+    };
+
+    rpc GetUserAuthData(Empty) returns (AuthenticationData) {
+        option (google.api.http) = {
+            get: "/api/user/v2/profile/answers"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Update User Profile"
+            tags: ["V2"];
+            description: "This User Profile API"
+        };
+    };
+
+    rpc ValidateNIKSecureHttp(ValidateNIKSecureRequest) returns (ValidateNIKSecureResponse) {
+        option (google.api.http) = {    
+            post: "/api/user/validate-nik"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { }
+            summary: "Validate user by NIK"
+            description: "This API for Validate user by NIK"
+        };
+    };
+
+    rpc GetParticipantEmail(GetParticipantEmailRequest) returns (GetParticipantEmailResponse);
+
+    rpc GetLastIdV2(Empty) returns (LastUserIdResponse) {
+        option (google.api.http) = {
+            get: "/api/user/v2/get-last-id"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get User Profile"
+            tags: ["V2"];
+            description: "This User ProfileAPI"
+        };
+    };
+
+    rpc GetUserByUsernameAndCompanyID(GetUserByUsernameAndCompanyIDReq) returns (GetUserByUsernameAndCompanyIDResp) {
+        option (google.api.http) = {
+            post: "/api/user/v2/detail-user"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get detail users by username and company id"
+            description: "This API for get users by username and companyID"
+        };
+    }
+    rpc GetUserByOnlyUsernameAndCompanyIdWithoutSession(GetUserByOnlyUsernameReq) returns (GetUserByOnlyUsernameRes) {
+        option (google.api.http) = {
+            post: "/api/user/v2/detail-user-without-session"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get detail users by username and company id"
+            description: "This API for get users by username and companyID"
+        };
+    }
+
+    rpc GetUserApprovedAndCreated(ListCreatedAndApprovedRequest) returns (GetUserApprovedAndCreatedResponse) {
+        option (google.api.http) = {
+            get: "/api/user/v2/approved-created"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get username by created and approved"
+            description: "This API for get users by username and companyID"
+        };
+    }
+
+    rpc QlolaGetUserByCompanyCode (QLolaGetUserByCompanyCodeRequest) returns (QlolaUserCompanyBrigateResponse) {
+        option (google.api.http) = {
+            post: "/api/user/qlola/user-list"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["QLOLA"]
+            summary: "get user detail by given company code"
+            description: "This API is used for getting user details given of company code"
+        };
+
+    }
+
+    rpc QlolaGetUserByUserId (QlolaGetUserByUserIdRequest) returns (QlolaUserByIdBrigateResponse) {
+        option (google.api.http) = {
+            post: "/api/user/qlola/user-detail"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["QLOLA"]
+            summary: "get user detail by given user id"
+            description: "This API is used for getting user details given of user id"
+        };
+    }
+
+    rpc IsUserNeedTokenOTP(IsNeedTokenOTPReq) returns (IsNeedTokenOTPRes) {
+        option (google.api.http) = {
+            post: "/api/user/need-token-otp"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Need Token OTP"
+            tags: ["V2"];
+            description: "This API for need token otp"
+        };
+    };
+
+    // ======================  end ofv2
+
+    rpc DownloadListUserHoldV3(DownloadListUserV3WithTaskRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/user/v3/task/hold/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list users task hold v3"
+            tags: ["V2","New"];
+            description: "This API for download list users task hold v3"
+        };
+    }
+
+    rpc DownloadListUserHistoryV3(DownloadListUserV3WithTaskRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/user/v3/task/history/file/{fileFormat}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list users task history v3"
+            tags: ["V2","New"];
+            description: "This API for download list users task history v3"
+        };
+    }
+
+    rpc GetUserByUsername(GetUserByUsernameAndCompanyIDReq) returns (GetUserByUsernameResponse);
+
+    rpc GetUserByOnlyUsername(GetUserByOnlyUsernameReq) returns (GetUserByOnlyUsernameRes);
+
+    rpc ListUserGroupWithoutSession(ListUserReq) returns (ListUserRes);
+
+    rpc ListUsersNotSetTokenByUserIds(ListUsersNotSetTokenByUserIdsReq) returns (ListUsersNotSetTokenByUserIdsRes);
+
+    rpc ListUsernameByAccountRoles(ListUsernameByAccountRolesReq) returns (ListUsernameByAccountRolesRes);
+}
+
+message IsNeedTokenOTPReq {
+    repeated uint64 taskID = 1;
+}
+
+message IsNeedTokenOTPRes {
+    bool isNeedTokenOTP = 1;
+    string message = 2;
+}
+
+message CekUsernameAvaibilityReq {
+    string username = 1;
+    uint64 taskID = 2;
+}
+
+message CekUsernameAvaibilityRes {
+    bool available = 1;
+    string status = 2;
+}
+
+message TempGenToken {
+    enum Role {
+        bankadmin = 0;
+        notificationadmin = 1;
+        notificationuser = 2;
+    }
+    Role role = 1;
+}
+
+message bricamsGetCustomerReq {
+    string id = 1;
+    string name = 2;
+    uint32 page = 3;
+    uint32 limit = 4;
+}
+
+message bricamsGetCustomerRes {
+    uint32 totalData = 1;
+    string responseCode = 2;
+    string responseMessage = 3;
+    repeated bricamsGetCustomerData data = 4;
+}
+
+message bricamsGetCustomerData {
+    string dType = 1;
+    string id = 2;
+    string authorizationBusinessDate = 3;
+    string createdByUri = 4;
+    string creationTimeStamp = 5;
+    string lastUpdatedByUri = 6;
+    string lastUpdatedTimeStamp = 7;
+    string persistenceStatus = 8;
+    string snapshotRecord = 9;
+    string systemModifiableOnly = 10;
+    string uuid = 11;
+    string makeBusinessDate = 12;
+    string tenantId = 13;
+    string activeFlag = 14;
+    string approvalStatus = 15;
+    string reviewedByUri = 16;
+    string reviewedTimeStamp = 17;
+    string description = 18;
+    string name = 19;
+    string branchCode = 20;
+    string hasParentBranchCalender = 21;
+    string isEmailFilterEnabled = 22;
+    string isLogAfterWorkHoursEnabled = 23;
+    string isOutOfWorkHLoginAllow = 24;
+    string maximumEmails = 25;
+    string parentBranchIds = 26;
+    string productOffered = 27;
+    string shortName = 28;
+    string systemName = 29;
+    string persistentFormData = 30;
+    string contactInfo = 31;
+    string primaryContactPerson = 32;
+    string branchCalendar = 33;
+    string organizationType = 34;
+    string signatureAuthority = 35;
+    string headOffice = 36;
+    string offlineFlag = 37;
+    string gStin = 38;
+    string isStopFreshBooking = 39;
+}
+
+
+

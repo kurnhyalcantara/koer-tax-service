@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package do_pupuk_indonesia.service.v1;
+
+import "do-pupuk-indonesia-service/do_pupuk_indonesia_core.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pb";
+
+message Orders {
+    uint64 order_id = 1;
+    uint64 task_id = 2;
+    string transaction_id = 3;
+    Status status = 4;
+    string booking_code = 5;
+    uint64 company_id = 6;
+    string company_name_inquiry = 7;
+    string sales_order_number = 8;
+    string booking_time_limit = 9;
+    string pickup_deadline = 10;
+    string destination = 11;
+    string warehouse = 12;
+    double amount = 13;
+    double fee = 14;
+    double total_amount = 15;
+    string products = 16;
+    ScheduleType schedule_type = 17;
+    google.protobuf.Timestamp schedule_date = 18;
+    string debit_account = 19;
+    string debit_account_name = 20;
+    string debit_account_type = 21;
+    string inquiry_id = 22;
+    string data_inquiry = 23;
+    string booking_name = 24;
+    string workflow_doc = 25;
+    double fee_inquiry = 26;
+    string fee_account = 27;
+    string created_by_name = 51;
+    uint64 created_by_id = 52;
+    google.protobuf.Timestamp created_at = 53;
+    string updated_by_name = 54;
+    uint64 updated_by_id = 55;
+    google.protobuf.Timestamp updated_at = 56;
+};
+
+message Tasks {
+    uint64 task_id = 1;
+    uint64 company_id = 2;
+    uint64 holding_id = 3;
+    uint64 parents_id = 4;
+    string comment = 5;
+    string data = 6;
+    uint32 status = 7;
+    uint32 step = 8;
+    string type = 9;
+    uint64 feature_id = 10;
+    uint64 parent_id = 11;
+    bool is_parent_active = 12;
+    string reasons = 13;
+    string data_bak = 14;
+    string child_bak = 15;
+    string workflow_doc = 16;
+    google.protobuf.Timestamp approved_at = 17;
+    uint64 last_approved_by_id = 18;
+    string last_approved_by_name = 19;
+    google.protobuf.Timestamp rejected_at = 20;
+    uint64 last_rejected_by_id = 21;
+    string last_rejected_by_name = 22;
+    google.protobuf.Timestamp created_at = 23;
+    uint64 created_by_id = 24;
+    string created_by_name = 25;
+    google.protobuf.Timestamp updated_at = 26;
+    uint64 updated_by_id = 27;
+    string updated_by_name = 28;
+    google.protobuf.Timestamp deleted_at = 29;
+};

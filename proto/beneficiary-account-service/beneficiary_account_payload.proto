@@ -1,0 +1,774 @@
+syntax = "proto3";
+
+import "beneficiary-account-service/beneficiary_account_gorm_db.proto";
+
+package beneficiary.account.service.v1;
+option go_package = "./pb";
+
+import "mwitkow/go-proto-validators/validator.proto";
+import "google/protobuf/timestamp.proto";
+// import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+message LoginRequest {
+    string username = 1 [(validator.field) = {msg_exists : true}];
+    string password = 2 [(validator.field) = {msg_exists : true}];
+}
+
+message LoginResponse {
+    string access_token = 1;
+}
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message Empty {}
+
+message InvalidKeyError {
+    string key = 1;
+    string message = 2;
+}
+
+message JWTTokenResponse {
+    string token = 1;
+    int64 expiredAt = 2;
+}
+
+message ListRequest {}
+
+message ListBeneficiaryAccountRequest {
+    BeneficiaryAccount beneficiaryAccount = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+    uint64 productID = 10;
+    string country_code = 11;
+    bool is_ukln = 12;
+}
+
+message ListBeneficiaryAccountDataByRoleRequest {
+    repeated uint64 roles = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 8;
+    string in = 9;
+
+    uint64 productID = 10;
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message ListBeneficiaryAccountResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated BeneficiaryAccount data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ListBeneficiaryAccountActiveResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated BeneficiaryAccount data = 4;
+}
+
+message CreateBeneficiaryAccountRequest {
+    BeneficiaryAccount data = 1;
+    uint64 taskID = 2;
+}
+
+ 
+message CreateBeneficiaryAccountTaskRequest {
+    BeneficiaryAccountWrite data = 1;
+    uint64 taskID = 2;
+    bool isDraft = 3;
+}
+
+message BeneficiaryAccountWrite {
+    uint64 beneficiaryAccountID = 1  ;
+    uint64 companyID = 2  ;
+    string country = 20; 
+    string bic = 21; 
+    string masterBankID = 19 ;
+    string accountNumber = 3 ;
+    repeated string accountAlias = 4  ;
+    string accountName = 5  ;
+    string accountType = 6  ;
+    string accountStatus = 7  ;
+    string accountCurrency = 8  ;
+    string accessLevel = 9 ;
+    string isOwnedByCompany = 10  ;
+    uint64 createdByID = 11  ;
+    uint64 updatedByID = 12 ;
+    uint64 deletedByID = 13  ;
+
+    string companyName = 31;
+    string masterBankName = 33;
+    string createdByName = 32;
+    uint64 roleID = 14;
+    bool disabled = 15  ; 
+    google.protobuf.Timestamp createdAt = 16;
+    google.protobuf.Timestamp updatedAt = 17;
+    google.protobuf.Timestamp deletedAt = 18 ; 
+}
+
+
+
+message CreateBeneficiaryAccountTaskBulkRequest {
+    repeated BeneficiaryAccountWrite beneficiaryAccounts = 1;
+    uint64 taskID = 2;
+    bool isDraft = 3;
+}
+
+message AccountAlias {
+    string accountAlias = 1;
+}
+
+message CreateBeneficiaryAccountResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    BeneficiaryAccount data = 4;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string status = 2;
+    string step = 3;
+    uint64 featureID = 4;
+    string lastApprovedByName = 5;
+    string lastRejectedByName = 6;
+    string createdByName = 7;
+    string updatedByName = 8;
+    string reasons = 9;
+    string comment = 10;
+    google.protobuf.Timestamp createdAt = 50;
+    google.protobuf.Timestamp updatedAt = 51;
+}
+
+
+message BeneficiaryAccountTaskData {
+    uint64 beneficiaryAccountID = 1;
+    uint64 companyID = 2;
+    string country = 17; 
+    string bic = 18; 
+    string masterBankID = 16;
+    string accountNumber = 3;
+    repeated string accountAlias = 4;
+    string accountName = 5;
+    string accountType = 6; 
+    string accountStatus = 7;
+    string accountCurrency = 8;
+    string accessLevel = 9;
+    string isOwnedByCompany = 10;
+    uint64 createdByID = 11;
+    uint64 updatedByID = 12;
+    uint64 deletedByID = 13;
+    uint64 roleID = 14  ;
+    bool disabled = 15  ; 
+
+    string companyName = 31;
+    string masterBankName = 33;
+    string createdByName = 32;
+
+    google.protobuf.Timestamp createdAt = 51;
+    google.protobuf.Timestamp updatedAt = 52;
+    google.protobuf.Timestamp deletedAt = 53;
+}
+
+message BeneficiaryAccountTaskDataString {
+    uint64 beneficiaryAccountID = 1;
+    uint64 companyID = 2;
+    string country = 20; 
+    string bic = 21; 
+    string masterBankID = 16 ;
+    string accountNumber = 3;
+    string accountAlias = 4;
+    string accountName = 5;
+    string accountType = 6; 
+    string accountStatus = 7;
+    string accountCurrency = 8;
+    string accessLevel = 9;
+    string isOwnedByCompany = 10;
+    uint64 createdByID = 11;
+    uint64 updatedByID = 12;
+    uint64 deletedByID = 13;
+    uint64 roleID = 14  ;
+    bool disabled = 15  ; 
+
+    string companyName = 31;
+    string masterBankName = 33;
+    string createdByName = 32;
+
+    google.protobuf.Timestamp createdAt = 51;
+    google.protobuf.Timestamp updatedAt = 52;
+    google.protobuf.Timestamp deletedAt = 53;
+}
+
+message BeneficiaryAccountTask {
+    BeneficiaryAccountTaskData beneficiaryAccount = 1;
+    Task task = 2;
+    repeated BeneficiaryAccountTaskData beneficiaryAccounts = 3;
+    CompanyData company = 4;
+}
+
+message CompanyData {
+    uint64 companyID = 1;
+    string companyCode = 2;
+    string companyName  = 3;
+    string countryCode = 4;
+    string countryName = 5;
+}
+
+message CreateBeneficiaryAccountTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    uint64 taskID = 4;
+}
+
+message CreateBeneficiaryAccountTaskMultipleResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated uint64 taskID = 4;
+}
+
+message ListBeneficiaryAccountTaskRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+//    uint64 companyID = 11;
+//    string companyCode = 12;
+//    string companyName  = 13;
+//    string countryCode = 14;
+//    string countryName = 15;
+//    string companyFilter = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+//        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+//    }];
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;
+    int32 totalPages = 4;   
+}
+
+message GetBeneficiaryAccountTaskByIDRequest {
+    uint64 taskID = 1;
+
+}
+
+message ListBeneficiaryAccountTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated BeneficiaryAccountTask data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message BeneficiaryAccountDetailRequest {
+    uint64 beneficiaryAccountID = 1;
+}
+
+message BeneficiaryAccountDetailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    BeneficiaryAccount data = 4;
+}
+
+message UpdateBeneficiaryAccountRoleRequest {
+    uint64 RoleID = 1;
+    repeated uint64 beneficiaryAccountID = 2;
+}
+
+message UpdateBeneficiaryAccountRoleResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated BeneficiaryAccount data = 4;
+}
+
+message FileListTemplateRequest {
+    
+    enum FormatTemplates {
+        null = 0;
+        csv = 1;
+        xls = 2;
+        xlsx = 3;
+    }
+    FormatTemplates fileFormat = 1;
+}
+	
+message FileListBeneficiaryAccountTaskRequest {
+    
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 1;
+    
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status =2;
+    steps step = 3;
+
+    int32 limit = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 7;
+    string filter = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+}
+
+
+message CekBeneficiaryAccountAvaibilityReq {
+    string companyID = 1;
+    string accountNumber = 2;
+    string masterBankName = 3;
+}
+
+message CekBeneficiaryAccountAvaibilityRes {
+    bool available = 1;
+    string status = 2;
+}
+
+message CekBeneficiaryAccountUsedRes {
+    repeated string accountAlias = 1;
+}
+
+
+message ListBankReq{
+    BeneficiaryBank beneficiaryBank = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 5;
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+
+    string bankName = 8;
+}
+
+
+message ListBankRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated BeneficiaryBank data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message BankDetailRequest {
+    uint64 beneficiaryBankID = 1;
+}
+
+message BankDetailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    BeneficiaryBank data = 4;
+}
+
+message DeleteBeneficiaryRes {
+    bool success = 1;
+}
+
+message BeneficiaryNotificationData {
+    string USERNAME_MAKER = 1 [json_name='USERNAME_MAKER'];
+    string USERNAME_APPROVER = 2 [json_name='USERNAME_APPROVER'];
+    string CREATED_DATETIME = 3 [json_name='CREATED_DATETIME'];
+    string CREATED_DATE = 4 [json_name='CREATED_DATE'];
+    string CREATED_TIME = 5 [json_name='CREATED_TIME'];
+    string EVENT_DATETIME = 6 [json_name='EVENT_DATETIME'];
+    string EVENT_DATE = 7 [json_name='EVENT_DATE'];
+    string EVENT_TIME = 8 [json_name='EVENT_TIME'];
+    string ACCOUNT_NUMBER = 9 [json_name='ACCOUNT_NUMBER'];
+    string ACCOUNT_ALIAS = 10 [json_name='ACCOUNT_ALIAS'];
+    string ACCOUNT_HOLDER_NAME = 11 [json_name='ACCOUNT_HOLDER_NAME'];
+    string BANK_NAME = 12 [json_name='BANK_NAME'];
+    string CURRENCY_NAME = 13 [json_name='CURRENCY_NAME'];
+    string TASK_ID = 14 [json_name='TASK_ID'];
+    string USERNAME_REJECTOR = 15 [json_name='USERNAME_REJECTOR'];
+    string COMPANY_NAME = 16 [json_name='COMPANY_NAME'];
+    string USERNAME_CHECKER = 17 [json_name='USERNAME_CHECKER'];
+    string USERNAME_RELEASER = 18 [json_name='USERNAME_RELEASER'];
+    string MODULE = 19 [json_name='MODULE'];
+    string MESSAGE = 20 [json_name='MESSAGE'];
+    string TEMPLATE = 21 [json_name='TEMPLATE'];
+    string STATUS_SEND = 22 [json_name='STATUS_SEND'];
+    string STATUS_ACTION = 23 [json_name='STATUS_ACTION'];
+    string STATUS_REQUEST_DELETE = 24 [json_name='STATUS_REQUEST_DELETE'];
+    string REASON = 25 [json_name='REASON'];
+    string COMMENT = 26 [json_name='COMMENT'];
+}
+
+message TaskActionRequest {
+    uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject', 'delete'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+    string passcode = 5;
+}
+
+message TaskActionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+}
+
+message ListBeneficiaryAccountByRoleRPCRequest {
+    BeneficiaryAccount beneficiaryAccount = 1;
+    repeated uint64 roles = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string filterOr = 9;
+    string in = 10;
+    uint64 productID = 11;
+}
+
+message ValidateBeneficiaryAccountEnquiryRequest {
+    string accountNumber = 1;
+    string bankCode = 2;
+    string amount = 4;
+}
+
+message ValidateBeneficiaryAccountEnquiryResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    ValidateBeneficiaryAccountEnquiryResponseData data = 4;
+}
+
+message ValidateBeneficiaryAccountEnquiryResponseData {
+    string creditorName = 1;
+    string creditorType = 2;
+    string creditorID = 3;
+    string creditorResidentStatus = 4;
+    string creditorTownName = 5;
+    string feeAmount = 6;
+    string accountType = 7;
+}
+
+// Beneficiary Favorite
+message FullCreateBeneficiaryFavoriteRequest {
+    uint64 product_id = 1;
+    string account_number = 2;
+    string account_alias = 3;
+    string account_name = 4;
+    string account_type = 5;
+    string account_currency = 6;
+    string bank_code = 7;
+    string bank_name = 8;
+    string bank_id_code = 9;
+}
+
+message CreateBatchBeneficiaryFavoriteRequest {
+    repeated FullCreateBeneficiaryFavoriteRequest beneficiary_favorites = 1;
+}
+
+message CreateBeneficiaryFavoriteRequest {
+    string account_number = 1;
+    int64 product_id = 2;
+}
+
+message UpdateBeneficiaryFavoriteRequest {
+    uint64 beneficiary_favorite_id = 1;
+    string account_alias = 2;
+    string account_name = 3;
+    uint64 product_id = 4;
+}
+
+message DeleteBeneficiaryFavoriteRequest {
+    uint64 beneficiary_favorite_id = 1;
+    uint64 product_id = 4;
+}
+
+message BeneficiaryFavoriteResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message ListBeneficiaryFavoriteRequest {
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    enum Direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    Direction dir = 4;
+
+    string search = 5;
+    uint64 product_id = 6;
+    uint64 is_ksei = 7;
+    string account_type = 8;
+    string account_currency = 9;
+}
+
+message BeneficiaryFavoriteData {
+    uint64 beneficiary_favorite_id = 1 [json_name = "beneficiary_favorite_id"];
+    uint64 user_id = 2 [json_name = "user_id"];
+    uint64 company_id = 3 [json_name = "company_id"];
+    uint64 product_id = 4 [json_name = "product_id"];
+    string account_number = 5 [json_name = "account_number"];
+    string account_alias = 6 [json_name = "account_alias"];
+    string account_name = 7 [json_name = "account_name"];
+    string account_type = 8 [json_name = "account_type"];
+    string account_currency = 9 [json_name = "account_currency"];
+    string bank_code = 10 [json_name = "bank_code"];
+    string bank_name = 11 [json_name = "bank_name"];
+
+    uint64 created_by_id = 12 [json_name = "created_by_id"];
+    google.protobuf.Timestamp created_at = 13 [json_name = "created_at"];
+    uint64 updated_by_id = 14 [json_name = "updated_by_id"];
+    google.protobuf.Timestamp updated_at = 15 [json_name = "updated_at"];
+    string bank_id_code = 16 [json_name = "bank_id_code"];
+}
+
+message ListBeneficiaryFavoriteResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated BeneficiaryFavoriteData data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message AddUKLNBeneficiaryAccountToListRequest{
+    string account_number = 1;
+    string transaction_type = 2;
+    string account_name = 3;
+    string alias_name = 4;
+}
+
+message AddUKLNBeneficiaryAccountToListResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    BeneficiaryAccount data = 4;
+}
+
+
+message BeneficiaryFavoriteAvaiblityRequest{
+    string account_number = 1;
+    string account_alias = 2;
+    uint64 product_id = 3;
+}
+
+message BeneficiaryFavoriteAvaiblityResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+// validate benef paymenthub RTGS
+message ValidateBenefPaymentHubV2Request{
+    string accountNo = 1;
+    string bankCode = 2;
+    string bicCode = 5;
+}
+
+message ValidateBenefPaymentHubV2Response{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    ValidateBenefPaymentHubV2ResponseData data = 4;
+}
+
+message ValidateBenefPaymentHubV2ResponseData{
+    string responseCode = 1;
+    string errorCode = 2;
+    string responseMessage = 3;
+    string name = 4;
+    string route = 5;
+}
+
+message IsExistBeneficiaryFavoriteRequest {
+    string accountNumber = 1;
+    uint64 productID = 2;
+    string accountAlias = 3;
+}
+
+message IsExistBeneficiaryFavoriteResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    bool isExist = 4;
+}

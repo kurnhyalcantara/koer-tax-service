@@ -1,0 +1,519 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/httpbody.proto";
+
+import "deposito-service/deposito_payload.proto";
+
+
+package deposito.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Deposito Online Service";
+        version: "0.1";
+    };
+    
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+
+    
+
+    // tags: [
+    //     {
+    //         name:     //         description: "All operations"
+    //     }
+    //     {
+    //         name: "Task"
+    //         descirption: "Task operations"
+    //     }
+    //     {
+    //         name: "Data"
+    //         descirption: "Data operations"
+    //     }
+    //     {
+    //         name: "External"
+    //         descirption: "External API"
+    //     }
+    //     {
+    //         name: "ESB"
+    //         descirption: "API operations for ESB"
+    //     }
+    // ]
+
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+
+    schemes: HTTP;
+    // schemes: HTTPS;
+    consumes: "application/json";
+    produces: "application/json";
+};
+
+
+
+service DepositoService {
+
+  rpc TimeDepositActiveQueue (TimeDepositActiveQueueReq) returns (TimeDepositActiveQueueRes) {
+          option (google.api.http) = {
+            get: "/api/deposito/activate/{key}"
+            //body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "make queue sactivate account time deposito";
+            tags: ["Automate"];
+            // security: {}
+            description: "activate account time deposito";
+        };
+    }
+
+    rpc TimeDepositActive (TimeDepositActiveReq) returns (TimeDepositActiveRes) {
+    //     option (google.api.http) = {
+    //       get: "/api/deposito/activate"
+    //       //body: "*"
+    //   };
+    //   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //       summary: "activate account time deposito";
+    //       tags: ["Automate"];
+    //       // security: {}
+    //       description: "activate account time deposito";
+    //   };
+  }
+
+  rpc TimeDepositMaturated (TimeDepositMaturatedReq) returns (TimeDepositMaturatedRes) {
+    //     option (google.api.http) = {
+    //       get: "/api/deposito/maturated"
+    //       //body: "*"
+    //   };
+    //   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //       summary: "updated data matured account time deposito";
+    //       tags: ["Automate"];
+    //       // security: {}
+    //       description: "activate account time deposito";
+    //   };
+  }
+
+    rpc TimeDepositMaturatedQueue (TimeDepositMaturatedQueueReq) returns (TimeDepositMaturatedQueueRes) {
+        option (google.api.http) = {
+          get: "/api/deposito/maturated/{key}"
+          //body: "*"
+        
+      };
+      option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+          summary: "make queue activate account time deposito";
+          tags: ["Automate"];
+          // security: {}
+          description: "activate account time deposito";
+      };
+  }
+
+    rpc ExecTransactionDeposito (ExecTransactionDepositoReq) returns (ExecTransactionDepositoRes) {
+        // option (google.api.http) = {
+        //     get: "/api/deposito/exec"
+        //     //body: "*"
+          
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     summary: "exec transaction";
+        //     tags: ["Transaction "];
+        //     // security: {}
+        //     description: "create new or update existing task, update when task id is provided";
+        // };
+    }
+
+    rpc CreateDepositoTask (CreateDepositoTaskRequest) returns (CreateDepositoTaskResponse) {
+        option (google.api.http) = {
+            post: "/api/deposito/task"
+            body: "*"
+            additional_bindings: [
+				{
+					post: "/api/deposito/task/edit/{taskID}"
+					body: "*"
+				}
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create or Update task";
+            tags: ["Task"];
+            // security: {}
+            description: "create new or update existing task, update when task id is provided";
+        };
+    }
+
+    rpc ManageDepositoTask (ManageDepositTaskRequest) returns (CreateDepositoTaskResponse) {
+        option (google.api.http) = {
+            post: "/api/deposito/manage/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Manage Deposito task";
+            tags: ["Manage Task"];
+            // security: {}
+            description: "create new or update existing task, update when task id is provided";
+        };
+    }
+
+
+    rpc WithdrawDepositoTask (WithdrawDepositTaskRequest) returns (CreateDepositoTaskResponse) {
+        option (google.api.http) = {
+            post: "/api/deposito/withdraw/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Manage Deposito task";
+            tags: ["Withdraw Task"];
+            // security: {}
+            description: "create new or update existing task, update when task id is provided";
+        };
+    }
+
+    rpc SendForDeleteDepositoTask (GetDepositoTaskByIDRequest) returns (GetDepositoTaskByIDResponse) {
+        option (google.api.http) = {
+            post: "/api/deposito/task/delete/{taskID}"
+           // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "delete task";
+            tags: ["Task"];
+            // security: {}
+            description: "function delete task "
+        };
+    }
+
+    rpc DepositoActionTaskHttp (TaskActionRequest) returns (TaskActionResponse) {
+        option (google.api.http) = {
+            post: "/api/deposito/task/action/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set action task";
+            tags: ["Task"];
+            // security: {}
+            description: "set task action. Action: 'approve’, 'rework’, 'reject’, ‘delete’"
+        };
+    }
+
+    rpc DepositoActionTask (TaskActionRequest) returns (TaskActionResponse) { }
+
+    rpc DepositoListTask (DepositoListTaskRequest) returns (DepositoListTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/deposito/task"
+            //body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get task list";
+            tags: ["Task"];
+            // security: {}
+            description: "get task list"
+        };
+    }
+
+
+    rpc GetDepositoTaskByID (GetDepositoTaskByIDRequest) returns (GetDepositoTaskByIDResponse) {
+        option (google.api.http) = {
+            get: "/api/deposito/task/{taskID}"
+            //body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get task detail";
+            tags: ["Task"];
+            // security: {}
+            description: "get task detail"
+        };
+    }
+
+    rpc GetDepositoTaskByDepositoID (DepositoDataDetailRequest) returns (GetDepositoTaskByIDResponse) {
+        option (google.api.http) = {
+            get: "/api/deposito/task/deposito/{depositoID}"
+            //body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get task detail by deposito ID";
+            tags: ["Task"];
+            // security: {}
+            description: "get task detail"
+        };
+    }
+
+    rpc DownloadDepositoListTask (FileTaskListRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            get: "/api/deposito/task/file/{fileFormat}"
+           // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get task list file";
+            tags: ["Task"];
+            // security: {}
+            description: "get task list"
+        };
+    }
+
+
+   
+
+    rpc ListDeposito (DepositoDataListRequest) returns (DepositoDataListResponse) {
+        option (google.api.http) = {
+            get: "/api/deposito/data"
+          //  body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get data list";
+            tags: ["Data"];
+            // security: {}
+            description: "get data list"
+        };
+    }
+
+    rpc DepositoDetail (DepositoDataDetailRequest) returns (DepositoDataDetailResponse) {
+        option (google.api.http) = {
+            get: "/api/deposito/data/{depositoID}"
+          //  body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Data detail";
+            tags: ["Data"];
+            // security: {}
+            description: "get data detail"
+        };
+    }
+
+    rpc createDeposito (CreateDepositoRequest) returns (CreateDepositoResponse) {
+        // option (google.api.http) = {
+        //     post: "/api/deposito/data"
+        //     body: "*"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     summary: "DATA SAVE";
+        //     tags: ["Data"];
+        //     // security: {}
+        //     description: "-"
+        // };
+    }
+
+
+    rpc createDepositoTransaction(CreateDepositoRequest) returns (CreateDepositoResponse) {}
+
+    rpc GetProductDeposito (GetProductDepositoRequest) returns (GetProductDepositoRespons){
+        option (google.api.http) = {
+            get: "/api/deposito/products"
+            //body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Data detail";
+            tags: ["Data"];
+            // security: {}
+            description: "get data deposito product rate"
+        };
+        
+    }
+
+    rpc DepositInquiryRateHttp (DepositInquiryRateRequest) returns (DepositInquiryRateRespons){
+        option (google.api.http) = {
+            post: "/api/deposito/inquiry-rate"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Data detail";
+            tags: ["ESB"];
+            // security: {}
+            description: "get data deposito rate"
+        };
+        
+    }
+
+    // rpc DepositInquiryCif (DepositInquiryCIFRequest) returns (DepositInquiryCIFRespons){
+        // option (google.api.http) = {
+        //     post: "/api/deposito/inquiry-cif/{ACCT_NO}"
+        //     //body: "*"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     summary: "Get Data CIF";
+        //     tags: ["ESB"];
+        //     // security: {}
+        //     description: "get data deposito cif no"
+        // };
+
+    // }
+
+    rpc DepositInquiryRateNego (DepositInquiryRateNegoRequest) returns (DepositInquiryRateNegoRespons){
+        // option (google.api.http) = {
+        //     post: "/api/deposito/inquiry-rate-nego"
+        //     body: "*"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     summary: "Get Data detail";
+        //     tags: ["ESB"];
+        //     // security: {}
+        //     description: "get data deposito rate"
+        // };
+    }
+
+    rpc DepositInquiryVoucherHttp (DepositVoucherNegoRequest) returns (DepositInquiryRateNegoRespons){
+        option (google.api.http) = {
+            post: "/api/deposito/voucher"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Data detail";
+            tags: ["Data"];
+            // security: {}
+            description: "get data deposito voucher"
+        };
+    }
+
+    // rpc DepositoMaintanance (DepositoMaintananceRequest) returns (DepositoMaintananceRespons){
+        // option (google.api.http) = {
+        //     post: "/api/deposito/maintanance"
+        //     body: "*"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     summary: "Get Data detail";
+        //     tags: ["ESB"];
+        //     // security: {}
+        //     description: "get data deposito rate"
+        // };
+
+    // }
+    
+    // rpc DepositoCreateAccount (DepositoCreateAccountRequest) returns (DepositoCreateAccountRespons){
+    //     // option (google.api.http) = {
+    //     //     post: "/api/deposito/create-account"
+    //     //     body: "*"
+    //     // };
+    //     // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //     //     summary: "Get Data detail";
+    //     //     tags: ["ESB"];
+    //     //     // security: {}
+    //     //     description: "create deposito account"
+    //     // };
+
+    // }
+
+    // rpc DepositoPlacement (DepositoPlacementRequest) returns (DepositoPlacementRespons){
+    //     // option (google.api.http) = {
+    //     //     post: "/api/deposito/placement"
+    //     //     body: "*"
+    //     // };
+    //     // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //     //     summary: "Get Data detail";
+    //     //     tags: ["ESB"];
+    //     //     // security: {}
+    //     //     description: "create deposito placement"
+    //     // };
+
+    // }
+
+    rpc DepositoInquiryTDPinaltiHttp (DepositInquiryTDPinaltiRequest) returns (DepositInquiryTDPinaltiResponse){
+        option (google.api.http) = {
+            post: "/api/deposito/penalty"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Data detail";
+            tags: ["ESB"];
+            // security: {}
+            description: "create deposito placement"
+        };
+    }
+
+    // rpc DepositoInquiryTD (DepositInquiryTDRequest) returns (DepositInquiryTDRespons){
+        // option (google.api.http) = {
+        //     post: "/api/deposito/TDAccount"
+        //     body: "*"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     summary: "Get Data detail";
+        //     tags: ["ESB"];
+        //     // security: {}
+        //     description: "create deposito placement"
+        // };
+    // }
+
+    // rpc DepositoWithdrawESB (DepositWithdrawRequest) returns (DepositWithdrawRespons){
+    //     // option (google.api.http) = {
+    //     //     post: "/api/deposito/withdrwaESB"
+    //     //     body: "*"
+    //     // };
+    //     // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //     //     summary: "Get Data detail";
+    //     //     tags: ["ESB"];
+    //     //     // security: {}
+    //     //     description: "create deposito placement"
+    //     // };
+    // }
+
+    rpc ListDepositoAccount (ListDepositoAccountRequest) returns (ListDepositoAccountResponse){
+        option (google.api.http) = {
+            get: "/api/deposito/list"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Data detail";
+            tags: ["Account Management"];
+            // security: {}
+            description: "get data deposito account"
+        };
+    }
+
+    rpc DownloadListDeposito (DownloadListDepositoRequest) returns (google.api.HttpBody){
+        option (google.api.http) = {
+            get: "/api/deposito/download/{format_file}"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Download Data detail";
+            tags: ["Account Management"];
+            // security: {}
+            description: "download data deposito account"
+        };
+    }
+
+    rpc GetDepositoByRole (GetDepositoByRoleRequest) returns (GetDepositoByRoleResponse){
+        option (google.api.http) = {
+            get: "/api/deposito/dataByRole"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Data Deposito by Role";
+            tags: ["Account Management"];
+            // security: {}
+            description: "Get Data Deposito by Role"
+        };
+    }
+
+    rpc UpdateDepositoRoleRPC (UpdateDepositoRoleRequest) returns (UpdateDepositoRoleResponse){}
+    rpc UpdateDepositoRole (UpdateDepositoRoleRequest) returns (UpdateDepositoRoleResponse){
+        option (google.api.http) = {
+            post: "/api/deposito/data/update-deposito"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Deposito data update deposito-account"
+            description: "This API for get deposito update deposito-account"
+        };
+    };
+
+}
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message Empty{}

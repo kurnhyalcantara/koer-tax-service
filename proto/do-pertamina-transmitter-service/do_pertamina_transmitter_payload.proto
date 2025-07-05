@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package do_pertamina_transmitter.service.v1;
+option go_package = "./pb";
+
+message ErrorBodyResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+};
+
+message PaymentRequest {
+  string app_key = 1;
+  string process_id = 2;
+  uint64 order_id = 3;
+  string external_id = 4;
+  ModuleTypes module_type = 5;
+  string esb_request = 6;
+  PaymentRequest last_request = 7;
+  uint64 retry_count = 8;
+  uint64 task_id = 9;
+  bool is_debit_account_unsupported = 10;
+  string error_message_debit_account = 11;
+  uint64 retry_payment = 12;
+};
+
+message PaymentResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+};
+
+enum ModuleTypes {
+  UNKNOWN_MODULE = 0;
+  CASH_CARRY = 1;
+  QUOTATION = 2;
+  PRODUCT_ALLOCATION = 3;
+}
+

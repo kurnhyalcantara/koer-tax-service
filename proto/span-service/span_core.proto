@@ -1,0 +1,44 @@
+syntax = "proto3";;
+
+package span.service.v1;
+option go_package = "./pb";
+
+enum Direction {
+    DESC = 0;
+    ASC = 1;
+}
+
+enum Status{
+    UNKNOWN_STATUS = 0;
+    FILE_IN_PROCESS = 1;
+    READY_TO_SUBMIT = 2;
+    ON_CHECKER = 3;
+    ON_SIGNER = 4;
+    ON_RELEASER = 5;
+    REJECTED = 6;
+    DELETED = 7;
+    PROCESS = 8;
+    SUCCESS = 9;
+    FAILED = 10;
+    WAITING = 11;
+    FILE_INVALID = 12;
+};
+
+enum StatusSpanItem {
+    UNKNOWN_STATUS_DATA = 0;
+    FAILED_DATA = 1;
+    SUCCESS_DATA = 2;
+}
+
+enum StatusSpanAction {
+    UNKNOWN_STATUS_SPAN_ACTION = 0;
+    FAILED_SPAN_ACTION = 1;
+    SUCCESS_SPAN_ACTION = 2;
+}
+
+enum SpanActionType {
+    UNKNOWN_ACTION_TYPE = 0;
+    REJECT = 1;
+    VOID = 2;
+    UPDATE_CURRENCY = 3;
+}

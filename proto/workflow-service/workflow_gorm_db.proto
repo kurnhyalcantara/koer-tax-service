@@ -1,0 +1,380 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+// import "mwitkow/go-proto-validators/validator.proto";
+
+package workflow.service.v1;
+option go_package = "./pb";
+
+message User {
+    uint64 id = 1;
+    string username = 2;
+    string password = 3;
+    string workflow = 4;
+    google.protobuf.Timestamp created_at = 5 ;
+    google.protobuf.Timestamp updated_at = 6 ;
+    google.protobuf.Timestamp deleted_at = 7 ;
+}
+
+message Workflow {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "workflows",
+    };
+
+    uint64 workflowID = 1 [
+        (gorm.field).tag = {column: "WorkflowID" primary_key: true not_null: true auto_increment: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+    
+    uint64 moduleID = 2 [
+        (gorm.field).tag = {column: "ModuleID" not_null: true}, 
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 companyID = 3 [
+        (gorm.field).tag = {column: "CompanyID" not_null: true}, 
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 currencyID = 4 [
+        (gorm.field).tag = {column: "CurrencyID"}, 
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 createdByID = 5 [
+        (gorm.field).tag = {column: "CreatedByID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    
+    uint64 updatedByID = 6 [
+        (gorm.field).tag = {column: "UpdatedByID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 deletedByID = 7 [
+        (gorm.field).tag = {column: "DeletedByID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    string currencyName = 8 [
+        (gorm.field).tag = {column: "currencyName" type: "varchar(255)"}
+    ];
+
+    string workflowCode = 9 [
+        (gorm.field).tag = {column: "WorkflowCode" not_null: true type: "varchar(255)"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: STRING}
+    ];
+
+    string description = 10 [
+        (gorm.field).tag = {column: "Description" type: "varchar(255)"}
+    ];
+
+    bool isCustomInputAccount = 11 [
+        (gorm.field).tag = {column: "IsCustomInputAccount"}
+    ];
+
+    bool isCreatedInputAccount = 12 [
+        (gorm.field).tag = {column: "IsCreatedInputAccount"}
+    ];
+
+    google.protobuf.Timestamp createdAt = 51 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {column: "CreatedAt" not_null: true}
+    ];
+    google.protobuf.Timestamp updatedAt = 52 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {column: "UpdatedAt" not_null: true}
+    ];
+    google.protobuf.Timestamp deletedAt = 53 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {column: "DeletedAt" }
+    ];
+
+    repeated WorkflowLogic logics = 101 [(gorm.field).has_many = {
+        foreignkey: "WorkflowID"
+        foreignkey_tag: { column: "WorkflowID" not_null: true }
+        append: true
+        // preload: true
+    }];
+
+
+}
+
+message WorkflowLogic {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "workflow_logics",
+    };
+
+    uint64 workflowLogicID = 1 [
+        (gorm.field).tag = {column: "WorkflowLogicID" primary_key: true not_null: true auto_increment: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 workflowID = 2 [
+        (gorm.field).tag = {column: "WorkflowID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 bottomRange = 3 [
+        (gorm.field).tag = {column: "BottomRange" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 topRange = 4 [
+        (gorm.field).tag = {column: "TopRange" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 createdByID = 5 [
+        (gorm.field).tag = {column: "CreatedByID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 updatedByID = 6 [
+        (gorm.field).tag = {column: "UpdatedByID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    google.protobuf.Timestamp createdAt = 51 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {column: "CreatedAt" not_null: true}
+    ];
+
+    google.protobuf.Timestamp updatedAt = 52 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {column: "UpdatedAt" not_null: true}
+    ];
+
+    repeated WorkflowRequirement requirements = 101 [(gorm.field).has_many = {
+        foreignkey: "WorkflowLogicID"
+        foreignkey_tag: { column: "WorkflowLogicID" not_null: true }
+        append: true
+        // preload: true
+    }];
+
+    // Workflow workflow = 102 [(gorm.field).belongs_to = {
+    //     foreignkey: "WorkflowID"
+    //     foreignkey_tag: { column: "WorkflowID" not_null: true }
+    //     preload: false
+    // }];
+}
+
+message WorkflowRequirement {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "workflow_requirements",
+    };
+
+    uint64 workflowRequirementID = 1 [
+        (gorm.field).tag = {column: "WorkflowRequirementID" primary_key: true not_null: true auto_increment: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 workflowLogicID = 2 [
+        (gorm.field).tag = {column: "WorkflowLogicID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    enum steps{
+        maker = 0;
+        checker = 1;
+        signer = 2;
+        releaser = 3;
+    }
+
+    string step = 3 [
+        (gorm.field).tag = {column: "Step"  default: "maker" not_null: true}
+    ];
+
+    uint64 roleID = 4 [
+        (gorm.field).tag = {column: "RoleID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint32 priority = 5 [
+        (gorm.field).tag = {column: "Priority" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint32 minimumNumber = 6 [
+        (gorm.field).tag = {column: "MinimumNumber" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 createdByID = 7 [
+        (gorm.field).tag = {column: "CreatedByID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 updatedByID = 8 [
+        (gorm.field).tag = {column: "UpdatedByID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    google.protobuf.Timestamp createdAt = 51 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {column: "CreatedAt" not_null: true}
+    ];
+
+    google.protobuf.Timestamp updatedAt = 52 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {column: "UpdatedAt" not_null: true}
+    ];
+
+    // Workflow logic = 102 [(gorm.field).belongs_to = {
+    //     foreignkey: "WorkflowLogicID"
+    //     foreignkey_tag: { column: "WorkflowLogicID" not_null: true }
+    //     preload: false
+    // }];
+
+}
+
+message CompanyWorkflows {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "company_workflows",
+    };
+
+   
+    uint64 WorkflowCompanyID = 1 [
+        (gorm.field).tag = {column: "WorkflowCompanyID" primary_key: true not_null: true auto_increment: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    bool isTransactionSTP = 2 [(gorm.field).tag = {column: "IsTransactionSTP"}];
+
+    bool isTransactionChecker = 3 [(gorm.field).tag = {column: "IsTransactionChecker"}];
+
+    bool isTransactionSigner = 4 [(gorm.field).tag = {column: "IsTransactionSigner"}];
+
+    bool isTransactionReleaser = 5 [(gorm.field).tag = {column: "IsTransactionReleaser"}];
+    
+    bool isNonTransactionSTP = 6 [(gorm.field).tag = {column: "IsNonTransactionSTP"}];
+
+    bool isNonTransactionChecker = 7 [(gorm.field).tag = {column: "IsNonTransactionChecker"}];
+
+    bool isNonTransactionSigner = 8 [(gorm.field).tag = {column: "IsNonTransactionSigner"}];
+
+    bool isNonTransactionReleaser = 9 [(gorm.field).tag = {column: "IsNonTransactionReleaser"}];
+
+    uint64 createdByID = 10 [
+        (gorm.field).tag = {column: "CreatedByID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+    
+    uint64 updatedByID = 11 [
+        (gorm.field).tag = {column: "UpdatedByID" not_null: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    uint64 deletedByID = 12 [
+        (gorm.field).tag = {column: "DeletedByID" },
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+        (google.api.field_behavior) = OUTPUT_ONLY
+    ];
+
+    uint64 companyID = 13 [(gorm.field).tag = {column: "companyID"}];
+
+    bool isNeedToken = 14 [(gorm.field).tag = {column: "IsNeedToken", default: "false"}];
+
+    google.protobuf.Timestamp createdAt = 51 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {column: "CreatedAt" not_null: true}
+    ];
+    google.protobuf.Timestamp updatedAt = 52 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {column: "UpdatedAt" not_null: true}
+    ];
+    google.protobuf.Timestamp deletedAt = 53 [
+        (google.api.field_behavior) = OUTPUT_ONLY, 
+        (gorm.field).tag = {column: "DeletedAt" }
+    ];
+}
+
+message TaskWorkflowCompany {
+    option (gorm.opts) = {
+        ormable: true;
+        table: "task_workflow_company"
+    };
+
+    uint64 taskID = 1 [
+        (gorm.field).tag = {column: "task_id"},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}
+    ];
+
+    string createdAt = 2 [
+        (gorm.field).tag = {column: "created_at"}
+    ];
+
+    string createdByName = 3 [
+        (gorm.field).tag = {column: "created_by_name"}
+    ];
+
+    string updatedAt = 4 [
+        (gorm.field).tag = {column: "approved_at"}
+    ];
+
+    string reviewedByName = 5 [
+        (gorm.field).tag = {column: "reviewed_by_name"}
+    ];
+
+    string updatedByName = 6 [
+        (gorm.field).tag = {column: "updated_by_name"}
+    ];
+
+    string reason = 7 [
+        (gorm.field).tag = {column: "reason"}
+    ];
+
+    string comment = 8 [
+        (gorm.field).tag = {column: "comment"}
+    ];
+
+    string status = 9 [
+        (gorm.field).tag = {column: "status"}
+    ];
+
+    string step = 10 [
+        (gorm.field).tag = {column: "step"}
+    ];
+
+    string companyID = 11 [
+        (gorm.field).tag = {column: "company_id"}
+    ];
+
+    string companyCode = 12 [
+        (gorm.field).tag = {column: "companyCode"}
+    ];
+
+    string company_name = 13 [
+        (gorm.field).tag = {column: "company_name"}
+    ];
+
+    string countryCode = 14 [
+        (gorm.field).tag = {column: "country_code"}
+    ];
+
+    string countryName = 15 [
+        (gorm.field).tag = {column: "country_name"}
+    ];
+
+    string workflowCode = 16 [
+        (gorm.field).tag = {column: "workflow_code"}
+    ];
+
+    string workflowDescription = 17 [
+        (gorm.field).tag = {column: "workflow_description"}
+    ];
+}

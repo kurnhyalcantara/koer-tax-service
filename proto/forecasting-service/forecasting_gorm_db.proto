@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+// import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+// import "mwitkow/go-proto-validators/validator.proto";
+// import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+package forecasting.service.v1;
+option go_package = "./pb";
+
+// Example User
+// message User {
+//     option (gorm.opts) = {
+//         ormable:true,
+//         table: "users",
+//     };
+//     uint64 id = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+//     string username = 2 [(google.api.field_behavior) = REQUIRED, (validator.field) = {msg_exists : true}, (gorm.field).tag = {unique: true not_null: true}];
+//     string password = 3 [(google.api.field_behavior) = REQUIRED, (validator.field) = {msg_exists : true}, (gorm.field).tag = {not_null: true}];
+//     string role = 4 [(validator.field) = {msg_exists : true}, (gorm.field).tag = {default: "user" not_null: true}];
+//     google.protobuf.Timestamp created_at = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+//     google.protobuf.Timestamp updated_at = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+//     google.protobuf.Timestamp deleted_at = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+// }
+
+
+message AccountStatements {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "qcash_account_statement.account_statements",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 userId = 2;
+    uint64 companyId = 3;
+    string accountNumber = 4 [(gorm.field).tag = {type: "jsonb"}];
+    Statuses status = 5;
+    string detail = 6;
+    string fileType = 7;
+    string fileName = 8;
+    string startDate = 9;
+    string endDate = 10;
+    string requestCode = 11;
+    string company_code = 12 [(gorm.field).tag = {type: "varchar"}];
+    string company_name = 13 [(gorm.field).tag = {type: "varchar(255)"}];
+    google.protobuf.Timestamp createdAt = 14 [(gorm.field).tag = {default: "NOW()"}];
+    google.protobuf.Timestamp updatedAt = 15 [(gorm.field).tag = {default: "NOW()"}];
+    string alias_account_number = 16 [(gorm.field).tag = {type: "jsonb" default: "{}"}];
+    StatementType statement_type = 17;
+    string account_name = 18;
+}
+
+    enum StatementType {
+        UNKNOWN_STATEMENT_TYPE = 0;
+        SINGLE_STATEMENT_TYPE = 1;
+        CONSOLIDATE_STATEMENT_TYPE = 2;
+    }
+
+    enum Statuses {
+        Queue = 0;
+        Process = 1;
+        Success = 2;
+        Failed = 3;
+        Cancelled = 5;
+    }
+
+
+message StatementTask {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "qcash_account_statement.statement_task",
+    };
+    uint64 task_id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 company_id = 2;
+    uint64 created_by_id = 3;
+    uint64 updated_by_id = 4;
+    string account_number = 5 [(gorm.field).tag = {type: "jsonb" default: "{}"}];
+    string description = 6 [(gorm.field).tag = {type: "varchar(255)"}];
+    string schedule_type = 7 [(gorm.field).tag = {type: "varchar(100)"}];
+    string schedule_start_date = 8 [(gorm.field).tag = {type: "varchar(100)"}];
+    string schedule_end_date = 9 [(gorm.field).tag = {type: "varchar(100)"}];
+    string schedule_day = 10 [(gorm.field).tag = {type: "varchar(100)"}];
+    string schedule_date = 11 [(gorm.field).tag = {type: "varchar(100)"}];
+    string schedule_times = 12 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+    string file_format = 13 [(gorm.field).tag = {type: "varchar(100)"}];
+    int32 status_task = 14;
+    StatementSchedule statement_schedule = 15 [(gorm.field).has_one = {foreignkey: "task_id"}];
+    string emails = 16 [(gorm.field).tag = { type: "jsonb" default: "{}" }];
+    google.protobuf.Timestamp createdAt = 17 [(gorm.field).tag = {default: "NOW()"}];
+    google.protobuf.Timestamp updatedAt = 18 [(gorm.field).tag = {default: "NOW()"}];
+    StatementType statement_type = 19;
+    string consolidate_type = 20 [(gorm.field).tag = {type: "varchar(100)"}];
+}
+
+message StatementSchedule {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "qcash_account_statement.statement_schedule",
+    };
+    uint64 schedule_id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string file_name = 2 [(gorm.field).tag = {type: "varchar(255)"}];
+    string schedule_type = 3 [(gorm.field).tag = {type: "varchar(100)"}];
+    google.protobuf.Timestamp start_date = 4;
+    google.protobuf.Timestamp next_schedule_time = 5;
+    int32 status_schedule = 6;
+    int32 retry_count = 7;
+    string url_download = 8;
+    string request_code = 9;
+    string previous_file_name = 10 [(gorm.field).tag = {type: "varchar(255)"}];
+    google.protobuf.Timestamp updatedAt = 11 [(gorm.field).tag = {default: "NOW()"}];
+    StatementType statement_type = 12;
+}
+
+message TemplateAccountStatement{
+    option (gorm.opts) = {
+        ormable:true,
+        table: "qcash_account_statement.template_account_statement",
+    };
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 created_by = 2;
+    string account_numbers = 3 [(gorm.field).tag = { type: "jsonb" }];
+    string list_name = 4;
+    uint64 total_account = 5;
+    google.protobuf.Timestamp created_at = 6 [(gorm.field).tag = {default: "NOW()"}];
+    uint64 company_id = 7;
+}

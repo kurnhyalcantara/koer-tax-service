@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "df-pupuk-indonesia-report-push-service/df_pupuk_indonesia_report_push_payload.proto";
+
+package df_pupuk_indonesia_report_push.service.v1;
+
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "BRICaMS ADDONS GRPC DF Pupuk Indonesia Report Push Service";
+    version: "1.0";
+  }
+
+  schemes: HTTP;
+  // schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service DFPupukIndonesiaReportPushService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      get: "/api/df-pupuk-indonesia/health-check"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Health Check"]
+      summary: "Health Check DF pupuk Indonesia Report Push"
+      description: "This API for health check DF pupuk Indonesia Report Push"
+    };
+  };
+
+  rpc ReportPush(ReportPushRequest) returns (ReportPushResponse) {
+    option (google.api.http) = {
+      post: "/api/df-pupuk-indonesia/report-push"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: { }
+      tags: ["Report Push"]
+      summary: "Report Push DF Pupuk Indonesia"
+      description: "This API for report push DF Pupuk Indonesia"
+    };
+  };
+}

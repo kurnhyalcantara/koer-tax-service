@@ -1,0 +1,162 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/httpbody.proto";
+
+import "file-listener-service/fileobject_dto.proto";
+
+package file_object.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Announcement Service";
+        version: "0.1";
+    };
+    
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+
+    schemes: HTTP;
+    // schemes: HTTPS;
+    consumes: "application/json";
+    produces: "application/json";
+};
+
+service FileProcessorService {
+
+    rpc ObjectUpload(stream ObjectUploadReq) returns (ObjectUploadRes) {};
+
+    rpc FileDownloadHandler(FileDownloadHandlerRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/file-listener/file-download"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download list users task"
+            description: "This API for download list users task"
+        };
+    };
+    rpc FileDownloadNonTokenHandler(FileDownloadNonTokenHandlerRequest) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/file-listener/file-download/non-token"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Download file without token"
+            description: "This API for download file without token"
+        };
+    };
+
+    rpc PutObject(stream PutObjectRequest) returns(PutObjectResponse) {};
+    rpc PutObjectValidation(PutObjectValidationReq) returns(UploadInfo);
+    rpc GetObjectDetailInfo(GetObjectDetailInfoReq) returns(GenObjectPutKey);
+
+    rpc GetObject(ObjectDownloadRequest) returns(stream GetObjectResponse) {};
+    rpc GenerateKeyForDownloadObject(ObjectRequest) returns(RequestKeyForGetObjectRes) {};
+
+    rpc RemoveKey(RemoveKeyReq) returns (RemoveKeyRes);
+    
+    rpc StatObject(ObjectRequest) returns (StatObjectResponse);
+    rpc GetObjectTagging(ObjectRequest) returns (ObjectTagsResponse);
+
+    rpc DownloadObject(ObjectRequestWithKey) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+          post: "/api/file-listener/object-download"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Fetch Object"
+        };
+    };
+
+    rpc RecieptStatement(RecieptStatementRequest) returns (RecieptStatementResponse);
+    rpc ResendRecieptStatement(ResendRecieptStatementRequest) returns (ResendRecieptStatementResponse){
+        option (google.api.http) = {
+          post: "/api/file-listener/url-download"
+          body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Fetch Url Download"
+        };
+    };
+
+    rpc GetUrlDownloadFromMinioEndpoint (GetUrlDownloadRequest) returns (GetUrlDownloadResponse);
+
+    rpc FileUpload(FileUploadRequest) returns (FileUploadResponse);
+    rpc FileUploadPublic(FileUploadPublicRequest) returns (FileUploadResponse);
+    rpc FileUploadWithDuplicateCheck(FileUploadRequest) returns (FileUploadInfoResponse);
+    rpc GetUrlDownload(GetUrlDownloadRequest) returns (GetUrlDownloadResponse);
+    rpc FileUploadMinioBucket(FileUploadRequest) returns (FileUploadResponse);
+
+    // ISG Minio
+    rpc FileUploadUKLN(FileUploadRequest) returns (FileUploadResponse);    
+    rpc GetObjectMinio(ObjectDownloadRequest) returns(stream GetObjectResponse) {};
+    rpc GetTaggingMinio(ObjectRequest) returns (Tag);
+    rpc GetStatObjectMinio(ObjectRequest) returns (StatObjectResponse){}
+
+    // Obras Minio
+    rpc FileUploadObras(FileUploadObrasRequest) returns (FileUploadResponse) {
+        option (google.api.http) = {
+          post: "/api/file-listener/upload-obras"
+          body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Fetch Url Download"
+        };
+    }
+    
+    rpc FileRemoveMinioBucket(FileRemoveRequest) returns (FileRemoveResponse);
+
+    rpc HandleBinaryFileUploadV2(AccountReceivableRequestV2) returns (FileUploadHandlerResponse);
+}
+
+message ObjectUploadReq {
+    oneof data {
+        ObjectInfo info = 1;
+        bytes chunk_object = 2;
+    }
+}
+
+message ObjectInfo {
+    string name = 1;
+    string mime_type = 2;
+    string size = 4;
+    string md5 = 5;
+    string sha256 = 6;
+    string sha512 = 7;
+    string path = 8;
+}
+
+message ObjectUploadRes {
+    string message = 1;
+    ObjectInfo info = 2;
+}
+
+message TempGenToken {
+    enum Role {
+        bankadmin = 0;
+        companyadmin = 1;
+        companyuser = 2;
+    }
+    Role role = 1;
+}

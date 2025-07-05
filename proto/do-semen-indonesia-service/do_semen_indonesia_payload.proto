@@ -1,0 +1,483 @@
+syntax = "proto3";
+
+package do_semen_indonesia.service.v1;
+
+import "do-semen-indonesia-service/do_semen_indonesia_core.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+
+option go_package = "./pb";
+
+/* #region payload for outbound esb  */
+message EsbInquiryRequest {
+  EsbInquiryRequestData request = 1;
+}
+
+message EsbInquiryRequestData {
+  string external_id = 1 [json_name = "externalId"];
+  string channel_id = 2 [json_name = "channelId"];
+  string card_number = 3 [json_name = "cardNumber"];
+  string acccount_number = 4 [json_name = "acccountNumber"];
+  string product_code = 5 [json_name = "productCode"];
+  string cust_number = 6 [json_name = "custNumber"];
+  string teller_id = 7 [json_name = "tellerId"];
+  EsbInquiryRequestBillData bill_data = 8 [json_name = "billData"];
+}
+
+message EsbInquiryRequestBillData {
+  string media = 1 [json_name = "media"];
+}
+
+message EsbInquiryResponse {
+  EsbInquiryResponses response = 1;
+}
+
+message EsbInquiryResponses {
+  string error_code = 1 [json_name = "errorCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  string response_code = 3 [json_name = "responseCode"];
+  EsbInquiryResponsesData data = 4 [json_name = "data"];
+}
+
+message EsbInquiryResponsesData {
+  string inquiry_id = 1 [json_name = "inquiryId"];
+  string biller_code = 3 [json_name = "billerCode"];
+  string cust_number = 4 [json_name = "custNumber"];
+  string credit_account = 5 [json_name = "creditAccount"];
+  string cust_name = 6 [json_name = "custName"];
+  string amount = 7;
+  string fee = 8;
+  string product_code = 9 [json_name = "productCode"];
+  string product_name = 10 [json_name = "productName"];
+  EsbInquiryResponsesBillData bill_data = 11 [json_name = "billData"];
+  string curr = 12;
+  string reff = 13;
+}
+
+message EsbInquiryResponsesBillData {
+  string bill_info1 = 1 [json_name = "billInfo1"];
+  string bill_info2 = 2 [json_name = "billInfo2"];
+  string bill_info3 = 3 [json_name = "billInfo3"];
+  string bill_info4 = 4 [json_name = "billInfo4"];
+  string bill_info5 = 5 [json_name = "billInfo5"];
+  string bill_code = 6 [json_name = "billCode"];
+  string bill_name = 7 [json_name = "billName"];
+  string bill_short_name = 8 [json_name = "billShortName"];
+  string reference1 = 9 [json_name = "reference1"];
+  string reference2 = 10 [json_name = "reference2"];
+  string reference3 = 11 [json_name = "reference3"];
+  string curr_code = 12 [json_name = "currCode"];
+  string inqdate = 13 [json_name = "inqdate"];
+  string media = 14;
+  string errdesc = 15;
+  string paydate = 16;
+}
+/* #end region esb */
+
+/* #region basic Payload */
+message SubmitDOSemenIndonesiaRequest {
+  bool is_draft = 1;
+  repeated OrderRequest order_request = 2 [(validator.field) = {repeated_count_min: 1}];
+}
+
+message UpdateDOSemenIndonesiaRequest {
+  bool is_draft = 1;
+  uint64 task_id = 2;
+  OrderRequest order_request = 3;
+}
+
+message OrderRequest {
+  string delivery_order_number = 1 [(validator.field) = {string_not_empty: true}];
+  string debit_account = 2 [(validator.field) = {string_not_empty: true}];
+  ScheduleType schedule_type = 3 [(validator.field) = {is_in_enum: true}];
+  string schedule_date = 4;
+  string schedule_time = 5;
+}
+
+message SubmitDOSemenIndonesiaResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message SaveTaskDOSemenIndonesiaResponse {
+  uint64 task_id = 1;
+  string transaction_id = 2;
+  Status status = 3;
+}
+
+message CheckDebitAccountRequest {
+  string account_number = 1;
+}
+
+message CheckDebitAccountResponse {
+  string available_bal = 1;
+  string account_type = 2;
+  string account_name = 3;
+}
+
+message ErrorBodyResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message HealthCheckResponse{
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message Sort {
+  string column = 1;
+  string direction = 2;
+}
+
+message PaginationRequest {
+  int32 limit = 1;
+  int32 page = 2;
+  string search = 3;
+}
+
+message OrderDetailRequest {
+  string transaction_id = 1;
+}
+
+message OrderDetailResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  OrderDataDetail data = 4;
+}
+
+message OrderDataDetail {
+  TransactionInformationResponse transaction_information = 1;
+  TaskDetailResponse task = 2;
+  string workflow_doc = 3;
+}
+
+message TransactionInformationResponse {
+  string transaction_id = 1;
+  string delivery_order_number = 2;
+  string name_of_distributor = 3;
+  string address_of_distributor = 4;
+  string supplier = 5;
+  string debit_account = 6;
+  string debit_account_name = 7;
+  double total_amount = 8;
+  double fee = 9;
+  string description_message = 10;
+  double fee_inquiry = 11;
+  double amount = 12;
+  Status status = 15;
+  string schedule_date = 16;
+  string schedule_time = 17;
+  uint32 schedule_type = 18;
+}
+
+message TaskDetailResponse {
+  uint64 task_id = 1;
+  string status = 2;
+  string reasons = 3;
+  string last_approved_by_name = 4;
+  string last_rejected_by_name = 5;
+  string updated_by_name = 6;
+  string created_by_name = 7;
+  string type = 8;
+  string comment = 9;
+  string created_at = 101;
+  string updated_at = 102;
+  string approved_at = 104;
+  string rejected_at = 105;
+}
+
+message InquiryRequest {
+  string delivery_order_number = 1 [(validator.field) = {string_not_empty: true}];
+  string debit_account = 2 [(validator.field) = {string_not_empty: true}];
+}
+
+message InquiryResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  InquiryResponseData data = 4;
+}
+
+message InquiryResponseData {
+  string name_of_distributor = 1;
+  string address_of_distributor = 2;
+  string supplier = 3;
+  double total_amount = 4;
+  double fee = 5;
+  InquiryAlert alert = 6;
+}
+
+message InquiryAlert{
+  string alert_message = 1;
+  string alert_variant = 2;
+}
+
+message PaginationResponse {
+  int32 limit = 1;
+  int32 page = 2;
+  int32 total_rows = 3;
+  int32 total_pages = 4;
+}
+
+message StandardResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message ScheduledPaymentRequest {
+  string app_key = 1;
+}
+
+message failedPaymentScheduledRequest {
+  uint64 task_id = 1;
+  Status status = 2;
+  string description_message = 3;
+}
+
+message GetFeeFromMenuLicenseResponse {
+  double fee_menu_license = 1;
+}
+/* #endregion basic Payload */
+
+/* #region task Payload */
+message ListTaskRequest {
+  string status = 1;
+  string filter = 2;
+  string search = 3;
+  int32 page = 4;
+  int32 limit = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Order data by column name",
+    }];
+  Direction dir = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Sort Direction enum should be ASC or DESC",
+    }];
+  string filter_or = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=created_at:>=2023-10-17,created_at:<=2023-10-18  => Where created_at >= 2023-10-17 AND created_at <= 2023-10-17 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=status:3,status:4 => Where status = 3 OR status = 4 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string typeTab = 10 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Action: 'transaction', 'history'"
+      }
+  ];
+}
+
+message ListTaskResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  repeated Task data = 4;
+  PaginationResponse pagination = 5;
+  repeated SummaryTask summary = 6;
+}
+
+message TaskDataDOSemenIndonesia {
+  uint64 order_id = 1;
+  string transaction_id = 2;
+  Status status = 3;
+  string delivery_order_number = 4;
+  string debit_account = 5;
+  string debit_account_name = 6;
+  string debit_account_type = 7;
+  string name_of_distributor = 8;
+  string supplier = 9;
+  double total_amount =  10;
+  ScheduleType schedule_type = 11;
+  string schedule_date = 12;
+  string address_of_distributor = 13;
+  uint64 company_id = 14;
+  string company_name = 15;
+  string description_message = 16;
+  double fee = 17;
+  double amount = 18;
+  string billName = 19;
+}
+
+message Task {
+  uint64 task_id = 1;
+  string type = 2;
+  string status = 3;
+  string step = 4;
+  uint64 created_by_id = 5;
+  uint64 last_approved_by_id = 6;
+  uint64 last_rejected_by_id = 7;
+  string data = 8;
+  string comment = 9;
+  uint64 feature_id = 10;
+  repeated Task childs = 11;
+  bool is_parent_active = 12;
+  string reasons = 13;
+  string last_approved_by_name = 14;
+  string last_rejected_by_name = 15;
+  uint64 updated_by_id = 16;
+  string updated_by_name = 17;
+  string created_by_name = 18;
+  string data_bak = 19;
+  string child_bak = 20;
+  string workflow_doc = 21;
+  uint64 company_id = 22;
+  uint64 holding_id = 23;
+  google.protobuf.Timestamp created_at = 101;
+  google.protobuf.Timestamp updated_at = 102;
+  google.protobuf.Timestamp deleted_at = 103;
+  google.protobuf.Timestamp approved_at = 104;
+  google.protobuf.Timestamp rejected_at = 105;
+}
+
+message SummaryTask{
+  string status = 1;
+  int32 count = 2;
+}
+
+message ListTaskFileRequest {
+  string status = 1;
+  string filter = 2;
+  string search = 3;
+  int32 page = 4;
+  int32 limit = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "limit data per page. Default value '-1' for disable limit",
+  }];
+  string sort = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Order data by column name",
+    }];
+  Direction dir = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Sort Direction enum should be ASC or DESC",
+    }];
+  string filter_or = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=created_at:>=2023-10-17,created_at:<=2023-10-18  => Where created_at >= 2023-10-17 AND created_at <= 2023-10-17 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=status:3,status:4 => Where status = 3 OR status = 4 \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+  string typeTab = 10 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Action: 'transaction', 'history'"
+      }
+  ];
+  string file_format = 11;
+}
+
+message DeleteTaskRequest {
+  repeated uint64 task_ids = 1 [(validator.field) = {repeated_count_min: 1}];
+}
+
+message DeleteTaskResponse {
+  bool error = 1;
+  uint32 code = 2;    
+  string message = 3;
+  int32 total_successful = 4;
+  int32 total_failed = 5;
+  repeated DeleteTaskResponses data = 6;
+}
+
+message DeleteTaskResponses {
+  bool error = 1;
+  string message = 2;
+  DeletedTask task = 3;
+}
+
+message DeletedTask {
+  uint64 task_id = 1;
+}
+
+message SetStatusesTaskRequest {
+  repeated uint64 task_ids = 1 [(validator.field) = {repeated_count_min: 1}];
+  string action = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Action: 'approve', 'reject', 'rework"
+    },
+    (validator.field) = {string_not_empty: true}
+  ];
+  string comment = 3 [(validator.field) = {length_lt:101}];
+  string reasons = 4 [(validator.field) = {length_lt:101}];
+  string pass_code = 5;
+  bool isFromDashboard = 6;
+}
+
+message SetStatusesTaskResponse {
+  bool error = 1;
+  int32 code = 2;
+  string message = 3;
+  int32 total_successful = 4;
+  int32 total_failed = 5;
+  repeated TaskStatusResponse data = 6;
+}
+
+message TaskStatusResponse {
+  bool error = 1;
+  string message = 2;
+  TaskActionResponse task = 3;
+}
+
+message TaskActionResponse {
+  uint64 task_id = 1;
+}
+/* #endregion task Payload */
+
+/* #region email payload */
+message NotificationData {
+  string creation_date = 1 [json_name='CREATION_DATE'];
+  string transaction_id = 2 [json_name='TRANSACTION_ID'];
+  string delivery_order_number = 3 [json_name='DELIVERY_ORDER_NUMBER'];
+  string company_name = 4 [json_name='COMPANY_NAME'];
+  string debit_account_number = 5 [json_name='DEBIT_ACCOUNT_NUMBER'];
+  string debit_account_name = 6 [json_name='DEBIT_ACCOUNT_NAME'];
+  string total_amount = 7 [json_name='TOTAL_AMOUNT'];
+  string transaction_status = 8 [json_name='TRANSACTION_STATUS'];
+  string username_maker = 9 [json_name='USERNAME_MAKER'];
+  string username_checker = 10 [json_name='USERNAME_CHECKER'];
+  string username_signer = 11 [json_name='USERNAME_SIGNER'];
+  string username_releaser = 12 [json_name='USERNAME_RELEASER'];
+  string reason = 13 [json_name='REASON'];
+  string description_rework = 14 [json_name='DESCRIPTION_REWORK'];
+  string rework_from = 15 [json_name='REWORK_FROM'];
+  string description_reject = 16 [json_name='DESCRIPTION_REJECT'];
+  string reject_from = 17 [json_name='REJECT_FROM'];
+  
+}
+/* #endregion email payload */
+
+/* #region Receipt */
+message DownloadReceiptFileRequest {
+  repeated string transaction_id = 1;
+}
+
+message ListModelData {
+  string header_data = 1;
+  repeated ModelData model_data = 2;
+  bool is_table = 3;
+  bool new_page = 4;
+  TableSpec table_spec = 5;
+  bool fill_page = 6;
+}
+
+message TableSpec {
+  repeated uint32 column_width = 1; 
+  repeated TableData table_data = 5;
+}
+
+message TableData {
+  repeated string data = 2;
+}
+
+message ModelData {
+  string key = 1;
+  string value = 2;
+  int32 len_char = 3;
+  int32 height = 4;
+  bool cut_dot = 5;
+  bool is_total_payment = 6;
+}
+/* #endregion */

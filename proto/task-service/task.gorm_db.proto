@@ -1,0 +1,798 @@
+syntax = "proto3";
+
+package task.service.v1;
+
+// import "google/protobuf/struct.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "./pb";
+
+// Example User
+message User {
+  option (gorm.opts) = {
+    ormable: true
+    table: "users"
+  };
+  uint64 id = 1 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      primary_key: true
+      not_null: true
+    }
+  ];
+  string username = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (validator.field) = {msg_exists: true},
+    (gorm.field).tag = {
+      unique: true
+      not_null: true
+    }
+  ];
+  string password = 3 [
+    (google.api.field_behavior) = REQUIRED,
+    (validator.field) = {msg_exists: true},
+    (gorm.field).tag = {not_null: true}
+  ];
+  string role = 4 [
+    (validator.field) = {msg_exists: true},
+    (gorm.field).tag = {
+      default: "user"
+      not_null: true
+    }
+  ];
+  google.protobuf.Timestamp created_at = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp updated_at = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp deleted_at = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+enum statuses {
+  NullStatus = 0;
+  Pending = 1;
+  Draft = 2;
+  Returned = 3;
+  Approved = 4;
+  Rejected = 5;
+  DeleteRequest = 6;
+  Deleted = 7;
+  Cancelled = 8;
+  OnProcess = 9;
+  ChangeRequest = 10;
+  PendingRm = 11;
+  PendingBoh = 12;
+  PendingBaMaker = 13;
+  PendingBaSigner = 14;
+}
+
+enum steps {
+  NullStep = 0;
+  Maker = 1;
+  Checker = 2;
+  Signer = 3;
+  Releaser = 4;
+  Verifier = 5; //for account registration
+  VerifierNds = 6; //for account registration
+  ApproverNds = 7; //for account registration
+  ReviewerBri = 8; //for account registration
+  ApproverBri = 9; //for account registration
+}
+
+message Task {
+  option (gorm.opts) = {
+    ormable: true
+    table: "tasks"
+  };
+  uint64 TaskID = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+    (gorm.field).tag = {
+      primary_key: true
+      not_null: true
+    }
+  ];
+  string type = 2 [(gorm.field).tag = {not_null: true}];
+
+  statuses status = 3 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+
+  steps step = 4 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+
+  uint64 createdByID = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+    (gorm.field).tag = {not_null: true}
+  ];
+  uint64 lastApprovedByID = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 lastRejectedByID = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+  string data = 8 [(gorm.field).tag = {type: "jsonb"}];
+
+  string comment = 9 [(gorm.field).tag = {type: "text"}];
+
+  uint64 featureID = 10;
+
+  repeated Task childs = 11 [(gorm.field).has_many = {
+    foreignkey: "ParentID"
+    append: true
+    preload: false
+  }];
+
+  bool isParentActive = 12 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {default: "false"}
+  ];
+
+  string reasons = 13 [(gorm.field).tag = {type: "varchar(255)"}];
+  string lastApprovedByName = 14 [(google.api.field_behavior) = OPTIONAL];
+  string lastRejectedByName = 15 [(google.api.field_behavior) = OPTIONAL];
+
+  uint64 updatedByID = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  string updatedByName = 17 [(google.api.field_behavior) = OPTIONAL];
+  string createdByName = 18 [(google.api.field_behavior) = OPTIONAL];
+
+  string dataBak = 19 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {type: "jsonb"}
+  ];
+  string childBak = 20 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      type: "jsonb"
+      default: "[]"
+    }
+  ];
+
+  string workflowDoc = 21 [(gorm.field).tag = {
+    type: "jsonb"
+    default: "{}"
+  }];
+  uint64 companyID = 22 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 holdingID = 23 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+  google.protobuf.Timestamp createdAt = 101;
+  google.protobuf.Timestamp updatedAt = 102;
+  google.protobuf.Timestamp deletedAt = 103;
+  google.protobuf.Timestamp approvedAt = 104;
+  google.protobuf.Timestamp rejectedAt = 105;
+}
+
+message TaskEV {
+  string taskID = 1;
+  string type = 2;
+
+  statuses status = 3;
+
+  steps step = 4;
+
+  string createdByID = 5;
+  string lastApprovedByID = 6;
+  string lastRejectedByID = 7;
+
+  string data = 8;
+
+  string comment = 9;
+
+  string featureID = 10;
+
+  repeated TaskEV childs = 11;
+
+  bool isParentActive = 12;
+
+  string reasons = 13;
+
+  string lastApprovedByName = 14;
+  string lastRejectedByName = 15;
+
+  uint64 updatedByID = 16;
+  string updatedByName = 17;
+  string createdByName = 18;
+
+  string dataBak = 19;
+
+  google.protobuf.Timestamp createdAt = 101;
+  google.protobuf.Timestamp updatedAt = 102;
+  google.protobuf.Timestamp deletedAt = 103;
+  google.protobuf.Timestamp approvedAt = 104;
+  google.protobuf.Timestamp rejectedAt = 105;
+}
+
+message TaskRequest {
+  uint64 TaskID = 1 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      primary_key: true
+      not_null: true
+    }
+  ];
+  string type = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {not_null: true}
+  ];
+
+  statuses status = 3 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {not_null: true}
+  ];
+
+  steps step = 4 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {not_null: true}
+  ];
+
+  uint64 createdByID = 5 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {not_null: true}
+  ];
+  string lastApprovedByID = 6 [(google.api.field_behavior) = OPTIONAL];
+  string lastRejectedByID = 7 [(google.api.field_behavior) = OPTIONAL];
+
+  string data = 8 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {}
+  ];
+
+  google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message CompanyTask {
+  option (gorm.opts) = {
+    ormable: true
+    table: "company_tasks"
+  };
+  uint64 TaskID = 1 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      primary_key: true
+      not_null: true
+    }
+  ];
+  string type = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {not_null: true}
+  ];
+
+  statuses status = 3 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+
+  steps step = 4 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+
+  uint64 createdByID = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+    (gorm.field).tag = {not_null: true}
+  ];
+  uint64 lastApprovedByID = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 lastRejectedByID = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+  string data = 8 [(gorm.field).tag = {type: "jsonb"}];
+
+  string comment = 9 [(gorm.field).tag = {type: "text"}];
+
+  uint64 featureID = 10;
+
+  repeated CompanyTask childs = 11 [(gorm.field).has_many = {
+    foreignkey: "ParentID"
+    append: true
+    preload: false
+  }];
+
+  bool isParentActive = 12 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {default: "false"}
+  ];
+
+  string reasons = 13 [(gorm.field).tag = {type: "varchar(255)"}];
+  string lastApprovedByName = 14 [(google.api.field_behavior) = OPTIONAL];
+  string lastRejectedByName = 15 [(google.api.field_behavior) = OPTIONAL];
+
+  uint64 updatedByID = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  string updatedByName = 17 [(google.api.field_behavior) = OPTIONAL];
+  string createdByName = 18 [(google.api.field_behavior) = OPTIONAL];
+
+  string dataBak = 19 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {type: "jsonb"}
+  ];
+  string childBak = 20 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      type: "jsonb"
+      default: "[]"
+    }
+  ];
+
+  string workflowDoc = 21 [(gorm.field).tag = {
+    type: "jsonb"
+    default: "{}"
+  }];
+  uint64 companyID = 22 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 holdingID = 23 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+  google.protobuf.Timestamp createdAt = 101;
+  google.protobuf.Timestamp updatedAt = 102;
+  google.protobuf.Timestamp deletedAt = 103;
+  google.protobuf.Timestamp approvedAt = 104;
+  google.protobuf.Timestamp rejectedAt = 105;
+}
+
+message UserTask {
+  option (gorm.opts) = {
+    ormable: true
+    table: "user_tasks"
+  };
+  uint64 TaskID = 1 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      primary_key: true
+      not_null: true
+    }
+  ];
+  string type = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {not_null: true}
+  ];
+
+  statuses status = 3 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+
+  steps step = 4 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+
+  uint64 createdByID = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+    (gorm.field).tag = {not_null: true}
+  ];
+  uint64 lastApprovedByID = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 lastRejectedByID = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+  string data = 8 [(gorm.field).tag = {type: "jsonb"}];
+
+  string comment = 9 [(gorm.field).tag = {type: "text"}];
+
+  uint64 featureID = 10;
+
+  repeated UserTask childs = 11 [(gorm.field).has_many = {
+    foreignkey: "ParentID"
+    append: true
+    preload: false
+  }];
+
+  bool isParentActive = 12 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {default: "false"}
+  ];
+
+  string reasons = 13 [(gorm.field).tag = {type: "varchar(255)"}];
+  string lastApprovedByName = 14 [(google.api.field_behavior) = OPTIONAL];
+  string lastRejectedByName = 15 [(google.api.field_behavior) = OPTIONAL];
+
+  uint64 updatedByID = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  string updatedByName = 17 [(google.api.field_behavior) = OPTIONAL];
+  string createdByName = 18 [(google.api.field_behavior) = OPTIONAL];
+
+  string dataBak = 19 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {type: "jsonb"}
+  ];
+  string childBak = 20 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      type: "jsonb"
+      default: "[]"
+    }
+  ];
+
+  string workflowDoc = 21 [(gorm.field).tag = {
+    type: "jsonb"
+    default: "{}"
+  }];
+  uint64 companyID = 22 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 holdingID = 23 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+  google.protobuf.Timestamp createdAt = 101;
+  google.protobuf.Timestamp updatedAt = 102;
+  google.protobuf.Timestamp deletedAt = 103;
+  google.protobuf.Timestamp approvedAt = 104;
+  google.protobuf.Timestamp rejectedAt = 105;
+}
+
+message AnnouncementTask {
+  option (gorm.opts) = {
+    ormable: true
+    table: "announcement_tasks"
+  };
+  uint64 TaskID = 1 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      primary_key: true
+      not_null: true
+    }
+  ];
+  string type = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {not_null: true}
+  ];
+  string data = 3 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {not_null: true}
+  ];
+
+  Task task = 51 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).belongs_to = {foreignkey: "task_id"}
+  ];
+
+  google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message AccountTask {
+  option (gorm.opts) = {
+    ormable: true
+    table: "account_tasks"
+  };
+  uint64 TaskID = 1 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      primary_key: true
+      not_null: true
+    }
+  ];
+  string type = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {not_null: true}
+  ];
+  string data = 3 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {not_null: true}
+  ];
+
+  Task task = 51 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).belongs_to = {foreignkey: "task_id"}
+  ];
+
+  google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+  google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message TaskMassTransfer {
+  option (gorm.opts) = {
+    ormable: true
+    table: "task_mass_transfers"
+  };
+  uint64 massTransferID = 1;
+  uint64 TaskID = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+    (gorm.field).tag = {
+      primary_key: true
+      not_null: true
+    }
+  ];
+  string type = 3 [(gorm.field).tag = {not_null: true}];
+
+  statuses status = 4 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+
+  steps step = 5 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+
+  uint64 createdByID = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+    (gorm.field).tag = {not_null: true}
+  ];
+  uint64 lastApprovedByID = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 lastRejectedByID = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+  string data = 9 [(gorm.field).tag = {type: "jsonb"}];
+
+  string comment = 10 [(gorm.field).tag = {type: "text"}];
+
+  uint64 featureID = 11;
+  uint64 parentID = 12;
+
+  // repeated Task childs = 13  [(gorm.field).has_many = {
+  //     foreignkey: "ParentID"
+  //     append: true
+  //     preload: false
+  // }];
+
+  bool isParentActive = 14 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {default: "false"}
+  ];
+
+  string reasons = 15 [(gorm.field).tag = {type: "varchar(255)"}];
+  string lastApprovedByName = 16 [(google.api.field_behavior) = OPTIONAL];
+  string lastRejectedByName = 17 [(google.api.field_behavior) = OPTIONAL];
+
+  uint64 updatedByID = 18 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  string updatedByName = 19 [(google.api.field_behavior) = OPTIONAL];
+  string createdByName = 20 [(google.api.field_behavior) = OPTIONAL];
+
+  string dataBak = 21 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {type: "jsonb"}
+  ];
+  string childBak = 22 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      type: "jsonb"
+      default: "[]"
+    }
+  ];
+
+  string workflowDoc = 23 [(gorm.field).tag = {
+    type: "jsonb"
+    default: "{}"
+  }];
+  uint64 companyID = 24 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 holdingID = 25 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+  google.protobuf.Timestamp createdAt = 101;
+  google.protobuf.Timestamp updatedAt = 102;
+  google.protobuf.Timestamp deletedAt = 103;
+  google.protobuf.Timestamp approvedAt = 104;
+  google.protobuf.Timestamp rejectedAt = 105;
+}
+
+message MenuTask {
+  option (gorm.opts) = {
+    ormable: true
+    table: "menu_tasks"
+  };
+  uint64 TaskID = 1 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      primary_key: true
+      not_null: true
+    }
+  ];
+  string type = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (gorm.field).tag = {not_null: true}
+  ];
+
+  statuses status = 3 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+
+  steps step = 4 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+
+  uint64 createdByID = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+    (gorm.field).tag = {not_null: true}
+  ];
+  uint64 lastApprovedByID = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 lastRejectedByID = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+  string data = 8 [(gorm.field).tag = {type: "jsonb"}];
+
+  string comment = 9 [(gorm.field).tag = {type: "text"}];
+
+  uint64 featureID = 10;
+
+  repeated MenuTask childs = 11 [(gorm.field).has_many = {
+    foreignkey: "ParentID"
+    append: true
+    preload: false
+  }];
+
+  bool isParentActive = 12 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {default: "false"}
+  ];
+
+  string reasons = 13 [(gorm.field).tag = {type: "varchar(255)"}];
+  string lastApprovedByName = 14 [(google.api.field_behavior) = OPTIONAL];
+  string lastRejectedByName = 15 [(google.api.field_behavior) = OPTIONAL];
+
+  uint64 updatedByID = 16 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  string updatedByName = 17 [(google.api.field_behavior) = OPTIONAL];
+  string createdByName = 18 [(google.api.field_behavior) = OPTIONAL];
+
+  string dataBak = 19 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {type: "jsonb"}
+  ];
+  string childBak = 20 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      type: "jsonb"
+      default: "[]"
+    }
+  ];
+
+  string workflowDoc = 21 [(gorm.field).tag = {
+    type: "jsonb"
+    default: "{}"
+  }];
+  uint64 companyID = 22 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 holdingID = 23 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+  google.protobuf.Timestamp createdAt = 101;
+  google.protobuf.Timestamp updatedAt = 102;
+  google.protobuf.Timestamp deletedAt = 103;
+  google.protobuf.Timestamp approvedAt = 104;
+  google.protobuf.Timestamp rejectedAt = 105;
+}
+
+// global cash management
+message UklnTransferTask {
+  option (gorm.opts) = {
+    ormable: true
+    table: "ukln_transfer_tasks"
+  };
+  uint64 TaskID = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+    (gorm.field).tag = {
+      primary_key: true
+      not_null: true
+    }
+  ];
+  string type = 2 [(gorm.field).tag = {not_null: true}];
+  statuses status = 3 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+  steps step = 4 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+  uint64 createdByID = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER},
+    (gorm.field).tag = {not_null: true}
+  ];
+  uint64 lastApprovedByID = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 lastRejectedByID = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  string data = 8 [(gorm.field).tag = {type: "jsonb"}];
+  string comment = 9 [(gorm.field).tag = {type: "text"}];
+  string reasons = 10 [(gorm.field).tag = {type: "varchar(255)"}];
+  string lastApprovedByName = 11 [(google.api.field_behavior) = OPTIONAL];
+  string lastRejectedByName = 12 [(google.api.field_behavior) = OPTIONAL];
+  uint64 updatedByID = 13 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  string updatedByName = 14 [(google.api.field_behavior) = OPTIONAL];
+  string createdByName = 15 [(google.api.field_behavior) = OPTIONAL];
+  string dataBak = 16 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {type: "jsonb"}
+  ];
+  string childBak = 17 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {
+      type: "jsonb"
+      default: "[]"
+    }
+  ];
+  repeated UklnTransferTask childs = 18 [(gorm.field).has_many = {
+    foreignkey: "ParentID"
+    append: true
+    preload: false
+  }];
+  uint64 featureID = 19;
+  bool isParentActive = 20 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {default: "false"}
+  ];
+
+  string workflowDoc = 21 [(gorm.field).tag = {
+    type: "jsonb"
+    default: "{}"
+  }];
+  uint64 companyID = 22 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+  uint64 holdingID = 23 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+
+  google.protobuf.Timestamp createdAt = 101;
+  google.protobuf.Timestamp updatedAt = 102;
+  google.protobuf.Timestamp deletedAt = 103;
+  google.protobuf.Timestamp approvedAt = 104;
+  google.protobuf.Timestamp rejectedAt = 105;
+}
+
+message DistinctResult {
+  string result = 1;
+}
+
+message MultipaymentView {
+  option (gorm.opts) = {
+    ormable: true
+    table: "view_task_multipayments"
+  };
+  uint64 task_id = 1 [(gorm.field).tag = {
+    primary_key: true
+    not_null: true
+  }];
+  statuses status = 2 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+  steps step = 3 [(gorm.field).tag = {
+    default: "1"
+    not_null: true
+  }];
+  uint64 created_by_id = 4 [(gorm.field).tag = {not_null: true}];
+  uint64 last_approved_by_id = 5;
+  uint64 last_rejected_by_id = 6;
+  string data = 7 [(gorm.field).tag = {type: "jsonb"}];
+  string comment = 8 [(gorm.field).tag = {type: "text"}];
+  string reasons = 9 [(gorm.field).tag = {type: "varchar(255)"}];
+  string last_approved_by_name = 10 [(google.api.field_behavior) = OPTIONAL];
+  string last_rejected_by_name = 11 [(google.api.field_behavior) = OPTIONAL];
+  uint64 updated_by_id = 12;
+  string updated_by_name = 13 [(google.api.field_behavior) = OPTIONAL];
+  string created_by_name = 14 [(google.api.field_behavior) = OPTIONAL];
+  string data_bak = 15 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (gorm.field).tag = {type: "jsonb"}
+  ];
+  string workflow_doc = 16 [(gorm.field).tag = {
+    type: "jsonb"
+    default: "{}"
+  }];
+  uint64 company_id = 17;
+  uint64 holding_id = 18;
+
+  google.protobuf.Timestamp created_at = 19;
+  google.protobuf.Timestamp updated_at = 20;
+  google.protobuf.Timestamp deleted_at = 21;
+
+  string transaction_id = 22 [(gorm.field).tag = {
+    default: "-"
+    not_null: true
+  }];
+  string billing_id = 23 [(gorm.field).tag = {
+    default: "-"
+    not_null: true
+  }];
+  string type = 24 [(gorm.field).tag = {
+    default: "-"
+    not_null: true
+  }];
+  string debit_account = 25 [(gorm.field).tag = {
+    default: "-"
+    not_null: true
+  }];
+  string amount = 26 [(gorm.field).tag = {
+    default: "-"
+    not_null: true
+  }];
+  string schedule_type = 27 [(gorm.field).tag = {
+    default: "-"
+    not_null: true
+  }];
+  string fee = 28 [(gorm.field).tag = {
+    default: "-"
+    not_null: true
+  }];
+  string status_word = 29 [(gorm.field).tag = {
+    default: "-"
+    not_null: true
+  }];
+  string current_schedule = 30 [(gorm.field).tag = {
+    default: "-"
+    not_null: false
+  }];
+}

@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+// import "mwitkow/go-proto-validators/validator.proto";
+
+package deposito.service.v1;
+option go_package = "./pb";
+
+
+message Deposito {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "deposito",
+    };
+    uint64 depositoID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+
+    uint64 companyID = 2 [(gorm.field).tag = {}];
+    string accNo_Deposito = 3 [(gorm.field).tag = {type: 'varchar(100)'}];
+
+    uint64 accTDID = 7 [(gorm.field).tag = {}];
+    uint64 accInterestID = 8 [(gorm.field).tag = {}];
+    uint64 accPrincipalID = 9 [(gorm.field).tag = {}];
+    string depositoName = 10 [(gorm.field).tag = {type: 'varchar(100)'}];
+    string depositType = 11 [(gorm.field).tag = {type: 'varchar(100)'}];
+    string tenor = 12 [(gorm.field).tag = {type: 'varchar(100)'}];
+    string amount = 13 [(gorm.field).tag = {type: 'varchar(100)'}];
+    string interestRate = 14 [(gorm.field).tag = {type: 'varchar(100)'}];
+    string currency = 15 [(gorm.field).tag = {type: 'varchar(100)'}];
+  
+  
+    google.protobuf.Timestamp withdrawAt = 16 [(gorm.field).tag = {}];
+    google.protobuf.Timestamp openDate = 18 [(gorm.field).tag = {}];
+    google.protobuf.Timestamp lastRenewalDate = 19 [(gorm.field).tag = {}];
+    string status = 20 [(gorm.field).tag = {}];
+    // bool is_withdraw = 18 [(gorm.field).tag = {}];
+   
+    uint64 createdById = 25 [(gorm.field).tag = {}];
+    uint64 updatedById = 26 [(gorm.field).tag = {}];
+    string code = 27 [(gorm.field).tag = {type: 'varchar(100)'}];
+    string voucher = 28 [(gorm.field).tag = {type: 'varchar(100)'}];
+    uint64 taskId = 29 [(gorm.field).tag = {not_null: true, default: '0'}];
+    uint64 transaction_svc_id = 96 [(gorm.field).tag = {not_null: true, default: '0'}];
+
+    
+    google.protobuf.Timestamp withdrawDate = 80 [(gorm.field).tag = {}];
+
+    google.protobuf.Timestamp createdAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: false}];
+    google.protobuf.Timestamp updatedAt = 103 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: false}];
+}
+
+message Deposito_Product {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "deposito_product",
+    };
+    uint64 depositoProductID = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {primary_key: true not_null: true}];
+    string tenor = 2 [(gorm.field).tag = {type: 'varchar(50)'}];
+    string currency = 3 [(gorm.field).tag = {type: 'varchar(50)'}];
+    string productCode = 4 [(gorm.field).tag = {type: 'varchar(50)'}];
+    google.protobuf.Timestamp createdAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: false}];
+    google.protobuf.Timestamp updatedAt = 103 [(google.api.field_behavior) = OUTPUT_ONLY, (gorm.field).tag = {not_null: false}];
+}
+
+
+message Deposito_Account {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "deposito_accounts",
+    };
+    string deposito_account = 1 [(gorm.field).tag = {type: 'varchar(100)'}];
+    string cif = 2 [(gorm.field).tag = {}];
+    uint64 company_id = 3 ;
+    string company_code = 4 [(gorm.field).tag = {type: 'varchar(150)'}];
+    string company_name = 5 [(gorm.field).tag = {type: 'varchar(100)'}];
+    string deposito_account_name = 6 [(gorm.field).tag = {type: 'varchar(150)'}];
+    string currency = 7 [(gorm.field).tag = {}];
+    google.protobuf.Timestamp placement_date = 8 [(gorm.field).tag = {}];
+    google.protobuf.Timestamp due_date = 9 [(gorm.field).tag = {}];
+    google.protobuf.Timestamp last_update = 10 [(gorm.field).tag = {}];
+    string status = 11 [(gorm.field).tag = {}];
+    string deposito_id = 12 [(gorm.field).tag = {type: 'varchar(255)'}];
+}
+
+message Deposito_Role {
+    option (gorm.opts) = {
+        ormable:true,
+        table: "deposito_roles",
+    };
+    string deposito_id = 1 [(gorm.field).tag = {type: 'varchar'}];
+    string deposito_account = 2 [(gorm.field).tag = {type: 'varchar(100)'}];
+    string company_id = 3 [(gorm.field).tag = {type: 'varchar(150)'}];
+    google.protobuf.Timestamp created_at = 4 [(gorm.field).tag = {}];
+    uint64 created_by_id = 5 [(gorm.field).tag = {}];
+    uint64 role_id = 6 [(gorm.field).tag = {}];
+    google.protobuf.Timestamp updated_at = 7 [(gorm.field).tag = {}];
+    uint64 updated_by_id = 8 [(gorm.field).tag = {}];
+}

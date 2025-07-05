@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+import "google/api/field_behavior.proto";
+// import "google/protobuf/struct.proto";
+// import "google/protobuf/any.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "task-service/task.gorm_db.proto";
+import "task-service/task.payload.proto";
+
+package task.service.v1;
+option go_package = "./pb";
+
+// import "mwitkow/go-proto-validators/validator.proto";
+
+message SaveTaskRequestEV {
+    string taskID = 1;
+    TaskEV task = 3 [(google.api.field_behavior) = OPTIONAL];
+    bool isDraft = 2;
+    double transactionAmount = 4;
+}
+
+message SaveTaskResponseEV {
+    bool success = 1;
+    TaskEV data = 2;
+}
+
+message SetTaskRequestEV {
+
+    string taskID = 1;
+    string action = 2 [
+               (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                 description: "Action: 'approve', 'rework', 'reject'"
+               }];
+    string comment = 3;
+    string reasons = 4;
+
+}
+
+message SetTaskResponseEV {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskEV data = 5;
+}
+
+message ListTaskRequestEV {
+    TaskEV task = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+
+    Direction dir = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order direction",
+	}];
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string in = 8;
+    string filterOr = 9;
+
+}
+
+message ListTaskResponseEV {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TaskEV data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message AssignaTypeIDRequestEV {
+    string taskID = 1;   
+    uint64 featureID = 2;
+    string type = 3;
+}
+
+message GetTaskByTypeIDReqEV {
+    string type = 1;
+    string ID = 2;
+}
+
+message GetTaskByTypeIDResEV {
+    bool found = 1;
+    TaskEV data = 2;
+}
+
+message DataOnProcessTaskMassTransfer{
+    string is_approved_by_parent = 1;
+    uint64 mass_transfer_id = 2;
+    uint64 company_id = 3;
+    uint64 task_ids = 4;
+    string is_process_done = 5;
+}
+
+message SetTaskWithWorkflowRequestEncrypted {
+  string rcode = 1;
+  repeated string taskID = 2;
+  string action = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Action: 'approve', 'rework', 'reject'"
+    }
+  ];
+  string comment = 4;
+  string reasons = 5;
+  string passCode = 6;
+  string productID = 7;
+}
+

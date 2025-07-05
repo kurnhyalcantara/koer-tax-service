@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package forecasting_mt.service.v1;
+option go_package = "./pb";
+
+// import "mwitkow/go-proto-validators/validator.proto";
+// import "google/protobuf/timestamp.proto";
+// import "google/api/field_behavior.proto";
+// import "protoc-gen-openapiv2/options/annotations.proto";
+
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4;   
+
+}
+
+enum Direction {
+    DESC = 0;
+    ASC = 1;
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message Empty {}
+
+message InvalidKeyError {
+    string key = 1;
+    string message = 2;
+}
+
+message InquiryAccountStatementRequest {
+    string accountNo = 1;
+    string startDate = 2;
+    string endDate = 3;
+    string fileType = 4;
+}
+
+message InquiryAccountStatementResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        string requestCode = 1;
+        string fileName = 2;
+        string status = 3;
+        string description = 4;
+    }
+
+    Response data = 4;
+}
+
+message CheckAccountStatementRequest {
+    string requestCode = 1;
+}
+
+
+message FindFileRequest {
+    uint64 id = 1;
+}
+
+message FindFileSingleResponse {
+    string fileName = 1;
+    bool status = 2;
+}
+
+message FindFileResponse {
+    repeated FindFileSingleResponse data = 1;
+}
+
+
+message ByteResponse {
+    bytes data = 1;
+}
+
+
+
+// message FileControllerRequest {
+//     FileUploads fileUpload = 1;
+//     Channel channel = 2;
+//   }

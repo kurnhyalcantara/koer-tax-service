@@ -1,0 +1,45 @@
+syntax = "proto3";;
+
+package do_pertamina.service.v1;
+option go_package = "./pb";
+
+enum Status{
+    UNKNOWN_STATUS = 0;
+    DRAFT = 1;
+    ON_CHECKER = 2;
+    ON_SIGNER = 3;
+    ON_RELEASER = 4;
+    RETURNED = 5;
+    REJECTED = 6;
+    DELETED = 7;
+    SUSPEND = 8;
+    PROCESS = 9;
+    SUCCESS = 10;
+    FAILED = 11;
+    WAITING = 12;
+};
+
+enum ModuleTypes {
+    UNKNOWN_MODULE = 0;
+    CASH_CARRY = 1;
+    QUOTATION = 2;
+    PRODUCT_ALLOCATION = 3;
+}
+
+enum AliasType {
+    UNKNOWN_ALIAS_TYPE = 0;
+    ALIAS_SHIP_TO = 1;
+    ALIAS_SOLD_TO = 2;
+}
+
+enum Direction {
+    DESC = 0;
+    ASC = 1;
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int32 total_rows = 3;
+    int32 total_pages = 4;
+}

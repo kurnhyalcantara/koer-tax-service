@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package df_pupuk_indonesia_report_push.service.v1;
+option go_package = "./pb";
+
+import "df-pupuk-indonesia-report-push-service/df_pupuk_indonesia_report_push_core.proto";
+
+message ErrorBodyResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message ReportPushRequest {
+  string app_key = 1;
+  uint64 task_id = 2;
+  Status status = 3;
+  string description_message = 4;
+  string process_id = 5;
+}
+
+message ReportPushResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  string message = 1;
+}
+
+message UpdateTaskRequest {
+  uint64 task_id = 1;
+  Status status = 2;
+  string description_message = 3;
+}
+
+message TaskDataDFPupukIndonesia {
+  uint64 order_id = 1;
+  string transaction_id = 2;
+  Status status = 3;
+  string df_invoice_number = 4;
+  string debit_account = 5;
+  string debit_account_name = 6;
+  string debit_account_type = 7;
+  uint64 company_id = 8;
+  string company_name = 9;
+  string description_message = 10;
+  double fee = 11;
+  double amount = 12;
+  double total_amount =  13;
+  string due_date = 14;
+}
+
+/* #region email payload */
+message NotificationData {
+  string creation_date = 1 [json_name='CREATION_DATE'];
+  string transaction_id = 2 [json_name='TRANSACTION_ID'];
+  string df_invoice_number = 3 [json_name='INVOICE_NUMBER'];
+  string company_name = 4 [json_name='COMPANY_NAME'];
+  string debit_account_number = 5 [json_name='DEBIT_ACCOUNT_NUMBER'];
+  string debit_account_name = 6 [json_name='DEBIT_ACCOUNT_NAME'];
+  string total_amount = 7 [json_name='TOTAL_AMOUNT'];
+  string transaction_status = 8 [json_name='TRANSACTION_STATUS'];
+  string user_maker = 9 [json_name='USER_MAKER'];
+  string user_checker = 10 [json_name='USER_CHECKER'];
+  string user_signer = 11 [json_name='USER_SIGNER'];
+  string user_releaser = 12 [json_name='USER_RELEASER'];
+  string reason = 13 [json_name='REASON'];
+  string description_rework = 14 [json_name='DESCRIPTION_REWORK'];
+  string rework_from = 15 [json_name='REWORK_FROM'];
+  string description_reject = 16 [json_name='DESCRIPTION_REJECT'];
+  string reject_from = 17 [json_name='REJECT_FROM'];
+}
+/* #endregion email payload */

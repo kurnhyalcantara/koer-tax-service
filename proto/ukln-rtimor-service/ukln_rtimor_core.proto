@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package ukln_other_bank_rtimor.service.v1;
+option go_package = "./pb";
+
+// import "google/protobuf/timestamp.proto";
+
+message Empty {}
+
+message ErrorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+enum Direction {
+    DESC = 0;
+    ASC = 1;
+}
+
+message PaginationRequest {
+    int32 limit = 1;
+    int32 page = 2;
+    string search = 3;
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 total_rows = 3;   
+    int32 total_pages = 4;   
+}
+
+
+enum Status{
+    UNKNOWN_STATUS = 0;
+    DRAFT = 1;
+    ON_CHECKER = 2;
+    ON_SIGNER = 3;
+    ON_RELEASER = 4;
+    PAID = 5;
+    UNPAID = 6;
+    RETUR = 7;
+    WAITING_SCHEDULE = 8;
+    REJECTED = 9;
+    WAITING_PROCESS = 10;
+    SENT_TO_SWIFT = 11;
+    INVALID_FILE_FORMAT = 12;
+    REGISTERED = 13;
+    FILE_REJECTED = 14;
+    PENDING_ACTION = 15;
+    PROCESSED = 16;
+    FILE_COMPLETED = 17;
+}

@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package span_file_processor.service.v1;
+
+import "span-file-processor-service/span_file_processor_core.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pb";
+
+message SpanItem {
+    uint64 span_item_id = 1;
+    uint64 task_id = 2;
+    string document_date = 3;
+    string document_number = 4;
+    string beneficiary_name = 5;
+    string beneficiary_bank_code = 6;
+    string beneficiary_bank = 7;
+    string beneficiary_account = 8;
+    double amount = 9;
+    string currency_target = 10;
+    string description = 11;
+    string agent_bank_code  = 12;
+    string agent_bank_account_number = 13;
+    string agent_bank_account_name = 14;
+    string email_address = 15;
+    string swift_code = 16;
+    string iban_code = 17;
+    string payment_method = 18;
+    string sp2d_count = 19;
+    StatusSpanItem status_validation = 20;
+    StatusSpanItem status_transaction = 21;
+    string reason_message = 22;
+    string currency = 23;
+    string transaction_type = 24;
+    string supplier_name = 25;
+    string satker_code = 26;
+    string address = 27;
+    google.protobuf.Timestamp created_at = 50;
+    google.protobuf.Timestamp updated_at = 51;
+}

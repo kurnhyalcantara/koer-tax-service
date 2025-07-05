@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+package do_semen_indonesia_transmitter.service.v1;
+
+import "do-semen-indonesia-transmitter-service/do_semen_indonesia_transmitter_core.proto";
+
+option go_package = "./pb";
+
+message ErrorBodyResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+};
+
+message PaymentRequest {
+  string app_key = 1;
+  uint64 task_id = 2;
+  string process_id = 3;
+};
+
+message PaymentResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+};
+
+message SendReportPushRequest {
+  uint64 task_id = 2;
+  Status status = 3;
+  string response_message = 4;
+}
+
+/* #start region esb */
+message EsbInquiryResponse {
+  EsbInquiryResponses response = 1;
+}
+
+message EsbInquiryResponses {
+  string error_code = 1 [json_name = "errorCode"];
+  string response_message = 2 [json_name = "responseMessage"];
+  string response_code = 3 [json_name = "responseCode"];
+  EsbInquiryResponsesData data = 4 [json_name = "data"];
+}
+
+message EsbInquiryResponsesData {
+  string inquiry_id = 1 [json_name = "inquiryId"];
+  string biller_code = 3 [json_name = "billerCode"];
+  string cust_number = 4 [json_name = "custNumber"];
+  string credit_account = 5 [json_name = "creditAccount"];
+  string cust_name = 6 [json_name = "custName"];
+  string amount = 7;
+  string fee = 8;
+  string product_code = 9 [json_name = "productCode"];
+  string product_name = 10 [json_name = "productName"];
+  EsbInquiryResponsesBillData bill_data = 11 [json_name = "billData"];
+  string curr = 12;
+  string reff = 13;
+}
+
+message EsbInquiryResponsesBillData {
+  string bill_info1 = 1 [json_name = "billInfo1"];
+  string bill_info2 = 2 [json_name = "billInfo2"];
+  string bill_info3 = 3 [json_name = "billInfo3"];
+  string bill_info4 = 4 [json_name = "billInfo4"];
+  string bill_info5 = 5 [json_name = "billInfo5"];
+  string bill_code = 6 [json_name = "billCode"];
+  string bill_name = 7 [json_name = "billName"];
+  string bill_short_name = 8 [json_name = "billShortName"];
+  string reference1 = 9 [json_name = "reference1"];
+  string reference2 = 10 [json_name = "reference2"];
+  string reference3 = 11 [json_name = "reference3"];
+  string curr_code = 12 [json_name = "currCode"];
+  string inqdate = 13 [json_name = "inqdate"];
+  string media = 14;
+  string errdesc = 15;
+  string paydate = 16;
+}
+
+message EsbPaymentRequest {
+  EsbPaymentRequestData request = 1;
+};
+
+message EsbPaymentRequestData {
+  string external_id = 1 [json_name="externalId"];
+  string inquiry_id = 2 [json_name="inquiryId"];
+  string request_time = 3 [json_name="requestTime"];
+  string channel_id = 4 [json_name="channelId"];
+  string card_number = 5 [json_name="cardNumber"];
+  string account_number = 6 [json_name="accountNumber"];
+  string credit_account = 7 [json_name="creditAccount"];
+  string cust_number = 8 [json_name="custNumber"];
+  string product_code = 9 [json_name="productCode"];
+  string amount = 10 [json_name="amount"];
+  string fee_override = 11 [json_name="feeOverride"];
+  string fee_amount = 12 [json_name="feeAmount"];
+  string fee_account = 13 [json_name="feeAccount"];
+  string remark2 = 14 [json_name="remark2"];
+  string remark3 = 15 [json_name="remark3"];
+  string service_id = 16 [json_name="serviceId"];
+  string teller_id = 17 [json_name="tellerId"];
+  string is_passbook = 18 [json_name="isPassbook"];
+  string is_cash = 19 [json_name="isCash"];
+  string source_account_type = 20 [json_name="sourceAccountType"];
+  EsbPaymentRequestBillData bill_data = 21 [json_name="billData"];
+}
+
+message EsbPaymentRequestBillData {
+  string media = 1 [json_name = "media"];
+  string currency = 2 [json_name = "currency"];
+  string charge_type = 3 [json_name = "chargeType"];
+  string message_type = 4 [json_name = "messageType"];
+}
+
+message EsbPaymentResponse {
+  EsbPaymentResponses response = 1;
+}
+
+message EsbPaymentResponses {
+  string response_code = 1 [json_name = "responseCode"];
+  string error_code = 2 [json_name = "errorCode"];
+  string response_message = 3 [json_name = "responseMessage"];
+  EsbPaymentResponsesData data = 4 [json_name = "data"];
+}
+
+message EsbPaymentResponsesData {
+  string journal_sequence = 1 [json_name = "journalSequence"];
+  string tran_code = 2 [json_name = "tranCode"];
+  string need_approval = 3 [json_name = "needApproval"];
+  string biller_code = 4 [json_name = "billerCode"];
+  string fee = 5 [json_name = "fee"];
+}
+/* #end region esb */

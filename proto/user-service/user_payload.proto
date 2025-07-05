@@ -1,0 +1,1137 @@
+syntax = "proto3";
+
+import "user-service/user_gorm_db.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+package user.service.v1;
+option go_package = "./pb";
+
+import "mwitkow/go-proto-validators/validator.proto";
+
+//  GetUserApprovedAndCreates
+message GetUserApprovedAndCreatedResponse{
+    bool error = 1;
+    uint64 code = 2;
+    string message = 3;
+    DataGetUserApprovedAndCreatedResponse data = 4;
+}
+
+message DataGetUserApprovedAndCreatedResponse{
+    repeated Username Created = 1;
+    repeated Username Approved = 2;
+}
+
+message Username {
+    string username = 1;
+}
+
+message LoginRequest {
+    string username = 1 [(validator.field) = {msg_exists : true}];
+    string password = 2 [(validator.field) = {msg_exists : true}];
+}
+
+message LoginResponse {
+    string access_token = 1;
+}
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    google.protobuf.NullValue data = 4;
+}
+
+message Empty {}
+
+message ArrayString {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated string data = 4;
+}
+
+message InvalidKeyError {
+    string key = 1;
+    string message = 2;
+}
+
+message JWTTokenResponse {
+    string token = 1;
+    int64 expiredAt = 2;
+}
+
+message CommonRequest {}
+
+message CommonResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    string errData = 4;
+}
+
+message CreateUserTaskV2RoleCheckErrors {
+    uint64 roleId = 1;
+    string roleName = 2;
+}
+
+message Pagination {
+    int32 page = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 maxPage = 3;
+    int32 totalItem = 4;
+}
+
+message ListUserResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Pagination pagination = 4;
+    repeated User data = 5;
+}
+
+message ListUserReq {
+    User user = 1;
+    bool isActiveOnly = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7;
+    string query = 8;
+    string customOrder = 9;
+    string in = 10;
+}
+
+message ListUserRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated User data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ListUserReqLogin {
+    UserLogin user = 1;
+    bool isActiveOnly = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7;
+    string query = 8;
+    string customOrder = 9;
+    string in = 10;
+}
+
+message ListUserResLogin {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated UserLogin data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message CreateUserRequest {
+    UserTaskData data = 1;
+    uint64 taskID = 2;
+}
+
+message CreateUserResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    User data = 4;
+}
+
+message CreateUserTaskRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		example:"{\"isDraft\":true,\"data\":{\"user\":{\"username\":\"string\",\"idType\":\"KTP\",\"idNumber\":\"string\",\"userTypeID\":0,\"isBlocked\":false,\"authority\":\"string\"},\"roles\":[{\"roleID\":0,\"roleName\":\"string\"}]}}"
+    };
+
+    UserTaskData data = 1;
+    uint64 taskID = 2;
+    bool isDraft = 3;
+    bool isSetStatus = 4;
+}
+
+message UserRoles {
+    uint64 roleID = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {type: INTEGER}];
+    string roleName = 2;
+}
+
+message UserTaskData {
+    User user = 1;
+    repeated UserRoles roles = 2;
+    bool isActiveTask = 3;
+}
+
+message UserTaskResponse {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 featureID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string lastApprovedByName = 8;
+    string lastRejectedByName = 9;
+    string createdByName = 10;
+    string reasons = 11;
+    string comment = 12;
+    string workflowDoc = 13;
+    string dataBak = 14;
+    google.protobuf.Timestamp createdAt = 101 [(google.api.field_behavior) = OUTPUT_ONLY];
+    google.protobuf.Timestamp updatedAt = 102 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+message UserWithTaskResponse {
+    UserTaskData user = 1;
+    UserTaskResponse task = 2;
+}
+
+message ListUserWithTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated UserWithTaskResponse data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message GetUserWithTaskRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    UserWithTaskResponse data = 4;
+}
+
+message PaginationResponse {
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 2;
+    int64 totalRows = 3;
+    int32 totalPages = 4;
+}
+
+message GetTaskByIDReq {
+    string taskID = 1;
+}
+
+message DeleteUserReq {
+    uint64 userID = 1;
+}
+
+message DeleteUserByCompanyIDReq {
+    uint64 companyID = 1;
+}
+
+message DeleteUserRes {
+    bool success = 1;
+}
+
+message ListUserWithTaskRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+    }];
+
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7;
+    string query = 8;
+    string filterOr = 9;
+}
+
+message DownloadListUserWithTaskRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+    }];
+
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    string filter = 7;
+    string query = 8;
+
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 15;
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message BricamsGetAddonsUserReq {
+    uint32 page = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value 1",
+	}];
+    uint32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value 1",
+    }];
+    repeated int64 customerId = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "for search data with specific company",
+    }];
+    repeated uint64 userID = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "for filter userID",
+    }];
+    string filter = 5;
+    Sort sort = 6;
+}
+
+message BricamsGetAddonsUserByUsernameReq {
+    string username = 1;
+}
+
+message BricamsGetAddonsUserByUserIDReq {
+    uint64 userID = 1;
+}
+
+message BricamsGetAddonsUserByUsernameAndCompanyIDReq {
+    string username = 1;
+    string companyID = 2;
+}
+
+message BricamsGetAddonsUserRes {
+    uint32 totalData = 1;
+    string responseCode = 2;
+    string responseMessage = 3;
+    repeated BricamsGetAddonsUserData data = 4;
+}
+message BricamsGetAddonsUserByUsernameRes {
+    string responseCode = 2;
+    string responseMessage = 3;
+    BricamsGetAddonsUserData data = 4;
+}
+
+message UserParams {
+    uint64 userID = 1;
+}
+
+message DetailUserRes {
+    uint64 userID = 1;
+    string username = 2;
+    string user_type = 3;
+    string authority = 4;
+    string status = 5;
+}
+
+message BRICaMSSvcUserRes{
+    string responseCode = 1;
+    string responseMessage = 2;
+    BRICaMSSvcUserData data = 3;
+}
+
+message BRICaMSSvcUserListRes{
+    BRICaMSSvcPagination pagination = 1;
+    string responseCode = 2;
+    string responseMessage = 3;
+    repeated BRICaMSSvcUserData data = 4;
+}
+
+message BRICaMSSvcUserData{
+    uint64 idUser = 1;
+    string username = 2;
+    uint64 idCompany = 3;
+    string phoneNumber = 4;
+    string email = 5;
+    string fullName = 6;
+    string firstName = 7;
+    string middleName = 8;
+    string lastName = 9;
+    string idToken = 10;
+    string createdDate = 11;
+    bool isCompanyNeedToken = 12;
+    string authority = 13;
+}
+
+message BRICaMSSvcPagination{
+    int32 page = 1;
+    int32 limit = 2;
+    int64 totalRow = 3;
+    int32 totalPage = 4;
+}
+
+message BricamsGetAddonsUserData {
+    int64 id = 2;
+    string authorizationBusinessDate = 3;
+    string createdByUri = 4;
+    string creationTimeStamp = 5;
+    string lastUpdatedByUri = 6;
+    string lastUpdatedTimeStamp = 7;
+    int32 persistenceStatus = 8;
+    int64 snapshotRecord = 9;
+    string systemModifiableOnly = 10;
+    string uuid = 11;
+    string makeBusinessDate = 12;
+    int64 tenantId = 13;
+    int32 activeFlag = 14;
+    int32 approvalStatus = 15;
+    string reviewedByUri = 16;
+    string reviewedTimeStamp = 17;
+    string accessToAllBranches = 18;
+    string accessToAllProducts = 19;
+    int32 daysToBlock = 64;
+    int32 forcePasswordResetOnLogin = 20;
+    string hashKey = 21;
+    int32 isBusinessPartner = 22;
+    int32 isRelationshipOfficer = 23;
+    int32 isSuperAdmin  = 24;
+    int32 isSupervisor = 25;
+    string lastLockedDate = 26;
+    string lastPasswordResetDate = 27;
+    string mailId = 28;
+    int32 numberOfFailedLoginAtt = 29;
+    int32 numbOfFailedPassResetAtt = 30;
+    string assignedTo = 31;
+    string delegatedToUserId = 32;
+    string fromDate = 33;
+    int32 outOfOffice = 34;
+    string toDate = 35;
+    string password = 36;
+    string passwordExpirationDate = 37;
+    string passwordExpiresInDays = 38;
+    string passwordHintAnswer = 39;
+    string passwordHintQuestion = 40;
+    string sourceSystem = 41;
+    int32 teamLead = 42;
+    int32 userStatus = 43;
+    string username = 44;
+    string persistentFormData = 45;
+    string deviationLevel = 46;
+    string employee = 47;
+    int32 passwordResetToken = 48;
+    string sanctionedLimit = 49;
+    string sysName = 50;
+    string userMobileInfo = 56;
+    int32 isLoginEnabled = 57;
+    string offlineFlag = 58;
+    string licenseAccepted = 59;
+    string slmtCLBaseCurrCode = 60;
+    string slmtCLBaseValue = 61;
+    string slmtCLNonBaseValue = 62;
+    string slmtCLNonBaseCurrCode = 63;
+}
+
+message GetUserIDRequest {
+    uint64 userID = 1;
+}
+
+message UpdateUsersBlockedResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    bool isSuccess = 4;
+}
+
+message GetUserIDArrayRequest {
+    repeated uint64 userID = 3;
+}
+
+message GetUserIDArrayResponse {
+    bool error = 1;
+    uint32 code = 2;
+    repeated User data = 5;
+}
+
+message UpdateUsersTokenFCMRequest {
+    uint64 userID = 1;
+    string tokenFCM = 2;
+}
+
+message UpdateUsersTokenFCMResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message GetUserByCompanyIDAndAuthorityRequest {
+    uint64 companyID = 1;
+    string authority = 2;
+}
+
+message GetUserByCompanyIDAndAuthorityResponse {
+    repeated User data = 1;
+}
+
+message ValidateUserByNIKRequest {
+    string accountNikNumber = 1;
+}
+
+message ValidateUserByNIKResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        string nik = 1;
+        string cif = 2;
+        string branch = 3;
+        string customerName = 4;
+        string phoneNumber = 5;
+        string email = 6;
+        string address1 = 7;
+        string address2 = 8;
+        string address3 = 9;
+        string address4 = 10;
+        string zipCode = 11;
+        string rtNo = 12;
+        string rwNo = 13;
+        string placeOfBirth = 14;
+        string dateOfBirth = 15;
+        string sex = 16;
+        string citizenship = 17;
+        string idType = 18;
+        string idNumber = 19;
+        string religion = 20;
+        string martialStatus = 21;
+        string motherName = 22;
+        string npwp = 23;
+        string accountOpeningPurpose = 24;
+        string typeOfWork = 25;
+        string educationCode = 26;
+        string educationDesc = 27;
+        string correspondenceAddress = 28;
+        string city = 29;
+        string district = 30;
+        string subDistrict = 31;
+        string officeAddress = 32;
+        string officeCity = 33;
+        string officeDistrict = 34;
+        string officeSubDistrict = 35;
+        string officeName = 36;
+        string officePhoneNumber = 37;
+        string officeZipCode = 38;
+        string income = 39;
+        string province = 40;
+        string primarySourceOfFunds = 41;
+        string primarySourceOfFundsDesc = 42;
+        string occupation = 43;
+        string occupationDesc = 44;
+        string dailyTransaction = 45;
+        string position = 46;
+        string positionDesc = 47;
+        string creditCardCode = 48;
+        string businessSector = 49;
+    }
+
+    Response data = 4;
+}
+
+message CheckUserNameRes {
+    string responseCode = 1 ;
+    string responseMessage = 2;
+    CheckUserNameResData data = 3;
+}
+
+message CheckUserNameResData{
+    string idToken = 1;
+    bool isCompanyNeedToken = 2;
+}
+
+enum actionTask {
+    NULL_ACTION = 0;
+    approve = 1;
+    rework = 2;
+    reject = 3;
+    delete = 4;
+}
+
+message TaskActionV2Request {
+    uint64 taskID = 1;
+    actionTask action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject', 'delete'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+    string passcode = 5;
+}
+
+message TaskActionV2Response {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+    string errData = 5;
+}
+
+enum StatusUser {
+    NULL_STATUS_USER = 0;
+    Hold = 1;
+    Inactive = 2;
+    Active = 3;
+}
+
+message SetStatusUserReq {
+    uint64 taskID = 1;
+    uint64 userID = 2;
+    StatusUser statusUser = 3;
+    string username = 4;
+}
+
+message SetStatusUserRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message UserCompanyLimitRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        int32 limitCompany = 1;
+        int64 activeUser = 2;
+    }
+
+    Response data = 4;
+}
+
+message UserPasswordResetRequest {
+    uint64 userID = 1;
+}
+
+
+message UserPasswordResetRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        string email = 1;
+    }
+
+    Response data = 4;
+}
+
+message UpdateProfileReq {
+    User data = 1;
+}
+message AuthenticationData {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    message Response {
+        string answerQuestion1 = 1;
+        string answerQuestion2 = 2;
+    }
+    Response data = 4;
+}
+
+message ValidateNIKSecureRequest{
+    string accountNikNumber = 1;
+}
+
+message ValidateNIKSecureResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message ResponseSecure {
+        string motherName = 1;
+        string address1 = 2;
+        string address2 = 3;
+        string address3 = 4;
+        string address4 = 5;
+        string zipCode = 6;
+        string email = 7;
+        string phoneNumber = 8;
+        string npwp = 9;
+    }
+
+    ResponseSecure data = 4;
+}
+
+message GetParticipantEmailRequest {
+    repeated uint64 userIDs = 1;
+}
+
+message GetParticipantEmailResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated string email = 4;
+}
+
+message LastUserIdResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    uint64 userId = 4;
+}
+
+message QLolaGetUserByCompanyCodeRequest {
+    string companyCode = 1;
+}
+
+message QLolaGetUserByCompanyCOdeResponse {
+    string name = 1;
+    uint64 userId = 2;
+    string username = 3;
+    string category = 4;
+    uint64 categoryId =9;
+    int32 identityType = 6;
+    string identityTypeName = 10;
+    string identityId = 7;
+    string email = 8;
+    string tokenId = 11;
+    string updatedAt = 20;
+}
+
+message QlolaGetListUserByCompanyCodeResponse {
+    repeated QLolaGetUserByCompanyCOdeResponse userList = 1;
+}
+
+message QlolaGetUserByUserIdRequest {
+    uint64 userId = 1;
+}
+
+message QlolaGetUserByUserIdResponse {
+    string name = 1;
+    uint64 userId = 2;
+    string username = 3;
+    string category = 4;
+    uint64 categoryId =5;
+    string identityType = 6;
+    string identityId = 7;
+    string email = 8;
+    string address = 9;
+    string region = 10;
+    string tokenId = 11;
+    string updatedAt = 20;
+}
+
+message QlolaUserByIdBrigateResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    QlolaGetUserByUserIdResponse responseData = 3;
+    string responseError = 4;
+}
+
+message QlolaUserCompanyBrigateResponse {
+    string responseCode = 1;
+    string responseMessage = 2;
+    QlolaGetListUserByCompanyCodeResponse responseData = 3;
+    string responseError = 4;
+}
+
+message GetUserByUsernameAndCompanyIDReq {
+    string username = 1;
+    string companyID = 2;
+}
+
+message GetUserByUsernameAndCompanyIDResp {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    UserData data = 4;
+}
+
+message UserData{
+    uint64 idUser = 1;
+    string username = 2;
+    uint64 idCompany = 3;
+    string phoneNumber = 4;
+    string email = 5;
+    string fullName = 6;
+    string firstName = 7;
+    string middleName = 8;
+    string lastName = 9;
+    string idToken = 10;
+    string createdDate = 11;
+    bool isCompanyNeedToken = 12;
+}
+
+message ListUserV3WithTaskRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+//    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+
+    enum Sort {
+        companyID = 0;
+        companyCode = 1;
+        companyName = 2;
+        countryCode = 3;
+        countryName = 4;
+        userID = 5;
+        username = 6;
+        fullName = 7;
+        userTypeID = 8;
+        userTypeName = 9;
+        idType = 10;
+        gender = 11;
+        createdByName = 12;
+        reviewedByName = 13;
+        channel = 14;
+        status = 15;
+        taskStatus = 16;
+        region = 17;
+        createdAt = 18;
+        updatedAt = 19;
+        authority = 20;
+    }
+
+    Sort sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    UserWithCompany filter = 7;
+    string query = 8;
+    string filterOr = 9;
+}
+
+
+message ListUserV3WithTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated UserV3WithTaskResponse data = 4;
+    PaginationResponse pagination = 5;
+}
+
+
+
+
+message UserV3WithTaskResponse {
+    UserV3TaskData user = 1;
+    UserTaskResponse task = 2;
+}
+
+
+
+message UserV3TaskData {
+    UserWithCompany user = 1;
+    repeated UserRoles roles = 2;
+}
+
+// User task data with company
+message ListUserTaskV3WithCompanyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated UserTaskV3WithCompanyResponse data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message UserTaskV3WithCompanyResponse {
+    UserTaskV3WithCompanyData user = 1;
+    UserTaskResponse task = 2;
+}
+
+
+message UserTaskV3CompanyData {
+    UserTaskWithCompany user = 1;
+    repeated UserRoles roles = 2;
+}
+
+message UserTaskV3WithCompanyData {
+    UserWithCompany user = 1;
+    repeated UserRoles roles = 2;
+}
+
+message ListCreatedAndApprovedRequest {
+    string currentTable = 1;
+}
+
+message DownloadListUserV3WithTaskRequest {
+    enum statuses{
+        AllStatus = 0;
+        Pending = 1;
+        Draft = 2;
+        Returned = 3;
+        Approved = 4;
+        Rejected = 5;
+        DeleteRequest = 6;
+        Deleted = 7;
+    }
+
+    enum steps{
+        AllStep = 0;
+        Maker = 1;
+        Checker = 2;
+        Signer = 3;
+        Releaser = 4;
+    }
+
+    //    statuses status = 1;
+    steps step = 2;
+
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+
+    enum Sort {
+        companyID = 0;
+        companyCode = 1;
+        companyName = 2;
+        countryCode = 3;
+        countryName = 4;
+        userID = 5;
+        username = 6;
+        fullName = 7;
+        userTypeID = 8;
+        userTypeName = 9;
+        idType = 10;
+        gender = 11;
+        createdByName = 12;
+        reviewedByName = 13;
+        channel = 14;
+        status = 15;
+        taskStatus = 16;
+        region = 17;
+        createdAt = 18;
+        updatedAt = 19;
+        authority = 20;
+    }
+
+    Sort sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    enum direction {
+        DESC = 0;
+        ASC = 1;
+    }
+
+    direction dir = 6;
+    UserWithCompany filter = 7;
+    string query = 8;
+    string filterOr = 9;
+
+    enum Formats {
+        null = 0;
+        pdf = 1;
+        xls = 2;
+        csv = 3;
+    }
+
+    Formats fileFormat = 15;
+}
+
+message GetUserByUsernameResponse{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    UsersData data = 4;
+}
+
+message UsersData{
+    uint64 idUser = 1;
+    string username = 2;
+    uint64 idCompany = 3;
+    string phoneNumber = 4;
+    string email = 5;
+    string fullName = 6;
+    string firstName = 7;
+    string lastName = 8;
+    string idToken = 9;
+    string createdDate = 10;
+    uint64 createdByID = 11;
+    bool isCompanyNeedToken = 12;
+    string companyName = 13;
+    uint64 userTypeID = 14;
+    string userTypeName = 15;
+    string region = 16;
+}
+
+message GetUserByOnlyUsernameReq {
+    string username = 1;
+    uint64 companyId = 2;
+}
+
+message GetUserByOnlyUsernameRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    GetUserByOnlyUsernameData data = 4;
+}
+
+message GetUserByOnlyUsernameData {
+    uint64 userID = 1;
+    uint64 companyID = 2;
+    string companyName = 3;
+    string username = 4;
+    repeated uint64 roleIDs = 5;
+    string userType = 6;
+    uint64 holdingID = 7;
+    string countryCode = 8;
+}
+
+message DeleteUserByUsersIDReq {
+    uint64 companyID = 1;
+    repeated uint64 userID = 2;
+}
+
+message DeleteUserRolesByUserID {
+    repeated uint64 userID = 1;
+}
+
+message ListUsersNotSetTokenByUserIdsReq {
+    repeated uint64 userID = 1;
+}
+
+message ListUsersNotSetTokenByUserIdsRes {
+    repeated UserNotSetTokenData data = 1;
+}
+
+message UserNotSetTokenData {
+  uint64 userID = 1;
+  string username = 2;
+  string fullName = 3;
+  uint64 taskID = 4;
+}
+
+message ListUsernameByAccountRolesReq {
+    uint64 accountID = 1;
+    repeated uint64 roleID = 2;
+}
+
+message ListUsernameByAccountRolesRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Names data = 4;
+}
+
+message Names {
+    repeated string username = 1;
+}

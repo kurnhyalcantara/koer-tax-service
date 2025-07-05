@@ -1,0 +1,1866 @@
+syntax = "proto3";
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+// import "google/protobuf/any.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "task-service/task.gorm_db.proto";
+import "mwitkow/go-proto-validators/validator.proto";
+
+
+package task.service.v1;
+option go_package = "./pb";
+
+enum Direction {
+    DESC = 0;
+    ASC = 1;
+}
+
+message LoginRequest {
+    string username = 1 [(validator.field) = {msg_exists : true}];
+    string password = 2 [(validator.field) = {msg_exists : true}];
+}
+
+message LoginResponse {
+    string access_token = 1;
+}
+
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message Empty {}
+
+message InvalidKeyError {
+    string key = 1;
+    string message = 2;
+}
+
+message GenerateTaskWithWokflowRequest{
+    uint64 taskID = 1;
+    Task task = 3 [(google.api.field_behavior) = OPTIONAL];
+    bool isDraft = 2;
+    double transactionAmount = 4;
+    string currencyCode = 5;
+}
+
+message GenerateTaskWithWokflowResponse{
+    
+}
+
+message SaveTaskRequest {
+    uint64 taskID = 1;
+    Task task = 3 [(google.api.field_behavior) = OPTIONAL];
+    bool isDraft = 2;
+    double transactionAmount = 4;
+    uint64 companyID = 5;
+    uint64 holdingID = 6;
+    string transactionCurrency = 7;
+    uint64 selectedAccountID = 8;
+    UserNonSession user = 9;
+    string action = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject'"
+        }
+    ];
+}
+
+message SaveTaskResponse {
+    bool success = 1;
+    Task data = 2;
+}
+
+message SaveCompanyTaskRequest{
+    uint64 taskID = 1;
+    CompanyTask companyTask = 3 [(google.api.field_behavior) = OPTIONAL];
+    bool isDraft = 2;
+    double transactionAmount = 4;
+    uint64 companyID = 5;
+    uint64 holdingID = 6;
+    string transactionCurrency = 7;
+    uint64 selectedAccountID = 8;
+}
+
+message SaveCompanyTaskResponse {
+    bool success = 1;
+    CompanyTask data = 2;
+}
+
+message SaveUserTaskRequest{
+    UserTask userTask = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+message SaveUserTaskResponse {
+    bool success = 1;
+    UserTask data = 2;
+}
+
+message SetTaskRequest {
+    uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+    string passcode = 5;
+}
+
+message SetTaskWithWorkflowRequestWithResCache {
+    string rcode = 100;
+    
+    repeated uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+    string passCode = 5;
+    string productID = 6;
+}
+
+message SetTaskWithWorkflowRequest {
+    repeated uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+    string passCode = 5;
+    string productID = 6;
+}
+message SetTaskWithWorkflowResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated SetTaskWithWorkflowResponseData data = 4;
+}
+message SetTaskWithWorkflowResponseData {
+    Task task = 1;
+    bool error = 2;
+    string message = 3;
+    string errData = 4;
+}
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    google.protobuf.NullValue data = 4;
+}
+
+message SetTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 5;
+    string errData = 6;
+}
+
+message ActionRoleApproveValidation {
+    uint64 userId = 1;
+    uint64 taskId = 2;
+    string username = 3;
+    string fullName = 4;
+}
+
+message ListRequest {
+    
+}
+
+message GetActivityLogsReq{
+    string type = 1;
+    uint64 taskID = 2;
+    int32 page = 3;
+    int32 limit = 4;
+	string sort = 5;
+	string search = 6;
+	string dateFrom = 7;
+	string dateTo = 8;
+	ActivityLogFilter filter = 9;
+    string key = 10;
+}
+
+message DownloadActivityLogsReq{
+    enum Formats {
+        null = 0;
+        xls = 2;
+        xlsx = 3;
+        csv = 4;
+        pdf = 5;
+    }
+
+    Formats fileformat = 21;
+    string type = 1;
+    uint64 taskID = 2;
+    int32 page = 3;
+    int32 limit = 4;
+    string sort = 5;
+    string search = 6;
+    string dateFrom = 7;
+    string dateTo = 8;
+    ActivityLogFilter filter = 9;
+    string key = 10;
+}
+
+message ActivityLogFilter{
+    string command = 1;
+    string action = 2;
+    string description = 3;
+    string username = 4;
+    string companyName = 5;
+}
+
+message ActivityLog{
+    string command = 1;
+    string type = 2;
+    string action = 3;
+    string description = 4;
+    string username = 5;
+    string companyName  = 6;
+    Task task = 7;
+    google.protobuf.Timestamp createdAt  = 8;
+    uint64 taskID = 9;
+    string key = 10;
+}
+
+message GetActivityLogsRes{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated ActivityLog data = 4;
+
+    message ActivityLogPagination {
+        int32 limit = 1;
+        int32 page = 2;
+        int32 totalRows = 3;   
+        int32 totalPages = 4;   
+        int32 recordsOnPage = 5;
+    }
+
+    ActivityLogPagination pagination = 5;
+}
+
+message ListTaskRequest {
+    Task task = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    Direction dir = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order direction",
+	}];
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string in = 8;
+    string filterOr = 9;
+    string customOrder = 10;
+    string distinctKey = 11;
+    repeated uint64 roleIDFilter = 12;
+    repeated uint64 accountIDFilter = 13;
+    uint64 userIDFilter = 14;
+    string filterNot = 15;
+    string services = 16;
+    string collectiveIn = 17 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries \n format: [key1:value1,value2|key2:value3,value4] \n example: collectiveIn=name:announcement,notification|task_id:1,2 => WHERE name IN('announcement', 'notification') AND task_id IN (1,2)",
+    }];
+}
+
+message ListTaskNewFilterRequest {
+    Task task = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    Direction dir = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order direction",
+	}];
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value|key:value] \n example: filter=task_id:1|task_id:2|type:Announcement => Where task_id IN (1,2) AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string in = 8;
+    string filterOr = 9;
+    string customOrder = 10;
+    string distinctKey = 11;
+    repeated uint64 roleIDFilter = 12;
+    repeated uint64 accountIDFilter = 13;
+    uint64 userIDFilter = 14;
+    string filterNot = 15;
+    string services = 16;
+    string customKeyStatus = 17;
+}
+
+message UserListTaskRequest {
+    UserTask task = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    Direction dir = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order direction",
+	}];
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string in = 8;
+    string filterOr = 9;
+    string customOrder = 10;
+    string distinctKey = 11;
+    repeated uint64 roleIDFilter = 12;
+    repeated uint64 accountIDFilter = 13;
+    uint64 userIDFilter = 14;
+    string filterNot = 15;
+    string services = 16;
+}
+
+message ListTaskPluckRequest {
+    string pluckKey = 1;
+    Task task = 2;
+    string filter = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string in = 5;
+    string filterOr = 6;
+    string distinctKey = 7;
+}
+
+message ListTaskPluckResponse {
+    repeated string data = 1;
+}
+
+message Pagination {
+    int32 limit = 1;
+    int32 page = 2;
+}
+
+message PaginationResponse {
+    int32 limit = 1;
+    int32 page = 2;
+    int64 totalRows = 3;   
+    int32 totalPages = 4; 
+}
+
+message Sort {
+    string column = 1;
+    string direction = 2;
+}
+
+message Search {
+    string value = 1;
+    string columns = 2;
+}
+
+message StatusSummary {
+    string status = 1;
+    int32 count = 2;
+}
+
+message ListTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Task data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ListTaskNewFilterResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Task data = 4;
+    repeated StatusSummary summary = 5;
+    PaginationResponse pagination = 6;
+}
+
+message UserListTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated UserTask data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message ListTaskWithTokenResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Task data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message GraphStatusRequest {
+    
+    statuses status = 1;
+    string service = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Service: 'Announcement', 'Company', 'Account', 'Notification'"
+        }];
+}
+
+message GraphStatusColumnTypeRequest {
+    statuses status = 1;
+    string service = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Service: 'Announcement', 'Company', 'Account', 'Notification'"
+        }];
+    string column = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Example: 'status' , 'data.statusLevel'"
+    }];
+}
+
+message GraphStatusColumnTypeResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated GraphStatusColumnType data = 4;
+}
+
+message GraphStatusColumnType {
+    string status = 1;
+    string type = 2;
+    uint64 total = 3;
+}
+
+message GraphStatus {
+    statuses status = 1;
+    string type = 2;
+    uint64 total = 3;
+}
+
+message GraphStatusResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated GraphStatus data = 4;
+}
+
+message GraphStepRequest {
+    steps step = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Default all steps"
+    }];
+    statuses status = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Default all status, exclude 'Approve' and 'Reject'"
+    }];
+    string service = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Service: 'Announcement', 'Company', 'Account', 'Notification'"
+        }];
+    bool isIncludeApprove = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "For include data Approve status"
+    }];
+    bool isIncludeReject = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "For include data Reject status"
+    }];
+}
+
+message GraphStep {
+    steps step = 1;
+    string type = 2;
+    uint64 total = 3;
+}
+
+message GraphStepResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated GraphStep data = 4;
+}
+
+message GetMyPendingTaskWithWorkflowGraphRequest {
+    string service = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "Service: 'Announcement', 'Company', 'Account', 'Notification'"
+        }];
+}
+
+message GraphStepWorkflow {
+    string step = 1;
+    string type = 2;
+    statuses status = 3;
+    uint64 total = 4;
+}
+
+message GetMyPendingTaskWithWorkflowGraphResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated GraphStepWorkflow data = 4;
+}
+
+message AssignaTypeIDRequest{
+    uint64 taskID = 1;   
+    uint64 featureID = 2;
+    string type = 3;
+}
+message AssignaTypeIDResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message GetTaskByTypeIDReq {
+    string type = 1;
+    uint64 ID = 2;
+}
+
+message GetTaskByTypeIDRes {
+    bool found = 1;
+    Task data = 2;
+}
+
+message RejectBySystemReq {
+    uint64 taskID = 1;
+    statuses status = 2;
+}
+
+message RejectBySystemRes {
+    bool success = 1;
+    string code = 2;
+}
+
+message GetTaskByIDReq {
+    string type = 1;
+    uint64 ID = 2;
+}
+
+message GetTaskByIDRes {
+    bool found = 1;
+    Task data = 2;
+}
+
+message UpdateTaskDataReq {
+    string type = 1;
+    uint64 taskID = 2;
+    string data = 3;
+}
+
+message UpdateTaskDataRes {
+    bool success = 1;
+}
+
+message UpdateTaskWorkflowReq {
+    string type = 1;
+    uint64 taskID = 2;
+    string workflow = 3;
+}
+
+message UpdateTaskWorkflowRes {
+bool success = 1;
+}
+
+message UpdateTaskRawReq {
+    Task task = 1;
+    string type = 2;
+    string action = 3;
+    bool updateChild = 4;
+}
+
+message DeleteDraftTaskRequest {
+    uint64 taskID = 1;
+}
+
+message DeleteDraftTaskRPCRequest {
+    uint64 taskID = 1;
+    uint64 userID = 2;
+}
+
+message DeleteDraftTaskResponse {
+    bool success = 1;
+}
+
+message TaskSummaryResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    uint64 data = 4;
+}
+
+message TaskSummaryAmountResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    double data = 4;
+}
+
+message DeleteFinishedTaskRequest {
+    string type = 1;
+    uint64 taskID = 2;
+}
+
+message DeleteFinishedTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message Ids {
+    repeated uint64 list = 1;
+    string taskType = 2;
+}
+
+message BidiGetTasksReq {
+    oneof tasksReq {
+        uint32 n = 1; // n number data recive or max lenght array task recive. default value 5, max 100
+        Ids data = 2;
+    }
+}
+
+message BidiGetTasksRes {
+    bool isError = 1;
+    string message = 2;
+    repeated uint64 ids = 3;
+    repeated Task list = 4;
+}
+
+message FindCompanyByCodeReqeust {
+    string companyLoginCode = 1;
+}
+
+// Mass Transfer
+message SetTaskMassTransferWithWorkflowResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated SetTaskMassTransferWithWorkflowResponseData data = 4;
+}
+message SetTaskMassTransferWithWorkflowResponseData {
+    TaskMassTransfer task = 1;
+    bool error = 2;
+    string message = 3;
+}
+
+// special for mass transfer swift tag72
+message Tag72 {
+    string mass_transfer_transaction_id = 1;
+    string beneficiary_text = 2;
+}
+
+message SetTaskMassTransfer {
+    string rcode = 100;
+        
+    repeated uint64 mass_transfer_id = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'reject'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+    string pass_code = 5;
+    repeated uint64 task_ids = 6;
+    bool is_approved_by_parent = 7;
+    repeated Tag72 tag72 = 8;
+}
+
+message SetTaskMassTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated SetTaskMassTransferWithWorkflowResponseData data = 4;
+}
+
+message GetTaskMassTransferReq {
+    TaskMassTransfer task = 1;
+}
+
+message GetTaskMassTransferRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskMassTransfer data = 4;
+}
+
+message CheckTaskMassTransferAuthorizedReq {
+    uint64 mass_transfer_id = 1;
+    repeated uint64 role_ids = 2;
+    uint64 company_id = 3;
+    string allowed_accounts = 4;
+    uint64 user_id = 5;
+}
+
+message CheckTaskMassTransferAuthorizedRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    bool is_authorized = 4;
+    double total_authorize_amount = 5;
+}
+
+// Check Task Mass Transfer Authorized V2
+message CheckTaskMassTransferAuthorizedReqV2 {
+    repeated uint64 mass_transfer_id = 1;
+    repeated uint64 role_ids = 2;
+    uint64 company_id = 3;
+    string allowed_accounts = 4;
+    uint64 user_id = 5;
+}
+
+message CheckTaskMassTransferAuthorizedResV2 {
+    message Data {
+        bool is_authorized = 1;
+        bool has_signer = 2;
+    }
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    
+    map<uint64, Data> is_authorized = 4;
+}
+
+message SaveTaskMassTransferRequest {
+    uint64 taskID = 1;
+    TaskMassTransfer task = 3 [(google.api.field_behavior) = OPTIONAL];
+    bool isDraft = 2;
+    double transactionAmount = 4;
+    uint64 companyID = 5;
+    uint64 holdingID = 6;
+    string transactionCurrency = 7;
+    uint64 selectedAccountID = 8;
+}
+
+message SaveTaskMassTransferResponse {
+    bool success = 1;
+    TaskMassTransfer data = 2;
+}
+
+message ResponsibleUserRes {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+
+    message Response {
+        repeated string createdByName = 1;
+        repeated string updatedByName = 2;
+    }
+
+    Response data = 4;
+}
+
+message ListTaskRequestV2 {
+    Task task = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+
+    Direction dir = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order direction",
+    }];
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string in = 8;
+    string filterOr = 9;
+    string customOrder = 10;
+    string distinctKey = 11;
+    repeated uint64 roleIDFilter = 12;
+    repeated uint64 accountIDFilter = 13;
+    uint64 userIDFilter = 14;
+    string filterNot = 15;
+    string services = 16;
+    bool isFilterUser = 17;
+}
+
+message SetActivityLogRequest {
+    Task task = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject'"
+        }
+    ];
+    string command = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Command: 'Create', 'Update', 'Delete'"
+        }
+    ];
+    string comment = 4;
+    string reasons = 5;
+    string key = 6;
+}
+
+message SetActivityLogRespoonse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+// Create Task Mass Transfer
+message UserMassTransferData {
+    uint64 user_id = 1;
+    string user_name = 2;
+    uint64 company_id = 3;
+    repeated uint64 role_ids = 4;
+    bool stp_status = 5;
+    bool nstp_status = 6;
+    bool is_maker_confirmation = 7;
+}
+
+message Transaction {
+    uint64 transactionalNumber = 1;
+    uint64 massTransferTransactionID = 2;
+    string data = 3;
+}
+message TransactionList {
+    repeated Transaction transactions = 1;
+}
+message ProductData {
+    map<string, TransactionList> currency = 1;
+}
+
+message Data {
+    UserMassTransferData user = 1;
+    map<string, ProductData> product_id = 2;
+    uint64 mass_transfer_id = 3;
+}
+  
+message GenerateTaskMassTransferRequest {
+    Data data = 1;
+}
+
+message TaskStatusData {
+    uint64 task_id = 1;
+    uint64 mass_transfer_transaction_id = 2;
+    uint64 task_status = 3;
+}
+message GenerateTaskMassTransferResponse {
+    repeated TaskStatusData data = 1;
+}
+  
+message GetListRequest {
+    string table = 1;
+    string column = 2;
+    string type = 3;
+    bool isDistinct = 4;
+}
+
+message MenuListTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated MenuTask data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message MenuTaskByID {
+    uint64 taskID = 1;
+} 
+
+
+message MenuTaskByIDResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    MenuTask data = 4;
+  }
+
+// UKLN 
+message UpdateUklnTaskChildBakRequest {
+    uint32 task_id = 1;
+    string child_bak = 2;
+}
+
+message UpdateUklnTaskChildBakResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message GetTaskUklnRequest {
+    uint64 task_id = 1;
+}
+
+message GetTaskUklnResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    UklnTransferTask data = 4;
+}
+
+message GetListTaskUKLNRequest {
+    UklnTransferTask task = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    Direction dir = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order direction",
+	}];
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string in = 8;
+    string filterOr = 9;
+    string customOrder = 10;
+    string distinctKey = 11;
+    repeated uint64 roleIDFilter = 12;
+    repeated uint64 accountIDFilter = 13;
+    uint64 userIDFilter = 14;
+    string filterNot = 15;
+    GetTransactionActionRequest transaction_action_request = 16;
+}
+
+message GetTransactionActionRequest{
+    int32 action_type = 1;    
+    int32 transaction_type = 2;
+    string account_number = 3;
+    string batch_reff_no = 4;
+    string transaction_start_date = 5;
+    string transaction_end_date = 6;
+    repeated int32 statuses_by_action_type = 7;
+}
+
+message GetListTaskUKLNResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated UklnTransferTask data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message DeleteUklnTaskRequest {
+    uint32 task_id = 1;
+}
+
+message DeleteUklnTaskResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message GetListTaskMassTransferRequest {
+    enum Action {
+        UNKNOWN = 0;
+        TRANSACTION_ACTION = 1;
+        TRANSFER_INQUIRY = 2;
+    }
+
+    TaskMassTransfer task = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    Direction dir = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order direction",
+	}];
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string in = 8;
+    string filterOr = 9;
+    string customOrder = 10;
+    string distinctKey = 11;
+    repeated uint64 roleIDFilter = 12;
+    repeated uint64 accountIDFilter = 13;
+    uint64 userIDFilter = 14;
+    string filterNot = 15;
+    MassTransferGeneralRequest mass_transfer_general_request = 16;
+    repeated string services = 17;
+    repeated uint64 taskIds = 18;
+    Action action = 19;
+}
+
+message GetListTaskMassTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TaskMassTransfer data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message MassTransferGeneralRequest {
+    string batch_reff_no = 1;
+    uint64 company_id = 2;
+    bool is_for_download = 3;
+    repeated uint64 statuses = 4;
+    repeated uint64 steps = 5;
+    int64 value_date_to = 6;
+    int64 value_date_from = 7;
+}
+
+message GetOnlyAuthorizedListTaskMassTransferRequest {
+    TaskMassTransfer task = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    
+    Direction dir = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order direction",
+	}];
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string in = 8;
+    string filterOr = 9;
+    string customOrder = 10;
+    string distinctKey = 11;
+    repeated uint64 roleIDFilter = 12;
+    repeated uint64 accountIDFilter = 13;
+    uint64 userIDFilter = 14;
+    string filterNot = 15;
+    repeated string services = 16;
+    repeated uint64 mass_transfer_ids = 17;
+}
+
+message GetOnlyAuthorizedListTaskMassTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated TaskMassTransfer data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message DeleteFinishedTaskMassTransferRequest {
+    string type = 1;
+    repeated uint64 taskID = 2;
+    bool is_maker_confirmation = 3;
+}
+
+message DeleteFinishedTaskMassTransferResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message SaveTaskWithoutSessionRequest {
+    uint64 taskID = 1;
+    Task task = 3 [(google.api.field_behavior) = OPTIONAL];
+    bool isDraft = 2;
+    double transactionAmount = 4;
+    uint64 companyID = 5;
+    uint64 holdingID = 6;
+    string transactionCurrency = 7;
+    uint64 selectedAccountID = 8;
+    UserNonSession user = 9;
+    bool isStp = 10;
+    string key = 11;
+    bool isSkipToApproved = 12;
+}
+
+
+message UserNonSession {
+    uint64 userID = 1;
+    uint64 companyID = 2;
+    string companyName = 3;
+    string userName = 4;
+    repeated uint64 roleIDs = 5;
+    string userType = 6;
+}
+
+
+//=== Start section payload for task v3 (Proxy)====
+
+message QueryBuilder {
+	string Filter = 1;
+	string FilterOr = 2;
+	string CollectiveAnd = 3;
+	string In = 4;
+	string MeFilterIn = 5;
+	string Distinct = 6;
+	string CustomOrder = 7;
+	Sort Sort = 8;
+	string CompanyID = 9;
+	string FilterNot = 10;
+	repeated string ProductIn = 11;
+}
+
+message ProductAccountFilter {
+	string ProductName = 1;
+	repeated uint64 AccountIDs = 2;
+	bool HasAuthorityMaker = 3;
+	bool HasAuthorityChecker = 4;
+	bool HasAuthoritySigner = 5;
+	bool HasAuthorityReleaser = 6;
+}
+
+message ProxyReqeustParameter {
+    Task filter = 1;
+    PaginationResponse pagination = 2;
+    QueryBuilder queryBuilder = 3;
+    uint64 userFilter = 4;
+    repeated uint64 roleFilter = 5;
+    repeated ProductAccountFilter accountFilter = 6;
+}
+
+//=== End section payload for task v3 (Proxy)====
+
+message TaskStatusesCounterData {
+    uint64 all = 1;
+    uint64 draft = 2;
+    uint64 returned = 3;
+    uint64 on_checker = 4;
+    uint64 on_signer = 5;
+    uint64 on_releaser = 6;
+}
+
+message GetTaskStatusesCounterRequest {
+    string type = 1;
+}
+
+message GetTaskStatusesCounterResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    TaskStatusesCounterData data = 4;
+}
+// UKLN Mass Transaction
+message GetTaskGlobalMassTransactionRequest {
+    Task task = 1;
+    int32 limit = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "limit data per page. Default value '-1' for disable limit",
+	}];
+    int32 page = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "page number to get data. Default value '-1' for disable page",
+	}];
+    string sort = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order data by column name",
+	}];
+    Direction dir = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Order direction",
+	}];
+    string filter = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string query = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+		description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+	}];
+    string in = 8;
+    string filterOr = 9;
+    string customOrder = 10;
+    string distinctKey = 11;
+    repeated uint64 roleIDFilter = 12;
+    repeated uint64 accountIDFilter = 13;
+    uint64 userIDFilter = 14;
+    string filterNot = 15;
+    GlobalMassTransactionRequest global_mass_transaction_request = 16;
+    string services = 17;
+}
+
+message GetTaskGlobalMassTransactionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated Task data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message GlobalMassTransactionRequest {
+    string is_benef_validation = 1;
+    repeated string file_type = 2;
+    repeated uint64 file_format_ids = 3;
+    string upload_date_from = 4;
+    string upload_date_to = 5;
+    repeated uint64 action_for = 6;
+}
+
+message SetTaskGlobalMassTransactionRequest {
+    repeated uint64 task_id = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+    string pass_code = 5;
+    bool is_maker_confirmation = 6;
+    string process_id = 7;
+}
+
+message SetTaskGlobalMassTransactionResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated SetTaskGlobalMassTransactionData data = 4;
+}
+
+message SetTaskGlobalMassTransactionData {
+    bool error = 1;
+    string message = 2;
+    Task task = 3;
+}
+
+
+message SaveTaskGlobalMassTransactionWithDataWithoutSessionRequest {
+    uint64 taskID = 1;
+    Task task = 3 [(google.api.field_behavior) = OPTIONAL];
+    bool isDraft = 2;
+    double transactionAmount = 4;
+    uint64 companyID = 5;
+    uint64 holdingID = 6;
+    string transactionCurrency = 7;
+    uint64 selectedAccountID = 8;
+    UserNonSession user = 9;
+    bool isStp = 10;
+    string key = 11;
+}
+
+
+message GetListTransactionPegadaianRequest {
+    int32 limit = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Order data by column name",
+    }];
+    Direction dir = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Order direction",
+    }];
+    string filter = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string in = 7;
+    string filter_or = 8 [json_name='filterOr'];
+    string custom_order = 9 [json_name='customOrder'];
+    uint64 user_id_filter = 10 [json_name='userIDFilter'];
+    string filter_not = 11 [json_name='filterNot'];
+    string search = 12;
+    string key = 13;
+    bool is_history = 14;
+    uint64 company_id = 15 [json_name='companyID'];
+    Task task = 16;
+    string services = 17;
+    repeated uint64 roleIDFilter = 18;
+    repeated string account_number = 19;
+    string authority_product = 20;
+  }
+  
+  message GetListTransactionPegadaianResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated BatchResponseData data = 4;
+    PaginationResponse pagination = 5;
+    Summary summary = 6;
+  }
+
+  message BatchResponseData {
+    DetailResponseData detail = 1;
+    TaskResponseData task = 2;
+    string workflow = 3;
+  }
+
+
+  message Summary {
+    uint64 file_in_process = 1 [json_name = "fileInProcess"];
+    uint64 on_process = 2 [json_name = "onProcess"];
+    uint64 file_processed = 3 [json_name = "fileProcessed"];
+    uint64 invalid_data = 4 [json_name = "InvalidData"];
+    uint64 AllStatus = 5 [json_name = "allStatus"];
+    uint64 file_completed = 6 [json_name = "fileCompleted"];
+  }
+
+  message TaskResponseData {
+    string status = 1;
+    string lastRejectedByName = 2;
+    string lastApprovedByName = 3;
+    string comment = 4;
+    string reason = 5;
+    string createdAt = 6;
+    string updatedAt = 7;
+    uint64 taskID = 8;
+  }
+  
+  message DetailResponseData {
+    string transaction_idd = 1 [json_name = "transactionId"];
+    string value_date = 2 [json_name = "valueDate"]; // ddmmyy
+    string account_number = 3 [json_name = "accountNumber"];
+    string branch_code_booking_office = 4 [json_name = "branchCodeBookingOffice"];
+    string account_description = 5 [json_name = "accountDescription"];
+    double plafon = 6 [json_name = "plafon"];
+    double old_extra_plafon = 7 [json_name = "oldExtraPlafon"];
+    double new_extra_plafon = 8 [json_name = "newExtraPlafon"];
+    double withdraw_amount = 9 [json_name = "withdrawAmount"];
+    string plafon_description = 10 [json_name = "plafonDescription"];
+    string status = 11 [json_name = "status"];
+}
+
+message CountStatusItemsRequest {
+    string services = 1;
+    uint64 company_id = 2;
+    repeated string statuses = 3;
+    uint64 user_id = 4;
+    uint64 workflow_user_id_filter = 5;
+    repeated uint64 workflow_role_id_filter = 6;
+    bool is_history = 7;
+    QueryBuilder queryBuilder = 8;
+    string collectiveIn = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries \n format: [key1:value1,value2|key2:value3,value4] \n example: collectiveIn=name:announcement,notification|task_id:1,2 => WHERE name IN('announcement', 'notification') AND task_id IN (1,2)",
+    }];
+}
+
+message CountStatusItemsResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    SummaryItems data = 4;
+}
+
+message SummaryItems {
+    uint64 all = 1 [json_name = "all"];
+    uint64 draft = 2 [json_name = "draft"];
+    uint64 returned = 3 [json_name = "returned"];
+    uint64 on_checker = 4 [json_name = "onChecker"];
+    uint64 on_signer = 5 [json_name = "onSigner"];
+    uint64 on_releaser = 6 [json_name = "onReleaser"];
+    uint64 approved = 7 [json_name = "approved"];
+    uint64 rejected = 8 [json_name = "rejected"];
+    uint64 draft_active = 9 [json_name = "draftActive"];
+    uint64 returned_active = 10 [json_name = "returnedActive"];
+    uint64 on_checker_active = 11 [json_name = "onCheckerActive"];
+    uint64 on_signer_active = 12 [json_name = "onSignerActive"];
+    uint64 on_releaser_active = 13 [json_name = "onReleaserActive"];
+}
+
+message FilterDistinctRequest{
+    int32 limit = 1;
+    string category = 2;
+    string query = 3;
+    bool is_history = 4;
+    string service = 5;
+    repeated string statuses = 6;
+    uint64 company_id = 7;
+    int32 page = 8; 
+    int32 transaction_type = 9;
+    repeated uint64 role_ids = 10;
+    uint64 user_id = 11; 
+    string user_type = 12;
+    string user_authority = 13;
+}
+  
+message FilterDistinctResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated string data = 4;
+}
+
+message SetTaskWithoutSessionRequest {
+    uint64 taskID = 1;
+    string action = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Action: 'approve', 'rework', 'reject'"
+        }
+    ];
+    string comment = 3;
+    string reasons = 4;
+    string key = 5;
+    UserNonSession user = 6;
+    Task task = 7 [(google.api.field_behavior) = OPTIONAL];
+}
+
+message MyAllowedAccountByProductsResponse {
+    repeated MyAllowedAccountByProductsResponseData data = 1;
+}
+
+message MyAllowedAccountByProductsResponseData {
+    string product_name = 1;
+    repeated uint64 account_ids = 2;
+}
+
+message DistinctByColumnRequest {
+    string services = 1;
+    uint64 company_id = 2;
+    repeated string statuses = 3;
+    uint64 user_id = 4;
+    uint64 workflow_user_id_filter = 5;
+    repeated uint64 workflow_role_id_filter = 6;
+    bool is_history = 7;
+    QueryBuilder queryBuilder = 8;
+    int32 page = 9;
+    int32 limit = 10;
+    string column_data = 11;
+    string collectiveIn = 12 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries \n format: [key1:value1,value2|key2:value3,value4] \n example: collectiveIn=name:announcement,notification|task_id:1,2 => WHERE name IN('announcement', 'notification') AND task_id IN (1,2)",
+    }];
+}
+
+message DistinctByColumnResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated string data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message SaveTaskWithoutSessionReq {
+    uint64 taskID = 1;
+    Task task = 3 [(google.api.field_behavior) = OPTIONAL];
+    bool isDraft = 2;
+    double transactionAmount = 4;
+    uint64 companyID = 5;
+    uint64 holdingID = 6;
+    string transactionCurrency = 7;
+    uint64 selectedAccountID = 8;
+    string key = 9;
+    string action = 10;
+    string comment = 11;
+    string reasons = 12;
+    UserNonSession user = 13;
+}
+
+message SummaryItemsMPN {
+    uint64 all = 1 [json_name = "all"];
+    uint64 draft = 2 [json_name = "draft"];
+    uint64 returned = 3 [json_name = "returned"];
+    uint64 on_checker = 4 [json_name = "onChecker"];
+    uint64 on_signer = 5 [json_name = "onSigner"];
+    uint64 on_releaser = 6 [json_name = "onReleaser"];
+    uint64 success = 7 [json_name = "success"];
+    uint64 failed = 8 [json_name = "failed"];
+    uint64 rejected = 9 [json_name = "rejected"];
+    uint64 checking = 10 [json_name = "checking"];
+    uint64 file_on_process = 11 [json_name = "fileOnProcess"];
+    uint64 ready_to_submit = 12 [json_name = "readyToSubmit"];
+    uint64 inquiry_failed = 13 [json_name = "inquiryFailed"];
+    uint64 on_process = 14 [json_name = "onProcess"];
+    uint64 completed = 15 [json_name = "completed"];
+    uint64 own_task_checker = 16 [json_name = "ownTaskChecker"];
+    uint64 own_task_signer = 17 [json_name = "ownTaskSigner"];
+    uint64 own_task_releaser = 18 [json_name = "ownTaskReleaser"];
+}
+
+message CountStatusItemMPNResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    SummaryItemsMPN data = 4;
+}
+
+message GetTaskMPNWithApproverNameRequest {
+    string approver_name = 1;
+    uint64 company_id = 2;
+}
+
+message GetTaskMPNWithApproverNameResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    bool found = 4;
+    Task data = 5;
+}
+
+message CheckCompanyTaskWithLoginCodeRequest {
+    string login_code = 1;
+}
+
+message CheckCompanyTaskWithLoginCodeResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    bool found = 4;
+}
+
+message DeleteTaskByCompanyIdRequest {
+    uint64 company_id = 1;
+    string product_type = 2;
+}
+
+message DeleteTaskByDataCompanyIdRegolRequest {
+    uint64 company_id = 1;
+}
+// END 
+
+// #region History Task
+
+message GetHistoryTasksRequest {
+    string process_id = 1;
+    uint64 company_id = 2;
+    string product_type = 3;
+    int32 limit = 4;
+    int32 page = 5;
+    string sort = 6;
+    string dir = 7;
+    bytes filter = 8;
+    string search = 9;
+};
+
+message GetHistoryTaskByIdRequest {
+    string process_id = 1;
+    uint64 company_id = 2;
+    uint64 task_id = 3;
+};
+
+message GetHistoryTaskByIdResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+}
+
+message ListTaskV4Request {
+    enum TaskStatus {
+        UNKNOWN_TASK_STATUS = 0;
+        PENDING = 1;
+        FINISHED = 2;
+    }
+
+    string process_id = 1;
+    uint64 company_id = 2;
+    uint32 step = 3;
+    TaskStatus status = 4;
+    string product = 5;
+    Pagination pagination = 6;
+}
+
+message ListTaskV4 {
+    uint32 id = 1;
+    uint32 company_id = 2;
+    uint32 status = 3;
+    uint32 step = 4;
+    string type = 5;
+    uint32 holding_id = 6;
+    bool is_parent_active = 7;
+    string data = 8;
+    uint32 feature_id = 9;
+    string workflow_doc = 10;
+    uint32 parent_id = 11;
+    uint64 created_by_id = 12;
+    string created_by_name = 13;
+    string comment = 14;
+    string data_bak = 15;
+    string child_bak = 16;
+    string reasons = 17;
+    string last_approved_by_name = 18;
+    string last_rejected_by_name = 19;
+    uint32 last_approved_by_id = 20;
+    uint32 last_rejected_by_id = 21;
+    google.protobuf.Timestamp approved_at = 22;
+    google.protobuf.Timestamp rejected_at = 23;
+    google.protobuf.Timestamp updated_at = 24;
+    uint64 updated_by_id = 25;
+    string updated_by_name = 26;
+    google.protobuf.Timestamp deleted_at = 27;
+    google.protobuf.Timestamp created_at = 28;
+}
+
+message ListTaskV4Response {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated ListTaskV4 data = 4;
+    PaginationResponse pagination = 5;
+}
+
+message SaveTaskDataV4 {
+    string reference_id = 1;
+    string description = 2;
+    string title = 3;
+}
+
+message SaveTaskWorkflowV4 {
+    double transaction_amount = 1;
+    string transaction_currency = 2;
+    uint64 account_id = 3;
+}
+
+message SaveTaskUserV4 {
+    uint64 id = 1;
+    string name = 2;
+    string type = 3;
+    uint64 company_id = 4;
+    string company_name = 5;
+    repeated uint64 role_ids = 6;
+}
+
+message SaveTaskRequestV4 {
+    string process_id = 1 [(google.api.field_behavior) = OPTIONAL];
+    uint64 company_id = 2 [(google.api.field_behavior) = OPTIONAL];
+    bool is_draft = 3;
+    string type = 4;
+    uint64 holding_id = 5 [(google.api.field_behavior) = OPTIONAL];
+    SaveTaskWorkflowV4 workflow = 6;
+    uint64 feature_id = 7 [(google.api.field_behavior) = OPTIONAL];
+    SaveTaskDataV4 data = 8 [(google.api.field_behavior) = OPTIONAL];
+    string comment = 9 [(google.api.field_behavior) = OPTIONAL];
+    string api_key = 10;
+}
+
+message SaveTaskRequestWithoutSessionV4 {
+    string process_id = 1 [(google.api.field_behavior) = OPTIONAL];
+    uint64 company_id = 2 [(google.api.field_behavior) = OPTIONAL];
+    bool is_draft = 3;
+    string type = 4;
+    uint64 holding_id = 5 [(google.api.field_behavior) = OPTIONAL];
+    SaveTaskWorkflowV4 workflow = 6;
+    uint64 feature_id = 7 [(google.api.field_behavior) = OPTIONAL];
+    SaveTaskDataV4 data = 8 [(google.api.field_behavior) = OPTIONAL];
+    string comment = 9 [(google.api.field_behavior) = OPTIONAL];
+    string api_key = 10;
+    SaveTaskUserV4 user = 11;
+    bool license_stp = 12;
+    bool is_skip_to_approved = 13;
+}
+
+message SaveTaskResponseData {
+    uint64 id = 1;
+    string workflow_doc = 2;
+    uint32 status = 3;
+    uint32 step = 4;
+}
+
+message SaveTaskResponseV4 {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    SaveTaskResponseData data = 4;
+}
+
+message GetMenuByCompanyAndIsParentRequest {
+    uint64 company_id = 1;
+    bool is_parent = 2;
+}
+
+message GetMenuByCompanyAndIsParentResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    Task data = 4;
+}
+
+message ActionTaskRequestV4 {
+    enum TaskAction {
+        UNKNOWN_TASK_ACTION = 0;
+        APPROVE = 1;
+        REJECT = 2;
+        DELETE = 3;
+    }
+
+    string process_id = 1;
+    TaskAction action = 2;
+    int32 task_id = 3;
+    string comment = 4;
+    string reasons = 5;
+    string workflow_doc = 6;
+}
+
+message ActionTaskResponseDataV4 {
+int64 id = 1;
+int32 status = 2;
+int32 step = 3;
+bool is_finished = 4;
+}
+
+message ActionTaskResponseV4 {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    ActionTaskResponseDataV4 data = 4;
+}
+
+message GetListTaskRegolRequest {
+    uint64 companyID = 1;
+}
+
+message GetFileNameAccountRegistrationRequest {
+    string fileName = 1;
+    uint64 companyID = 2;
+}
+
+message GetFileNameAccountRegistrationResponse {
+  bool error = 1;
+  uint32 code = 2;
+  string message = 3;
+  bool found = 4;
+}
+// #endregion
+
+message FilterData {
+    string transaction_id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries transaction_id \n format: [value,value] \n example: FilterList.transactionID=112,113",
+    }, json_name = 'transactionId'];
+    string billing_id = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries referre_ideNo \n format: [value,value] \n example: FilterList.billingID=88471289,74737 ",
+    }, json_name = 'billingId'];
+    string billing_type = 3[(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries billing_id \n format: [value,value] \n example: FilterList.billingType=Pungutan OJK",
+    }, json_name = 'billingType'];
+    string debit_account = 4[(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries beneficiaryName \n format: [value,value] \n example: FilterList.debitAccount=SITI KRISWANTI RAMBA | 383901029431535",
+    }, json_name = 'debitAccount'];
+    string amount = 5[(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries submissionList \n format: [value,value] \n example: FilterList.amount=IDR 157,000.00",
+    }];
+    string schedule_type = 6[(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries amount \n format: [value,value] \n example: FilterList.scheduleType=Immediate",
+    }, json_name = 'scheduleType'];
+    string created_at = 7[(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries status \n format: [value,value] \n example: FilterList.createdAt=14/03/2024 14:23:18",
+    }, json_name = 'createdAt'];
+    string created_by = 8[(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries status \n format: [value,value] \n example: FilterList.createdBy=CU_TSMC_M",
+    }, json_name = 'createdBy'];
+    string updated_at = 9[(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries status \n format: [value,value] \n example: FilterList.updatedAt=14/03/2024 14:23:18",
+    }, json_name = 'updatedAt'];
+    string updated_by = 10[(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'IN' queries status \n format: [value,value] \n example: FilterList.updatedBy=CU_TSMC_M",
+    }, json_name = 'updatedBy'];
+}
+
+message SummaryMultipayment {
+  int64 Draft = 1 [json_name = "draft"];
+  int64 Returned = 2 [json_name = "returned"];
+  int64 on_checker = 3 [json_name = "onChecker"];
+  int64 on_signer = 4 [json_name = "onSigner"];
+  int64 on_releaser = 5 [json_name = "onReleaser"];
+  int64 Draft_active = 6 [json_name = "draftActive"];
+  int64 Returned_active = 7 [json_name = "returnedActive"];
+  int64 on_checker_active = 8  [json_name = "onCheckerActive"];
+  int64 on_signer_active = 9 [json_name = "onSignerActive"];
+  int64 on_releaser_active = 10 [json_name = "onReleaserActive"];
+  int64 AllStatus = 11 [json_name = "allStatus"];
+}
+
+message GetTaskMultipaymentListResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    GetTaskMultipaymentListData data = 4;
+}
+
+message GetTaskMultipaymentListData {
+    repeated MultipaymentView list = 1;
+    SummaryMultipayment summary = 2;
+    PaginationResponse pagination = 3;
+    repeated DistinctDataMultipayment distinctData = 4;
+}
+
+message GetTaskMultipaymentRequest {
+    string status = 1;
+    string step = 2;
+    int32 limit = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Limit data per page. Default value '-1' for disable limit",
+    }];
+    int32 page = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Page number to get data. Default value '-1' for disable page",
+    }];
+    string sort = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Order data by column name",
+    }];
+    string dir = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Sort DirectionEnum should be ASC or DESC",
+    }];
+    string filter = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'AND' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string filterOr = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key:value,key:value] \n example: filter=task_id:1,type:Announcement => Where task_id = 1 AND type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key:>=value' => 'key >= value' \n - 'key:<=value' => 'key <= value' \n - 'key1:>=value1,key2:<=value2' => 'key1 >= value1 AND key2 <= value2' BETWEEN EXAMPLE \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string query = 9 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Create 'OR' queries \n format: [key1,key2,key3:value] \n example: query=name,type:Announcement => Where name = 'Announcement' OR type = 'Announcement' \n Expressions: \n - 'key:value' => 'key = value' \n - 'key:%%value' => 'key LIKE %value%' \n - 'key:%!value' => 'key ILIKE %value%' \n - 'key1.nestedKey1:value' => 'key1->>nestedKey1 = value'",
+    }];
+    string services = 10;
+
+    FilterData FilterList = 11 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "is contain a filter building ",
+    }];
+
+    string distinct = 12 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Distinct column name",
+    }];
+    string search = 13;
+}
+
+message DistinctDataMultipayment {
+    string transaction_id = 1;
+    string billing_id = 2;
+    string debit_account = 3;
+    string fee = 4;
+    string schedule_type = 5;
+    string created_at = 6;
+    string created_by = 7;
+    string updated_at = 8;
+    string updated_by = 9;
+    string status = 10;
+    string amount = 11;
+    string type = 12;
+    string name = 13;
+    string currentSchedule = 14;
+}
+
+message BillingRequestMultipayment {
+    string name = 1;
+    string currentSchedule = 2;
+}
+message  GetTaskStatusesCounterIFTRequest {
+    string type = 1;
+    string range = 2;
+}

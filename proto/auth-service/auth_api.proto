@@ -1,0 +1,448 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "auth-service/auth_payload.proto";
+
+package auth.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+};
+
+service ApiService {
+
+    rpc HealthCheck(Empty) returns (HealthCheckResponse) {
+        option (google.api.http) = {
+            get: "/api/user/health"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Health Check"
+            description: "This API for check health server"
+        };
+    };
+
+    rpc GetSignatureKey(GetSigKeyReq) returns (GetSigKeyResponse) {
+        option (google.api.http) = {
+            get: "/api/auth/signature/key"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get key to generate signature"
+            description: "This API is used for providing key to generate signature"
+        };
+    }
+
+    rpc Login(LoginRequest) returns (LoginResponse) {
+        option (google.api.http) = {
+            post: "/api/auth/login/password",
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Auth login"
+            description: "This API for login to addons services"
+        };
+    }
+
+    rpc Logout(LogoutRequest) returns (Empty) {
+        option (google.api.http) = {
+            get: "/api/auth/logout"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Auth logout"
+            description: "This API for logout to addons services"
+        };
+    }
+
+    rpc RefreshToken(RefreshRequest) returns (RefreshResponse) {
+        option (google.api.http) = {
+            post: "/api/auth/refresh",
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Auth refresh token"
+            description: "This API for refresh auth token"
+        };
+    }
+
+    // This api is to get token data, without check signature, or check is token exist at server side or not
+    // it accept array of token with max 2 tokens
+    rpc GetTokenData(GetTokenDataRequest) returns (GetTokenDataResponse) {
+        option (google.api.http) = {
+            post: "/api/auth/token-data",
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Auth is expired token"
+            description: "This API for check token expired"
+        };
+    }
+
+    rpc DeleteAccessTokenWhenCompanyOrUserStatusChange(DeleteAccessTokenRequest) returns (DeleteAccessTokenResponse){
+        option (google.api.http) = {
+            get: "/api/auth/delete-token"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete Token user when company or user status change"
+            description: "This API for delete all user token when their company or user status change"
+        };
+    }
+
+    rpc VerifyToken(VerifyTokenReq) returns (VerifyTokenRes);
+    rpc SetMe(VerifyTokenReq) returns (SetMeRes);
+
+    rpc GetMe(VerifyTokenReq) returns (FilteredVerifyTokenRes){
+        option (google.api.http) = {
+            get: "/api/auth/me"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get me use token"
+            description: "This API for login to addons services"
+        };
+    }
+
+    rpc GetTokenBySession(VerifySessionReq) returns (LoginResponse) {
+        option (google.api.http) = {
+            get: "/api/auth/me/session"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Get me use session"
+            description: "This API for login to addons services"
+        };
+    }
+
+    rpc BricamsVerify(BricamsVerifyReq) returns (google.api.HttpBody) {
+        option (google.api.http) = {
+            post: "/api/auth/verify",
+            body: "*",
+            additional_bindings: {
+                get: "/api/auth/verify"
+            }
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Auth login"
+            description: "This API for login to addons services"
+        };
+    }
+
+    rpc BricamsLogin(BricamsLoginReq) returns (LoginResponse) {
+        option (google.api.http) = {
+            get: "/api/auth/login"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Auth login"
+            description: "This API for login to addons services"
+        };
+    }
+    
+    rpc QlolaLogin(QlolaLoginReq) returns (InitLoginResponse) {
+        option (google.api.http) = {
+            post: "/api/auth/login/qlola"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            parameters: {
+                headers: {
+                    name: "X-Signature";
+                    description: "signature";
+                    type: STRING,
+                    required: true;
+                };
+            }
+            security: { } // Disable security key
+            summary: "Auth login 11"
+            description: "This API for login to addons services from Qlola"
+        };
+    }
+
+    rpc QlolaLoginV2(QlolaLoginReq) returns (InitLoginResponse) {
+        option (google.api.http) = {
+            post: "/api/auth/v2/login/qlola"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            parameters: {
+                headers: {
+                    name: "X-Signature";
+                    description: "signature";
+                    type: STRING,
+                    required: true;
+                };
+            }
+            security: { } // Disable security key
+            summary: "Auth login 11"
+            description: "This API for login to addons services from Qlola"
+        };
+    }
+
+    rpc SSOLoginWithInitToken(InitTokenLoginReqEncrypted) returns (SSOLoginResponse) {
+        option (google.api.http) = {
+            post: "/api/auth/login/init-token"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Auth login 11"
+            description: "This API for login to addons services from Qlola"
+        };
+    } 
+
+    rpc QlolaLogout(QlolaLogoutReq) returns (Empty) {
+        option (google.api.http) = {
+            post: "/api/auth/logout/qlola"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            parameters: {
+                headers: {
+                    name: "X-Signature";
+                    description: "signature";
+                    type: STRING,
+                    required: true;
+                };
+            }
+            security: { } // Disable security key
+            summary: "Auth login 11"
+            description: "This API for login to addons services from Qlola"
+        };
+    } 
+
+    rpc LoginV2(LoginV2Request) returns (LoginV2Response) {
+        option (google.api.http) = {
+            post: "/api/auth/v2/login",
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            parameters: {
+                headers: {
+                    name: "X-Signature";
+                    description: "signature";
+                    type: STRING,
+                    required: true;
+                };
+            }
+            security: { } // Disable security key
+            summary: "Auth login"
+            description: "This API for login to addons services"
+        };
+    }
+
+    rpc VerifyUserQuestion(VerifyUserQuestionRequest) returns (VerifyUserQuestionResponse){
+        option (google.api.http) = {
+            post: "/api/auth/verify-question",
+            body: "*"        
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Verify User Question in Forgot Password form"
+            description: "This API for checking user question"
+        };
+    }
+
+    rpc VerifyChangePasswordToken(VerifyChangePasswordTokenRequest) returns (VerifyChangePasswordTokenResponse){
+        option (google.api.http) = {
+            post: "/api/auth/verify-change-password-token",
+            body: "*"        
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Verify Token for Change Password"
+            description: "This API for checking token when change password"
+        };
+    }
+    
+    rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse) {
+        option (google.api.http) = {
+            post: "/api/auth/forgot-password",
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Auth forgot password"
+            description: "This API for forgot password to addons services"
+        };
+    }
+
+    rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
+        option (google.api.http) = {
+            post: "/api/auth/change-password",
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Auth change password"
+            description: "This API for change password to addons services"
+        };
+    }
+
+    rpc QlolaTestGenerateSignature(QlolaLoginReq) returns (QlolaSignatureTestRes) {
+        option (google.api.http) = {
+            post: "/qlola/signature-test"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Qlola signature Test"
+            description: "This API for login to addons services from Qlola"
+        };
+    }
+    rpc QlolaTestSignatureBystring(SignatureReq) returns (QlolaSignatureTestRes) {
+        option (google.api.http) = {
+            post: "/qlola/signature-test-string"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Qlola signature Test"
+            description: "This API for login to addons services from Qlola"
+        };
+    }
+
+    rpc ResetUserLoginTimeAttemptByUserId(ResetUserLoginTimeAttemptReq) returns (ResetUserLoginTimeAttemptRes);
+
+    rpc RegisterUserIntoAuth(RegisterUserIntoAuthReq) returns (RegisterUserIntoAuthRes);
+    rpc RequestAuthData(RequestUserId) returns (AuthenticationData){
+        option (google.api.http) = {
+            get: "/api/auth/user/{userId}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            security: { } // Disable security key
+            summary: "Auth login"
+            description: "This API for login to addons services"
+        };
+    }
+    rpc ChangePasswordWithProfile(ChangePasswordRequest) returns (ChangePasswordResponse) {
+        option (google.api.http) = {
+            post: "/api/auth/change-password-profile",
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Auth change password"
+            description: "This API for change password to addons services"
+        };
+    }
+    rpc RegisterAddonsUserIntoAuth(RegisterUserIntoAuthReq) returns (RegisterUserIntoAuthRes);
+
+    rpc QLolaUserValidation(LoginV2Request) returns (QlolaUserValidationBrigateResponse) {
+        option (google.api.http) = {
+            post: "/api/auth/qlola/validation",
+            body:"*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Auth user validation"
+            description: "This API is used for providing qlola to validate user"
+        };
+    }
+
+    rpc QlolaForgotPassword(QlolaForgotPasswordRequest) returns (QlolaForgotPasswordResponse) {
+        option (google.api.http) = {
+            post: "/api/auth/qlola/forgot-password",
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["QLOLA"]
+            security: {} // Disable security key
+            summary: "Auth forgot password"
+            description: "This API for forgot password to addons services"
+        };
+    }
+
+    rpc RollbackAuthenticationByCompanyIdRPC(RollbackAuthenticationByCompanyIdRPCRequest) returns (DeleteAccessTokenResponse) {}
+
+    rpc DeleteAuthenticationByUsersIDAndCompanyIDRPC(DeleteAuthByUsersIdAndCompanyIdReq) returns (DeleteAccessTokenResponse) {}
+
+    rpc InsertHistoryChangePassword(HistoryChangePassword) returns (ChangePasswordResponse) {}
+
+    rpc GetDetailAuthentication(GetDetailAuthenticationRequest) returns (GetDetailAuthenticationResponse) {}
+
+    rpc SendEmailNotificationSuccessChangePassword(PayloadSendMailSuccessChangePassword) returns (ChangePasswordResponse) {}
+}
+
+message ResetUserLoginTimeAttemptReq{
+    uint64 userID = 1;
+}
+
+message ResetUserLoginTimeAttemptRes{
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    bool isSuccess = 4;
+}
+
+message BricamsVerifyReq{
+    string USERID = 1;
+    string SESSIONID = 2;
+}
+
+message BricamsLoginReq{
+    string USERID = 1;
+    string SESSIONID = 2;
+    string DTTIME = 3;
+    string tokenFCM = 4;
+}
+ 
+message QlolaLoginSignature{
+    string REQUEST = 1;
+}
+
+message QlolaLoginReq{
+    string COMPANYID = 1;
+    string USERID = 2;
+    string SESSIONID = 3;
+    string URL = 4;
+}
+
+message QlolaLogoutReq{
+    string COMPANYID = 1;
+    string USERID = 2;
+    string SESSIONID = 3;
+}
+
+message SignatureReq{
+    string sessionid = 1;
+    string jsonstring = 2;
+}
+
+message QlolaSignatureTestRes{
+    string signature = 1;
+    string jsonbody = 2;
+}
+
+message BricamsVerifyRes {}
+
+message TempGenToken {
+    enum Role {
+        bankadmin = 0;
+        notificationadmin = 1;
+        notificationuser = 2;
+    }
+    Role role = 1;
+}

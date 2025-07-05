@@ -1,0 +1,478 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/httpbody.proto";
+
+import "cut-off-service/cut_off_payload.proto";
+
+package cut.off.service.v1;
+option go_package = "./pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Cut-Off Service";
+        version: "0.2";
+    };
+    
+    security_definitions: {
+        security: {
+                key: "bearer"
+                value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "Authorization"
+                description: "Authentication token, prefixed by Bearer: Bearer <token>"
+            }
+        }
+    }
+
+    // tags: [
+    //     {
+    //         name: "All"
+    //         description: "All operations"
+    //     }
+    //     {
+    //         name: "Task"
+    //         descirption: "Task operations"
+    //     }
+    //     {
+    //         name: "Data"
+    //         descirption: "Data operations"
+    //     }
+    //     {
+    //         name: "External"
+    //         descirption: "External API"
+    //     }
+    //     {
+    //         name: "ESB"
+    //         descirption: "API operations for ESB"
+    //     }
+    // ]
+
+    security: {
+        security_requirement: {
+            key: "bearer"
+        }
+    }
+
+    schemes: HTTP;
+    // schemes: HTTPS;
+    consumes: "application/json";
+    produces: "application/json";
+};
+
+service CutOffService {
+
+    rpc CreateCutOffTask (CreateCutOffTaskRequest) returns (CreateCutOffTaskResponse) {
+    option (google.api.http) = {
+            post: "/api/cut-off/task"
+            body: "*"
+            additional_bindings: [
+				{
+					post: "/api/cut-off/task/edit/{taskID}"
+					body: "*"
+				}
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create task";
+            tags: ["Task Cut Off"];
+            // security: {}
+            description: "create new or update existing task, update when task id is provided";
+        };
+    }
+
+    rpc ListCutOffTask (ListCutOffTaskRequest) returns (ListCutOffTaskResponse) {
+    option (google.api.http) = {
+        post: "/api/cut-off/task/list"
+        body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get task list";
+            tags: ["Task Cut Off"];
+            // security: {}
+            description: "get task list"
+        };
+    }
+
+    rpc CutOffTaskAction (CutOffTaskActionRequest) returns (CutOffTaskActionResponse) {
+    option (google.api.http) = {
+        post: "/api/cut-off/task/action"
+        body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set action task";
+            tags: ["Task Cut Off"];
+            // security: {}
+            description: "set task action. Action: 'approve’, 'rework’, 'reject’, ‘delete’"
+        };
+    }
+
+   
+
+    rpc DownloadListCutOffTask (FileListCutOffTaskRequest) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+        post: "/api/cut-off/task/list/{fileFormat}"
+        body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get task list file";
+            tags: ["Task Cut Off"];
+            // security: {}
+            description: "get task list"
+        };
+    }
+
+
+    rpc GetCutoffTaskByID (GetCutOffTaskByIDRequest) returns (GetCutOffTaskByIDResponse) {
+    option (google.api.http) = {
+            post: "/api/cut-off/task/detail"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get task detail";
+            tags: ["Task Cut Off"];
+            // security: {}
+            description: "get task detail"
+        };
+    }
+
+    rpc ListCutOffData (ListCutOffDataRequest) returns (ListCutOffDataResponse) {
+    option (google.api.http) = {
+        get: "/api/cut-off/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get data list";
+            tags: ["Cut Off"];
+            // security: {}
+            description: "get data list"
+        };
+    }
+
+    rpc ListCutOffDataTemplate (Empty) returns (ListCutOffDataTemplateResponse) {
+   // option (google.api.http) = {
+        // post: "/api/cut-off/template"
+        // // body: "*"
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     summary: "Get data list";
+        //     tags: ["Cut Off"];
+        //     // security: {}
+        //     description: "get data list"
+        // };
+    }
+
+    rpc GetCutOffDataByID (GetCutOffDataByIDRequest) returns (GetCutOffDataByIDResponse) {
+    option (google.api.http) = {
+        post: "/api/cut-off/data/detail"
+        body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Data detail";
+            tags: ["Cut Off"];
+            // security: {}
+            description: "get data detail"
+        };
+    }
+        rpc GetCutOffSchedule (ListCutOffDataScheduleRequest) returns (ListCutOffScheduledDataResponse) {
+        // option (google.api.http) = {
+        //         get: "/api/cut-off/data/schedule"
+        //         //body: "*"
+        //     };
+        //     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //         summary: "Get Data Schedule list";
+        //         tags: ["Cut Off"];
+        //         // security: {}
+        //         description: "get data Schedule list"
+        //     };
+        }
+
+        rpc GetCutOffScheduleByTime (ListCutOffDataScheduleRequest) returns (ListCutOffScheduledDataByTimeResponse) {
+            option (google.api.http) = {
+                    get: "/api/cut-off/data/schedule"
+                    //body: "*"
+                };
+                option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+                    summary: "Get Data Schedule list";
+                    tags: ["Cut Off"];
+                    // security: {}
+                    description: "get data Schedule list"
+                };
+        }
+
+        rpc GetCutOffScheduleToday (ListCutOffDataScheduleTodayRequest) returns (ListCutOffDataScheduleTodayRespons) {
+            option (google.api.http) = {
+                    get: "/api/cut-off/today"
+                    //body: "*"
+                };
+                option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+                    summary: "Get Cut off Schedule list";
+                    tags: ["Cut Off"];
+                    // security: {}
+                    description: "get cut Schedule list"
+                };
+        }
+
+        rpc GetMyTasksCreatedBy(Empty) returns (ArrayString) {
+            option (google.api.http) = {
+                get: "/api/cut-off/task/me/created-by"
+            };
+            option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+                
+                summary: "Get list my user tasks"
+                description: "This API for get list users task"
+                tags: ["Task Cut Off"];
+            };
+        };
+    
+        rpc GetMyTasksApprovedBy(Empty) returns (ArrayString) {
+            option (google.api.http) = {
+                get: "/api/cut-off/task/me/approved-by"
+            };
+            option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+                summary: "Get list my user tasks"
+                description: "This API for get list users task"
+                tags: ["Task Cut Off"];
+            };
+        };
+
+        rpc GetProductAvailable(ListProductUsedReq) returns (ListProductUsedRes) {
+            option (google.api.http) = {
+                get: "/api/cut-off/task/product/{scheduleType}"
+            };
+            option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+                summary: "Get list Product avaible used"
+                description: "This API for get list Product avaible used"
+                tags: ["Task Cut Off"];
+            };
+        };
+    
+
+    rpc SaveCutOffData (SaveCutOffDataRequest) returns (SaveCutOffDataResponse) {
+    // option (google.api.http) = {
+        //     post: "/api/cut-off/data"
+        //     body: "*"
+        //     additional_bindings: [
+        //         {
+        //             put: "/api/cut-off/data/{dataID}"
+        //             body: "*"
+        //         }
+        //     ]
+        // };
+        // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        //     summary: "DATA SAVE";
+        //     tags: ["All","Cut Off"];
+        //     // security: {}
+        //     description: "-"
+        // };
+    }
+
+    rpc DeleteCutOffData (SaveCutOffDataRequest) returns (SaveCutOffDataResponse) {
+    
+    }
+
+    // ==== Holiday APIs ====
+
+    rpc GetHolidayTask (GetHolidayTaskRequest) returns (GetHolidayTaskResponse) {
+        option (google.api.http) = {
+            get: "/api/cut-off/holiday/task"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "List holiday management tasks"
+            tags: ["Holiday","All","Task"];
+            description: "This API for get list holiday management tasks"
+        };
+    }
+
+    rpc GetHolidayTaskByID (GetHolidayTaskByIDRequest) returns (GetHolidayTaskByIDResponse) {
+        option (google.api.http) = {
+            get: "/api/cut-off/holiday/task/{taskID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Get holiday management task by ID"
+            tags: ["Holiday","All","Task"];
+            description: "This API for get holiday management task by ID"
+        };
+    }
+    
+    rpc CreateHolidayTask (CreateHolidayTaskRequest) returns (CreateHolidayTaskResponse) {
+        // Create and Edit
+        option (google.api.http) = {
+            post: "/api/cut-off/holiday/task"
+            body: "*"
+            additional_bindings: [
+				{
+					post: "/api/cut-off/holiday/task/edit/{taskID}"
+					body: "*"
+				}
+			]
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "Create task holiday management"
+            tags: ["Holiday","All","Task"];
+            description: "This API for create task holidaymanegement"
+        };
+    }
+
+    rpc GetHoliday (GetHolidayRequest) returns (GetHolidayResponse) {}
+
+    rpc GetHolidayHTTP (GetHolidayRequest) returns (GetHolidayResponse) {
+        option (google.api.http) = {
+            get: "/api/cut-off/holiday/data"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "List holiday management data"
+            tags: ["Holiday","All"];
+            description: "This API for get list holiday management data"
+        };
+    }
+
+    rpc GetHolidayByFeatureID (GetHolidayByFeatureIDRequest) returns (GetHolidayByFeatureIDResponse) {
+        option (google.api.http) = {
+            get: "/api/cut-off/holiday/data/{featureID}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "List holiday management data by feature ID"
+            tags: ["Holiday","All"];
+            description: "This API for get holiday management data by feature ID"
+        };
+    }
+
+    rpc HolidayTaskAction (HolidayTaskActionRequest) returns (HolidayTaskActionResponse) {
+    option (google.api.http) = {
+            post: "/api/cut-off/holiday/task/action/{taskID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set action task";
+            tags: ["Holiday","All","Task"];
+            // security: {}
+            description: "This API is used for set task by action \n Actions: \n - approve \n - rework \n - reject"
+        };
+    }
+
+    rpc GetHolidaySchedules (GetHolidaySchedulesRequest) returns (GetHolidaySchedulesResponse) {
+        option (google.api.http) = {
+            get: "/api/cut-off/holiday/schedules"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "List holiday management schedules"
+            tags: ["Holiday","All"];
+            description: "This API for get holiday management schedules"
+        };
+    }
+
+    rpc DownloadListHolidayTask (DownloadListHolidayTaskRequest) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+            get: "/api/cut-off/holiday/task/file/{fileFormat}"
+            // body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get task list file";
+            tags: ["All","Task","Holiday"];
+            // security: {}
+            description: "get task list"
+        };
+    }
+
+     rpc GetMyHolidayTasksCreatedBy(Empty) returns (ArrayString) {
+        option (google.api.http) = {
+            get: "/api/cut-off/holiday/task/me/created-by"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            
+            summary: "Get list my user tasks"
+            description: "This API for get list users task"
+            tags: ["Task","Holiday"];
+        };
+    };
+
+    rpc GetMyHolidayTasksApprovedBy(Empty) returns (ArrayString) {
+        option (google.api.http) = {
+            get: "/api/cut-off/holiday/task/me/approved-by"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get list my user tasks"
+            description: "This API for get list users task"
+            tags: ["Task","Holiday"];
+        };
+    };
+
+    rpc GetHolidayPatternList (GetHolidayPatternListRequest) returns (GetHolidayPatternListResponse) {
+        option (google.api.http) = {
+            get: "/api/cut-off/holiday/pattern"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "List holiday management pattern"
+            tags: ["Holiday","All"];
+            description: "This API for get holiday management pattern"
+        };
+    }
+
+    rpc GetWeekendDayList (GetWeekendDayListRequest) returns (GetWeekendDayListResponse) {
+        option (google.api.http) = {
+            get: "/api/cut-off/holiday/weekend-days"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            // security: { } // Disable security key
+            summary: "List holiday management weekend days"
+            tags: ["Holiday","All"];
+            description: "This API for get holiday management weekend days"
+        };
+    }
+
+    rpc CreateHoliday (CreateHolidayRequest) returns (CreateHolidayResponse) {}
+    rpc DeleteHoliday (DeleteHolidayRequest) returns (Empty) {}
+
+    rpc GetAvailableTime (GetAvailableTimeRequest) returns (GetAvailableTimeResponse) {}
+    rpc GetAvailableTimeHttp (GetAvailableTimeRequest) returns (GetAvailableTimeResponse) {
+        option (google.api.http) = {
+            get: "/api/cut-off/available-time"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get available time"
+            description: "This API for Get available time"
+            tags: ["All","Holiday","Cut Off"];
+        };
+    }
+    
+
+    rpc GetAvailableTimeRecurring (GetAvailableTimeRecurringRequest) returns (GetAvailableTimeRecurringResponse) {
+        option (google.api.http) = {
+            get: "/api/cut-off/available-time-recurring"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get available time for recurring"
+            description: "This API for Get available time recurring"
+            tags: ["All","Holiday","Cut Off"];
+        };
+    }
+
+    rpc GetAvailableCurrency (Empty) returns (GetAvailableCurrencyResponse) {
+        option (google.api.http) = {
+            get: "/api/cut-off/available-currency"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get available time for recurring"
+            description: "This API for Get available time recurring"
+            tags: ["All","Holiday","Cut Off"];
+        };
+    }
+
+}
+
+message errorBodyResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+}
+
+message Empty{}

@@ -1,0 +1,176 @@
+syntax = "proto3";
+
+package ukln_other_bank_rtimor.service.v1;
+option go_package = "./pb";
+
+// import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+import "ukln-rtimor-service/ukln_rtimor_core.proto";
+
+message HealthCheckResponse {
+    string message = 1;
+};
+message Pagination {
+    int32 limit = 1;
+    int32 page = 2;
+    string sort = 3;
+    Direction dir = 4;
+    uint64 total_pages = 5;
+    uint64 total_rows = 6;
+    string filter = 7;
+};
+
+/* 
+ * This is the payload for the API [SubmitMaker]
+*/
+message SubmitMakerRequest {
+    repeated SubmitMakerTransaction transactions = 1;
+}
+
+message SubmitMakerTransaction {
+    string iban = 1;
+    string sender_account_number = 2;
+    SubmitMakerBeneficiary beneficiary = 3;
+    int32 amount = 4;
+    int32 charge_type = 5;
+    string value_date = 6;
+    repeated string remarks = 7;
+}
+
+message SubmitMakerBeneficiary {
+    string account_number = 1;
+    string bank_name = 2;
+    repeated string emails = 3;
+    string account_name = 4;
+    bool is_favorite = 5;
+    string alias_name = 6;
+}
+
+message SubmitMakerResponse {
+    bool error = 1;
+    int32 code = 2;
+    string message = 3;
+}
+
+/*
+* This is the payload for the API Beneficiary Favourite
+*/
+message CreateBeneficiaryFavouriteRequest {
+    repeated CreateBeneficiaryFavouriteData beneficiaries = 1;
+}
+
+message CreateBeneficiaryFavouriteData {
+    string account_number = 1;
+    string bank_name = 2;
+    repeated string emails = 3;
+    string account_name = 4;
+    string alias_name = 5;
+}
+
+message DeleteBeneficiaryFavouriteRequest {
+    uint64 id = 1;
+}
+
+message UpdateBeneficiaryFavouriteRequest {
+    uint64 id = 1;
+    string account_number = 2;
+    string bank_name = 3;
+    repeated string emails = 4;
+    string account_name = 5;
+    string alias_name = 6;
+}
+
+message ListBeneficiaryFavouriteRequest {
+    int32 id = 1;
+    int32 limit = 2;
+    int32 page = 3;
+    string sort = 4;
+    Direction dir = 5;
+    string filter = 6;
+}
+
+message ListBeneficiaryFavouriteResponse {
+    bool error = 1;
+    uint32 code = 2;
+    string message = 3;
+    repeated BeneficiaryFavourite data = 4;
+    Pagination pagination = 5;
+}
+
+/*
+    This section for database
+*/
+message Transaction {
+    uint64 transaction_id = 1;
+    uint64 transaction_type_id = 2;
+    google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp updated_at = 4;
+    Status status_id = 5;
+    bool exe = 6;
+    string reversal_id = 7;
+    string debit_number = 8;
+    string debit_currency = 9;
+    double debit_amount = 10;
+    string debit_name = 11;
+    string debit_address = 12;
+    string debit_zipcode = 13;
+    string beneficiary_account = 14;
+    string beneficiary_name = 15;
+    string beneficiary_address1 = 16;
+    string beneficiary_address2 = 17;
+    string beneficiary_address3 = 18;
+    string credit_currency = 19;
+    double credit_amount = 20;
+    string credit_account = 21;
+    double beneficiary_charge = 22;
+    string intermediary_bank = 23;
+    double fee_amount = 24;
+    string commision_type = 25;
+    string account_with_bank = 26;
+    bool send_to_party = 27;
+    string bk_to_bk_out1 = 28;
+    string bk_to_bk_out2 = 29;
+    string bk_to_bk_out3 = 30;
+    string bk_to_bk_out4 = 31;
+    string remark = 32;
+    string beneficiary_bank_code = 33;
+    string beneficiary_alias = 34;
+    string beneficiary_bank_name = 35;
+    string beneficiary_email = 36;
+    string beneficiary_country = 37;
+    string amount_currency = 38;
+    string deal_code = 39;
+    string transaction_schedule = 40;
+    string transfer_purpose = 41;
+    string remark_beneficiary = 42;
+    string transaction_ref_no = 43;
+    string file_id = 44;
+    uint64 task_id = 45;
+    string workflow_doc = 46;
+    string transaction_message = 47;
+    uint64 company_id = 48;
+    string created_by = 49;
+    string updated_by = 50;
+    string status_description = 51;
+    string debit_alias = 52;
+    double converted_amount = 53;
+    double amount = 54;
+    string country_code = 55;
+    string swift_code = 56;
+    double exchange_rate = 57;
+    string flagging_legend = 58;
+    string exchange_currency = 59;
+}
+
+message BeneficiaryFavourite {
+    int64 id = 1;
+    int32 transaction_type_id = 2;
+    string account_number = 3;
+    string bank_name = 4;
+    string account_name = 5;
+    string alias_name = 6;
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+}
+

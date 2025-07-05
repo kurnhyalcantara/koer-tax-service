@@ -1,0 +1,170 @@
+syntax = "proto3";
+
+package bifast.service.v1;
+option go_package = "./pb";
+
+// import "mwitkow/go-proto-validators/validator.proto";
+import "google/protobuf/timestamp.proto";
+// import "google/api/field_behavior.proto";
+// import "protoc-gen-openapiv2/options/annotations.proto";
+// import "google/protobuf/struct.proto";
+
+enum TaskStatus {
+    AllStatus = 0;
+    Pending = 1;
+    Draft = 2;
+    Returned = 3;
+    Approved = 4;
+    Rejected = 5;
+    DeleteRequest = 6;
+    Deleted = 7;
+    Cancelled = 8;
+    OnProcess = 9;
+}
+
+enum TaskStep {
+    AllStep = 0;
+    Maker = 1;
+    Checker = 2;
+    Signer = 3;
+    Releaser = 4;
+}
+
+message Participant {
+    uint64 userID = 1;
+    string userName = 2;
+    uint64 roleID = 3;
+    bool isReject = 5;
+    google.protobuf.Timestamp approvedAt = 6;
+    string step = 7;
+}
+
+message Participants {
+    int32 approvedCount = 1;
+    int32 rejectedCount = 2;
+    int32 Requirement = 3;
+    repeated Participant participants = 4;
+}
+
+message Flow {
+    uint64 workflowLogicID = 1;
+    Participants verifier = 2;
+    Participants approver = 3;
+    Participants releaser = 4;
+    bool isRejected = 5;
+    google.protobuf.Timestamp completedAt = 7;
+}
+
+message WorkflowRecords {
+    google.protobuf.Timestamp lastUpdatedAt = 1;
+    uint64 topRange = 2;
+    uint64 bottomRange = 3;
+    repeated Flow flows = 4;
+}
+
+message UserData {
+    uint64 userID = 1;
+    string username = 2;
+}
+
+message WorkflowHeader {
+    uint64 productID = 1;
+    string productName = 2;
+    uint64 currencyID = 3;
+    string currencyName = 5;
+    uint64 companyID = 6;
+    string companyName = 7;
+    uint64 transactionalNumber = 10;
+    uint64 workflowID = 11;
+    uint64 uaID = 12; // used account id
+}
+
+message WorkflowPayload {
+    WorkflowHeader header = 1;
+    WorkflowRecords records = 2;
+    UserData createdBy = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    bool isDefault = 5;
+    bool isTransactional = 6;
+    repeated uint64 currentRoleIDs = 7;
+    string currentStep = 8;
+    repeated uint64 participantUserIDs = 9;
+}
+
+message ValidateWorkflowData {
+    WorkflowPayload workflow = 1;
+    string nextStatus = 2;
+    string nextStep = 3;
+}
+
+message Task {
+    uint64 taskID = 1;
+    string type = 2;
+    string status = 3;
+    string step = 4;
+    uint64 createdByID = 5;
+    uint64 lastApprovedByID = 6;
+    uint64 lastRejectedByID = 7;
+    string comment = 8;
+    uint64 featureID = 9;
+    string reasons = 10;
+    string lastApprovedByName = 11;
+    string lastRejectedByName = 12;
+    uint64 updatedByID = 13;
+    string updatedByName = 14;
+    string createdByName = 15;
+    uint64 companyID = 16;
+    uint64 holdingID = 17;
+    string workflow = 18;
+
+    google.protobuf.Timestamp createdAt = 101;
+    google.protobuf.Timestamp updatedAt = 102;
+    google.protobuf.Timestamp deletedAt = 103;
+    google.protobuf.Timestamp approvedAt = 104;
+    google.protobuf.Timestamp rejectedAt = 105;
+}
+
+message HealthCheckRequest {}
+message HealthCheckResponse {
+    string message = 1;
+}
+
+message NotificationData {
+    string USERNAME_MAKER = 1 [json_name='USERNAME_MAKER'];
+    string USERNAME_CHECKER = 17 [json_name='USERNAME_CHECKER'];
+    string USERNAME_APPROVER = 2 [json_name='USERNAME_APPROVER'];
+    string USERNAME_RELEASER = 41 [json_name='USERNAME_RELEASER'];
+    string CREATED_DATETIME = 3 [json_name='CREATED_DATETIME'];
+    string CREATED_DATE = 4 [json_name='CREATED_DATE'];
+    string CREATED_TIME = 5 [json_name='CREATED_TIME'];
+    string EVENT_DATETIME = 6 [json_name='EVENT_DATETIME'];
+    string EVENT_DATE = 7 [json_name='EVENT_DATE'];
+    string EVENT_TIME = 8 [json_name='EVENT_TIME'];
+    string ACCOUNT_NUMBER = 9 [json_name='ACCOUNT_NUMBER'];
+    string ACCOUNT_ALIAS = 10 [json_name='ACCOUNT_ALIAS'];
+    string ACCOUNT_HOLDER_NAME = 11 [json_name='ACCOUNT_HOLDER_NAME'];
+    string BANK_NAME = 12 [json_name='BANK_NAME'];
+    string CURRENCY_NAME = 13 [json_name='CURRENCY_NAME'];
+    string TASK_ID = 14 [json_name='TASK_ID'];
+    string USERNAME_REJECTOR = 15 [json_name='USERNAME_REJECTOR'];
+    string COMPANY_NAME = 16 [json_name='COMPANY_NAME'];
+    string MODULE = 19 [json_name='MODULE'];
+    string MESSAGE = 20 [json_name='MESSAGE'];
+    string TEMPLATE = 21 [json_name='TEMPLATE'];
+    string STATUS_SEND = 22 [json_name='STATUS_SEND'];
+    string STATUS_ACTION = 23 [json_name='STATUS_ACTION'];
+    string STATUS_INFO = 31 [json_name='STATUS_INFO'];
+    string STATUS_REQUEST_DELETE = 24 [json_name='STATUS_REQUEST_DELETE'];
+    string REASON = 25 [json_name='REASON'];
+    string COMMENT = 26 [json_name='COMMENT'];
+    string TRANSACTION_ID = 27 [json_name='TRANSACTION_ID'];
+    string SENDER_ACCOUNT = 28 [json_name='SENDER_ACCOUNT'];
+    string BENEFICIARY_ACCOUNT = 29 [json_name='BENEFICIARY_ACCOUNT'];
+    string AMOUNT = 30 [json_name='AMOUNT'];
+    string BENEFICIARY_ACCOUNT_ALIAS = 32 [json_name='BENEFICIARY_ACCOUNT_ALIAS'];
+    string BENEFICIARY_ACCOUNT_HOLDER_NAME = 33 [json_name='BENEFICIARY_ACCOUNT_HOLDER_NAME'];
+    string BENEFICIARY_ACCOUNT_NUMBER = 34 [json_name='BENEFICIARY_ACCOUNT_NUMBER'];
+    string EXCHANGE_RATE = 38 [json_name='EXCHANGE_RATE'];
+    string SEND_AMOUNT = 40 [json_name='SEND_AMOUNT'];
+    string REMARK = 42 [json_name='REMARK'];
+}

@@ -1,0 +1,3 @@
+[submodule "proto"]
+	path = proto
+	url = https://bitbucket.bri.co.id/scm/bricams-addons/qcash-base-protobuf.git

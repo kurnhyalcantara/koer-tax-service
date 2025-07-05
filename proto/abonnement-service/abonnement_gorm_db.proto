@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-gorm/options/gorm.proto";
+
+package abonnement.service.v1;
+option go_package = "./pb";
+
+message User {
+    uint64 id = 1;
+    string username = 2;
+    string password = 3;
+    string abonnement = 4;
+    string role = 8;
+    google.protobuf.Timestamp created_at = 5 ;
+    google.protobuf.Timestamp updated_at = 6 ;
+    google.protobuf.Timestamp deleted_at = 7 ;
+}
+
+message Abonnement {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "abonnements",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 companyID = 2 [(gorm.field).tag = {not_null: true}];
+    string amount = 3 [(gorm.field).tag = {not_null: true}];
+    google.protobuf.Timestamp deadlineDate = 4 [(gorm.field).tag = {not_null: true}];
+    string period = 5 [(gorm.field).tag = {not_null: true}];
+    // string mechanismType = 8 [(gorm.field).tag = {not_null: false}];
+    // string mechanismValue = 9 [(gorm.field).tag = {not_null: false}];
+    // uint64 mechanismAccountID = 10 [(gorm.field).tag = {not_null: false}];
+    string billingStatus = 11 [(gorm.field).tag = {not_null: false}];
+    uint64 createdByID = 6;
+    uint64 updatedByID = 7;
+    google.protobuf.Timestamp createdAt = 51;
+    google.protobuf.Timestamp updatedAt = 52;
+    repeated AbonnementAccount abonnementAccounts = 101 [(gorm.field).has_many = {foreignkey: "abonnement_id", preload: true}];
+    repeated AbonnementInvoice abonnementInvoices = 103 [(gorm.field).has_many = {foreignkey: "abonnement_id", preload: true}];
+    repeated AbonnementRetry abonnementRetries = 102 [(gorm.field).has_many = {foreignkey: "abonnement_id", preload: true}];
+    repeated CustomAbonnement customAbonnements = 104 [(gorm.field).has_many = {foreignkey: "abonnement_id", preload: true}];
+}
+
+message AbonnementRetry {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "abonnement_retries",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 abonnementID = 2;
+    Abonnement abonnement = 102 [(gorm.field).belongs_to = {foreignkey: "abonnement_id"}];
+    uint64 abonnementInvoiceID = 6;
+    AbonnementInvoice abonnementInvoice = 103 [(gorm.field).belongs_to = {foreignkey: "abonnement_invoice_id"}];
+    google.protobuf.Timestamp retryDate = 3;
+    uint64 createdByID = 4;
+    uint64 updatedByID = 5;
+    google.protobuf.Timestamp createdAt = 51;
+    google.protobuf.Timestamp updatedAt = 52;
+}
+
+message AbonnementAccount {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "abonnement_accounts",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 abonnementID = 2;
+    Abonnement abonnement = 102 [(gorm.field).belongs_to = {foreignkey: "abonnement_id"}];
+    uint64 accountID = 3;
+    string accountAlias = 7;
+    string accountNumber = 8;
+    string accountCurrency = 9;
+    uint64 order = 4;
+    uint64 createdByID = 5;
+    uint64 updatedByID = 6;
+    google.protobuf.Timestamp createdAt = 51;
+    google.protobuf.Timestamp updatedAt = 52;
+}
+
+message AbonnementInvoice {
+    option (gorm.opts) = {
+        ormable: true,
+        table: "abonnement_invoices",
+    };
+
+    string invoiceCode = 5;
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    uint64 abonnementID = 2;
+    Abonnement abonnement = 102 [(gorm.field).belongs_to = {foreignkey: "abonnement_id"}];
+    string periodCode = 3;
+    string amount = 6;
+    string creditAmount = 19;
+    string status = 7;
+    google.protobuf.Timestamp deadlineDate = 8;
+    uint64 accountID = 9;
+    string accountAlias = 10;
+    string accountNumber = 11;
+    string accountCurrency = 12;
+    string esbExternalID = 18;
+    string esbJournalSeq = 13;
+    string esbResponseCode = 14;
+    string esbResponseMessage = 15;
+    string esbResponse = 16 [(gorm.field).tag = { type: "jsonb" }];
+    uint64 retryCounter = 17;
+    uint64 createdByID = 4;
+    google.protobuf.Timestamp createdAt = 51;
+}
+
+message CustomAbonnement{
+    option (gorm.opts) = {
+        ormable: true,
+        table: "abonnement_custom",
+    };
+
+    uint64 id = 1 [(gorm.field).tag = {primary_key: true not_null: true}];
+    string type = 2;
+    string value = 3;
+    string amount = 4;
+    uint64 abonnementID = 5;
+    Abonnement abonnement = 102 [(gorm.field).belongs_to = {foreignkey: "abonnement_id"}];
+}
