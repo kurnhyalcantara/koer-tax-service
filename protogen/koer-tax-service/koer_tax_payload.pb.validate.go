@@ -271,27 +271,9 @@ func (m *V3SaveTaxNumberRequest) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetTaxIdNumber()) < 1 {
-		err := V3SaveTaxNumberRequestValidationError{
-			field:  "TaxIdNumber",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for TaxIdNumber
 
-	if utf8.RuneCountInString(m.GetTaxOwnerName()) < 1 {
-		err := V3SaveTaxNumberRequestValidationError{
-			field:  "TaxOwnerName",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for TaxOwnerName
 
 	if len(errors) > 0 {
 		return V3SaveTaxNumberRequestMultiError(errors)

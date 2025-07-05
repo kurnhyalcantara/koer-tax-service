@@ -20,12 +20,12 @@ func (h *Handler) V3SaveTaxNumber(ctx context.Context, req *pb.V3SaveTaxNumberRe
 		return nil, status.Error(codes.PermissionDenied, "Permission Denied")
 	}
 
-	if err := req.Validate(); err != nil {
+	if err := h.validator.Validate(req); err != nil {
 		return nil, err
 	}
 
 	if err := h.uc.Tax.SaveTaxNumber(ctx, currentUser.CompanyID, req.TaxIdNumber, req.TaxOwnerName); err != nil {
-		return nil, status.Error(codes.Internal, "Unexpected Error")
+		return nil, err
 	}
 
 	return &pb.GeneralBodyResponse{

@@ -17,6 +17,6 @@ message GeneralBodyRequest {
 };
 
 message V3SaveTaxNumberRequest {
-  string tax_id_number = 1 [(validate.rules).string = {min_len: 1}];
-  string tax_owner_name = 2 [(validate.rules).string = {min_len: 1}];
+  string tax_id_number = 1 [(buf.validate.field).required = true];
+  string tax_owner_name = 2 [(buf.validate.field).required = true];
 }

@@ -109,7 +109,38 @@ func TestHandler_V3SaveTaxNumber(t *testing.T) {
 			want:    nil,
 			wantErr: true,
 			assertErr: func(t *testing.T, err error) {
-				require.Equal(t, err, "taxIdnumber is required")
+				require.Error(t, err, "Tax Id Number is required")
+			},
+		},
+		{
+			name: "tax name is nil",
+			fields: fields{
+				manager: func() jwtmanager.JwtManagerCore {
+					mockJwt := new(mocks.MockJwtManagerCore)
+					mockJwt.On("GetMeFromMD", mock.Anything).
+						Return(&jwtmanagerDom.UserData{
+							UserType: "cu",
+						}, nil, nil)
+					return mockJwt
+				}(),
+				validator: func() *validator.ProtoValidator {
+					protoValidator, err := validator.NewProtoValidator()
+					if err != nil {
+						log.Fatal(err)
+					}
+					return protoValidator
+				}(),
+			},
+			args: args{
+				ctx: context.TODO(),
+				req: &pb.V3SaveTaxNumberRequest{
+					TaxIdNumber: "999128128128",
+				},
+			},
+			want:    nil,
+			wantErr: true,
+			assertErr: func(t *testing.T, err error) {
+				require.Error(t, err, "Tax Name is required")
 			},
 		},
 	}

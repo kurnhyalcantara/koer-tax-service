@@ -2,6 +2,7 @@ package tax
 
 import (
 	"context"
+	"errors"
 
 	"github.com/kurnhyalcantara/koer-tax-service/pkg/log"
 	"github.com/kurnhyalcantara/koer-tax-service/server/repository/tax"
@@ -14,6 +15,9 @@ type Core struct {
 
 // SaveTaxNumber implements UseCase.
 func (c *Core) SaveTaxNumber(ctx context.Context, companyId uint64, taxIdNumber, taxIdName string) error {
+	if companyId == 0 {
+		return errors.New("companyId is required")
+	}
 	return c.Repo.SaveTaxNumber(ctx, companyId, taxIdNumber, taxIdName)
 }
 

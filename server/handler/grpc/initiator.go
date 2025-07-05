@@ -8,14 +8,14 @@ import (
 )
 
 type Handler struct {
-	validator validator.Validator
+	validator *validator.ProtoValidator
 	uc        *usecase.UseCases
 	manager   jwtmanager.JwtManagerCore
 
 	pb.KoerTaxServiceServer
 }
 
-func NewHandler(validator validator.Validator, uc *usecase.UseCases, manager jwtmanager.JwtManagerCore) *Handler {
+func NewHandler(validator *validator.ProtoValidator, uc *usecase.UseCases, manager jwtmanager.JwtManagerCore) *Handler {
 	return &Handler{
 		validator: validator,
 		uc:        uc,
