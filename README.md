@@ -15,31 +15,6 @@
 
 ---
 
-## 🧱 Struktur Proyek
-koer-tax-service/
-├── assets/ # File statis (contoh: font, img, dll)
-├── cmd/
-│ └── api/
-│ └── main.go # Entry-point aplikasi
-├── config/ # Konfigurasi aplikasi ( env loader, dsb)
-├── pkg/ # Paket utilitas umum
-│ ├── constants/ # Definisi konstanta global
-│ ├── logs/ # Logging terstruktur
-│ ├── utils/ # Fungsi bantu/utilitas umum
-│ └── validator/ # Validasi input dan payload
-├── proto/ # File .proto API service
-├── protogen/ # Hasil generate dari buf/grpc (pb.go, gw.go, dsb)
-├── server/
-│ ├── domain/ # Entity & contract interface (model + interface)
-│ ├── handler/ # Handler gRPC & REST (HTTP Gateway)
-│ ├── infrastructure/ # Setup koneksi eksternal (DB, Redis, dll)
-│ ├── repository/ # Implementasi akses data (PostgreSQL, dsb)
-│ └── usecase/ # Bisnis logic / interactor
-├── tests/ # Unit & integration test
-└── go.mod / go.sum # Dependency & module management
-
----
-
 ## 🛠️ Build & Jalankan
 
 ### 1. Clone Repo
